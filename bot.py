@@ -28,7 +28,17 @@ async def cmd_play(message: types.Message):
 
 @dp.message()
 async def handle_text(message: types.Message):
-    await message.answer(f"Ты написал: {message.text}. Пока я не понимаю команд, используй /play")
+    text = message.text
+    
+    # Обрабатываем кнопки (с эмодзи или без)
+    if "Работать" in text or text == "💼 Работать":
+        await message.answer("💼 Поработал. +1500₽, -30 энергии")
+    elif "Есть" in text or text == "🍜 Есть":
+        await message.answer("🍜 Поел. +20 энергии, -200₽")
+    elif "Спать" in text or "спать" in text.lower():
+        await message.answer("😴 Новый день! Энергия восстановлена")
+    else:
+        await message.answer("Используй кнопки или /play")
 
 async def main():
     await dp.start_polling(bot)
