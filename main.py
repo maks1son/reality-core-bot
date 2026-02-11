@@ -84,162 +84,516 @@ async def root():
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>RE:ALITY: Core</title>
         <script src="https://telegram.org/js/telegram-web-app.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
         <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-                color: white;
-                padding: 20px;
+            * { 
+                margin: 0; 
+                padding: 0; 
+                box-sizing: border-box; 
+                image-rendering: pixelated;
+                image-rendering: crisp-edges;
             }
-            .container { max-width: 400px; margin: 0 auto; }
+            
+            :root {
+                --bg-color: #2d1b4e;
+                --panel-bg: #1a0f2e;
+                --border-color: #4a3b6b;
+                --accent: #ff6b9d;
+                --accent-dark: #c44569;
+                --success: #4ecdc4;
+                --warning: #ffe66d;
+                --danger: #ff6b6b;
+                --text: #f7f1e3;
+                --shadow: 4px 4px 0px #1a0f2e;
+            }
+            
+            body {
+                font-family: 'Press Start 2P', cursive;
+                background: var(--bg-color);
+                min-height: 100vh;
+                color: var(--text);
+                padding: 15px;
+                font-size: 10px;
+                line-height: 1.6;
+            }
+            
+            .container { 
+                max-width: 380px; 
+                margin: 0 auto; 
+            }
+            
             .hidden { display: none !important; }
             
-            /* Экран создания персонажа */
-            .create-screen { text-align: center; }
-            .create-screen h1 { margin-bottom: 10px; }
-            .create-screen h2 { margin: 20px 0 10px; font-size: 18px; }
+            /* Пиксельные боксы */
+            .pixel-box {
+                background: var(--panel-bg);
+                border: 4px solid var(--border-color);
+                box-shadow: var(--shadow);
+                position: relative;
+            }
             
+            .pixel-box::before {
+                content: '';
+                position: absolute;
+                top: -4px; left: -4px; right: -4px; bottom: -4px;
+                border: 2px solid var(--accent);
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.2s;
+            }
+            
+            .pixel-box:hover::before {
+                opacity: 1;
+            }
+            
+            /* Экран создания */
+            .create-screen { text-align: center; }
+            
+            .create-screen h1 { 
+                font-size: 16px; 
+                color: var(--accent);
+                text-shadow: 3px 3px 0px var(--accent-dark);
+                margin-bottom: 15px;
+                animation: blink 2s infinite;
+            }
+            
+            @keyframes blink {
+                0%, 50% { opacity: 1; }
+                51%, 100% { opacity: 0.8; }
+            }
+            
+            .create-screen h2 { 
+                font-size: 10px; 
+                color: var(--warning);
+                margin: 20px 0 10px;
+            }
+            
+            /* Аватары пиксельные */
             .avatars {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                gap: 10px;
+                gap: 8px;
                 margin: 15px 0;
             }
-            .avatar-option {
-                font-size: 40px;
-                padding: 10px;
-                background: rgba(255,255,255,0.1);
-                border-radius: 15px;
-                cursor: pointer;
-                transition: all 0.3s;
-                border: 3px solid transparent;
-            }
-            .avatar-option:hover { background: rgba(255,255,255,0.2); }
-            .avatar-option.selected { border-color: #4CAF50; background: rgba(76,175,80,0.3); }
             
+            .avatar-option {
+                font-size: 32px;
+                padding: 15px 10px;
+                background: var(--panel-bg);
+                border: 4px solid var(--border-color);
+                box-shadow: var(--shadow);
+                cursor: pointer;
+                transition: all 0.1s;
+                image-rendering: pixelated;
+            }
+            
+            .avatar-option:hover { 
+                transform: translate(-2px, -2px);
+                box-shadow: 6px 6px 0px #1a0f2e;
+                border-color: var(--accent);
+            }
+            
+            .avatar-option.selected { 
+                border-color: var(--success);
+                background: #0f3d3e;
+                box-shadow: inset 4px 4px 0px #000;
+                transform: translate(2px, 2px);
+            }
+            
+            /* Пиксельный инпут */
             .name-input {
                 width: 100%;
                 padding: 15px;
-                border-radius: 15px;
-                border: none;
-                font-size: 16px;
+                font-family: 'Press Start 2P', cursive;
+                font-size: 10px;
+                background: var(--panel-bg);
+                border: 4px solid var(--border-color);
+                box-shadow: var(--shadow);
+                color: var(--text);
                 margin: 10px 0;
-                background: rgba(255,255,255,0.1);
-                color: white;
+                outline: none;
             }
-            .name-input::placeholder { color: rgba(255,255,255,0.5); }
             
+            .name-input:focus {
+                border-color: var(--accent);
+            }
+            
+            .name-input::placeholder { 
+                color: #6b5b8a; 
+            }
+            
+            /* Статистики создания */
             .stats-create {
-                background: rgba(255,255,255,0.1);
-                border-radius: 15px;
+                background: var(--panel-bg);
+                border: 4px solid var(--border-color);
+                box-shadow: var(--shadow);
                 padding: 15px;
                 margin: 15px 0;
             }
+            
             .stat-row-create {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin: 10px 0;
+                margin: 12px 0;
+                font-size: 8px;
             }
+            
+            .stat-name {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .stat-icon {
+                font-size: 16px;
+            }
+            
             .stat-controls {
                 display: flex;
                 align-items: center;
-                gap: 15px;
+                gap: 10px;
             }
-            .stat-btn {
-                width: 30px;
-                height: 30px;
-                border-radius: 50%;
-                border: none;
-                background: #4CAF50;
-                color: white;
-                font-size: 18px;
-                cursor: pointer;
-            }
-            .stat-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-            .stat-value { font-size: 20px; font-weight: bold; min-width: 30px; }
-            .points-left { margin-top: 15px; font-size: 18px; color: #FFD700; }
             
-            .create-btn {
-                width: 100%;
-                padding: 18px;
-                margin-top: 20px;
-                background: #4CAF50;
+            .stat-btn {
+                width: 28px;
+                height: 28px;
+                font-family: 'Press Start 2P', cursive;
+                font-size: 12px;
+                background: var(--accent);
                 border: none;
-                border-radius: 15px;
+                box-shadow: 3px 3px 0px var(--accent-dark);
                 color: white;
-                font-size: 18px;
                 cursor: pointer;
+                transition: all 0.1s;
             }
-            .create-btn:disabled { opacity: 0.5; }
+            
+            .stat-btn:active {
+                transform: translate(2px, 2px);
+                box-shadow: 1px 1px 0px var(--accent-dark);
+            }
+            
+            .stat-btn:disabled { 
+                opacity: 0.3; 
+                cursor: not-allowed;
+                box-shadow: none;
+            }
+            
+            .stat-value { 
+                font-size: 12px; 
+                min-width: 25px;
+                color: var(--success);
+            }
+            
+            .points-left { 
+                margin-top: 15px; 
+                font-size: 10px; 
+                color: var(--warning);
+                text-align: center;
+                padding: 10px;
+                background: rgba(255, 230, 109, 0.1);
+                border: 2px dashed var(--warning);
+            }
+            
+            /* Пиксельная кнопка */
+            .pixel-btn {
+                width: 100%;
+                padding: 20px;
+                margin-top: 20px;
+                font-family: 'Press Start 2P', cursive;
+                font-size: 12px;
+                background: var(--success);
+                border: none;
+                box-shadow: 4px 4px 0px #2d8b84;
+                color: #1a0f2e;
+                cursor: pointer;
+                transition: all 0.1s;
+                text-transform: uppercase;
+            }
+            
+            .pixel-btn:hover {
+                transform: translate(-2px, -2px);
+                box-shadow: 6px 6px 0px #2d8b84;
+            }
+            
+            .pixel-btn:active {
+                transform: translate(2px, 2px);
+                box-shadow: 2px 2px 0px #2d8b84;
+            }
+            
+            .pixel-btn:disabled { 
+                opacity: 0.4;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: 4px 4px 0px #2d8b84;
+                background: #6b5b8a;
+            }
             
             /* Экран игры */
             .game-screen { }
-            .header { text-align: center; margin-bottom: 20px; }
-            .header h1 { font-size: 24px; margin-bottom: 5px; }
-            .character-bar {
+            
+            .header { 
+                text-align: center; 
+                margin-bottom: 15px; 
+            }
+            
+            .header h1 { 
+                font-size: 14px; 
+                color: var(--accent);
+                text-shadow: 2px 2px 0px var(--accent-dark);
+            }
+            
+            .day-counter {
+                font-size: 10px;
+                color: var(--warning);
+                margin-top: 5px;
+            }
+            
+            /* Карточка персонажа */
+            .character-card {
                 display: flex;
                 align-items: center;
-                gap: 15px;
-                background: rgba(255,255,255,0.1);
-                padding: 15px;
-                border-radius: 15px;
-                margin-bottom: 20px;
+                                gap: 12px;
+                background: var(--panel-bg);
+                border: 4px solid var(--border-color);
+                box-shadow: var(--shadow);
+                padding: 12px;
+                margin-bottom: 15px;
             }
-            .character-avatar { font-size: 50px; }
-            .character-info { flex: 1; }
-            .character-name { font-size: 20px; font-weight: bold; }
-            .character-stats { font-size: 12px; opacity: 0.8; margin-top: 5px; }
             
-            .stats {
-                background: rgba(255,255,255,0.1);
-                border-radius: 15px;
+            .character-avatar { 
+                font-size: 40px;
+                width: 60px;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #0f3d3e;
+                border: 3px solid var(--success);
+                image-rendering: pixelated;
+            }
+            
+            .character-info { flex: 1; }
+            
+            .character-name { 
+                font-size: 12px; 
+                color: var(--accent);
+                margin-bottom: 5px;
+            }
+            
+            .character-stats { 
+                font-size: 8px; 
+                color: #8b7cb0;
+                line-height: 1.8;
+            }
+            
+            /* Статус бар */
+            .status-panel {
+                background: var(--panel-bg);
+                border: 4px solid var(--border-color);
+                box-shadow: var(--shadow);
                 padding: 15px;
                 margin-bottom: 15px;
             }
+            
             .stat-row {
                 display: flex;
                 justify-content: space-between;
-                margin: 8px 0;
-                font-size: 16px;
+                align-items: center;
+                margin: 10px 0;
+                font-size: 10px;
             }
             
-            .actions { display: grid; gap: 10px; }
-            .btn {
-                background: rgba(255,255,255,0.2);
-                border: none;
+            .stat-label {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .stat-bar {
+                width: 100px;
+                height: 12px;
+                background: #1a0f2e;
+                border: 2px solid var(--border-color);
+                position: relative;
+            }
+            
+            .stat-bar-fill {
+                height: 100%;
+                background: var(--success);
+                transition: width 0.3s;
+                box-shadow: inset 0 0 0 2px rgba(255,255,255,0.2);
+            }
+            
+            .stat-bar-fill.low { background: var(--danger); }
+            .stat-bar-fill.medium { background: var(--warning); }
+            
+            .stat-text {
+                font-size: 10px;
+                min-width: 60px;
+                text-align: right;
+            }
+            
+            /* Кнопки действий */
+            .actions { 
+                display: grid; 
+                gap: 10px; 
+            }
+            
+            .action-btn {
+                display: flex;
+                align-items: center;
+                gap: 12px;
                 padding: 15px;
-                border-radius: 12px;
-                color: white;
-                font-size: 16px;
+                font-family: 'Press Start 2P', cursive;
+                font-size: 10px;
+                background: var(--panel-bg);
+                border: 4px solid var(--border-color);
+                box-shadow: var(--shadow);
+                color: var(--text);
                 cursor: pointer;
-                transition: all 0.3s;
+                transition: all 0.1s;
+                text-align: left;
             }
-            .btn:hover { background: rgba(255,255,255,0.3); }
-            .btn-primary { background: #4CAF50; }
-            .btn:disabled { opacity: 0.4; cursor: not-allowed; }
             
-            .log {
+            .action-btn:hover {
+                transform: translate(-2px, -2px);
+                box-shadow: 6px 6px 0px #1a0f2e;
+                border-color: var(--accent);
+            }
+            
+            .action-btn:active {
+                transform: translate(2px, 2px);
+                box-shadow: 2px 2px 0px #1a0f2e;
+            }
+            
+            .action-btn:disabled { 
+                opacity: 0.4;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: var(--shadow);
+                border-color: #3d2f5a;
+            }
+            
+            .action-btn.primary {
+                background: #0f3d3e;
+                border-color: var(--success);
+            }
+            
+            .action-btn.primary:hover {
+                border-color: #6ee8df;
+            }
+            
+            .action-icon {
+                font-size: 24px;
+                width: 40px;
+                text-align: center;
+            }
+            
+            .action-info {
+                flex: 1;
+            }
+            
+            .action-name {
+                display: block;
+                margin-bottom: 4px;
+            }
+            
+            .action-desc {
+                font-size: 8px;
+                color: #8b7cb0;
+            }
+            
+            /* Лог */
+            .log-panel {
                 margin-top: 15px;
-                padding: 15px;
-                background: rgba(0,0,0,0.2);
-                border-radius: 12px;
-                min-height: 80px;
-                max-height: 150px;
+                background: var(--panel-bg);
+                border: 4px solid var(--border-color);
+                box-shadow: var(--shadow);
+                padding: 12px;
+                min-height: 100px;
+                max-height: 140px;
                 overflow-y: auto;
             }
-            .log p { margin: 5px 0; font-size: 14px; }
+            
+            .log-entry {
+                margin: 8px 0;
+                padding: 8px;
+                background: rgba(0,0,0,0.3);
+                border-left: 3px solid var(--accent);
+                font-size: 8px;
+                line-height: 1.6;
+                animation: slideIn 0.3s;
+            }
+            
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+            
+            .log-time {
+                color: #6b5b8a;
+                font-size: 7px;
+                margin-bottom: 3px;
+            }
+            
+            .log-success { border-left-color: var(--success); }
+            .log-warning { border-left-color: var(--warning); }
+            .log-danger { border-left-color: var(--danger); }
+            
+            /* Скроллбар пиксельный */
+            ::-webkit-scrollbar {
+                width: 12px;
+            }
+            
+            ::-webkit-scrollbar-track {
+                background: var(--panel-bg);
+                border: 2px solid var(--border-color);
+            }
+            
+            ::-webkit-scrollbar-thumb {
+                background: var(--accent);
+                border: 2px solid var(--panel-bg);
+            }
+            
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--accent-dark);
+            }
+            
+            /* Анимации */
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-3px); }
+                75% { transform: translateX(3px); }
+            }
+            
+            .shake {
+                animation: shake 0.3s;
+            }
+            
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+            }
+            
+            .pulse {
+                animation: pulse 0.5s;
+            }
         </style>
     </head>
     <body>
         <!-- Экран создания персонажа -->
         <div class="container create-screen" id="createScreen">
-            <h1>🎮 RE:ALITY: Core</h1>
-            <p>Создай своего персонажа</p>
+            <h1>◆ RE:ALITY: CORE ◆</h1>
+            <p style="font-size: 8px; color: #8b7cb0;">CREATE YOUR CHARACTER</p>
             
-            <h2>Выбери аватар</h2>
+            <h2>◆ SELECT AVATAR ◆</h2>
             <div class="avatars" id="avatars">
                 <div class="avatar-option" data-avatar="👨">👨</div>
                 <div class="avatar-option" data-avatar="👩">👩</div>
@@ -251,13 +605,16 @@ async def root():
                 <div class="avatar-option" data-avatar="👨‍🦲">👨‍🦲</div>
             </div>
             
-            <h2>Имя персонажа</h2>
-            <input type="text" class="name-input" id="charName" placeholder="Введи имя..." maxlength="15">
+            <h2>◆ ENTER NAME ◆</h2>
+            <input type="text" class="name-input" id="charName" placeholder="..." maxlength="12">
             
-            <h2>Распредели очки (15)</h2>
+            <h2>◆ DISTRIBUTE POINTS ◆</h2>
             <div class="stats-create">
                 <div class="stat-row-create">
-                    <span>💪 Сила (доход от работы)</span>
+                    <span class="stat-name">
+                        <span class="stat-icon">💪</span>
+                        <span>STR</span>
+                    </span>
                     <div class="stat-controls">
                         <button class="stat-btn" onclick="changeStat('strength', -1)">-</button>
                         <span class="stat-value" id="strength">5</span>
@@ -265,7 +622,10 @@ async def root():
                     </div>
                 </div>
                 <div class="stat-row-create">
-                    <span>🧠 Интеллект (скорость обучения)</span>
+                    <span class="stat-name">
+                        <span class="stat-icon">🧠</span>
+                        <span>INT</span>
+                    </span>
                     <div class="stat-controls">
                         <button class="stat-btn" onclick="changeStat('intelligence', -1)">-</button>
                         <span class="stat-value" id="intelligence">5</span>
@@ -273,7 +633,10 @@ async def root():
                     </div>
                 </div>
                 <div class="stat-row-create">
-                    <span>✨ Харизма (социальные бонусы)</span>
+                    <span class="stat-name">
+                        <span class="stat-icon">✨</span>
+                        <span>CHA</span>
+                    </span>
                     <div class="stat-controls">
                         <button class="stat-btn" onclick="changeStat('charisma', -1)">-</button>
                         <span class="stat-value" id="charisma">5</span>
@@ -281,65 +644,99 @@ async def root():
                     </div>
                 </div>
                 <div class="stat-row-create">
-                    <span>🍀 Удача (случайные бонусы)</span>
+                    <span class="stat-name">
+                        <span class="stat-icon">🍀</span>
+                        <span>LCK</span>
+                    </span>
                     <div class="stat-controls">
                         <button class="stat-btn" onclick="changeStat('luck', -1)">-</button>
                         <span class="stat-value" id="luck">5</span>
                         <button class="stat-btn" onclick="changeStat('luck', 1)">+</button>
                     </div>
                 </div>
-                <div class="points-left">Осталось очков: <span id="pointsLeft">0</span></div>
+                <div class="points-left">
+                    POINTS: <span id="pointsLeft">0</span>/20
+                </div>
             </div>
             
-            <button class="create-btn" id="createBtn" onclick="createCharacter()" disabled>
-                Начать игру
+            <button class="pixel-btn" id="createBtn" onclick="createCharacter()" disabled>
+                START GAME ▶
             </button>
         </div>
         
         <!-- Экран игры -->
         <div class="container game-screen hidden" id="gameScreen">
             <div class="header">
-                <h1>🎮 RE:ALITY: Core</h1>
-                <p>День <span id="day">1</span></p>
+                <h1>◆ RE:ALITY: CORE ◆</h1>
+                <div class="day-counter">DAY <span id="day">1</span></div>
             </div>
             
-            <div class="character-bar">
+            <div class="character-card">
                 <div class="character-avatar" id="gameAvatar">👨</div>
                 <div class="character-info">
-                    <div class="character-name" id="gameName">Игрок</div>
-                    <div class="character-stats" id="gameStats">💪5 🧠5 ✨5 🍀5</div>
+                    <div class="character-name" id="gameName">PLAYER</div>
+                    <div class="character-stats" id="gameStats">
+                        STR:5 INT:5 CHA:5 LCK:5
+                    </div>
                 </div>
             </div>
             
-            <div class="stats">
+            <div class="status-panel">
                 <div class="stat-row">
-                    <span>💰 Деньги</span>
-                    <span id="money">5000 ₽</span>
+                    <span class="stat-label">
+                        <span>💰</span>
+                        <span>MONEY</span>
+                    </span>
+                    <span class="stat-text" id="moneyText">5000₽</span>
                 </div>
                 <div class="stat-row">
-                    <span>⚡ Энергия</span>
-                    <span id="energy">100%</span>
+                    <span class="stat-label">
+                        <span>⚡</span>
+                        <span>ENERGY</span>
+                    </span>
+                    <div class="stat-bar">
+                        <div class="stat-bar-fill" id="energyBar" style="width: 100%"></div>
+                    </div>
+                    <span class="stat-text" id="energyText">100%</span>
                 </div>
                 <div class="stat-row">
-                    <span>📅 Действий</span>
-                    <span id="actions">3/3</span>
+                    <span class="stat-label">
+                        <span>📅</span>
+                        <span>ACTIONS</span>
+                    </span>
+                    <span class="stat-text" id="actionsText">3/3</span>
                 </div>
             </div>
             
             <div class="actions">
-                <button class="btn btn-primary" id="btn-work" onclick="doAction('work')">
-                    💼 Работать (+1500₽)
+                <button class="action-btn primary" id="btn-work" onclick="doAction('work')">
+                    <span class="action-icon">💼</span>
+                    <span class="action-info">
+                        <span class="action-name">WORK</span>
+                        <span class="action-desc">+1500₽ / -30⚡</span>
+                    </span>
                 </button>
-                <button class="btn" id="btn-eat" onclick="doAction('eat')">
-                    🍜 Есть (+20⚡, -200₽)
+                <button class="action-btn" id="btn-eat" onclick="doAction('eat')">
+                    <span class="action-icon">🍜</span>
+                    <span class="action-info">
+                        <span class="action-name">EAT</span>
+                        <span class="action-desc">+20⚡ / -200₽</span>
+                    </span>
                 </button>
-                <button class="btn" id="btn-sleep" onclick="doAction('sleep')">
-                    😴 Спать (новый день)
+                <button class="action-btn" id="btn-sleep" onclick="doAction('sleep')">
+                    <span class="action-icon">😴</span>
+                    <span class="action-info">
+                        <span class="action-name">SLEEP</span>
+                        <span class="action-desc">NEW DAY / -700₽</span>
+                    </span>
                 </button>
             </div>
             
-            <div class="log" id="log">
-                <p>Загрузка...</p>
+            <div class="log-panel" id="log">
+                <div class="log-entry">
+                    <div class="log-time">--:--</div>
+                    <div>WELCOME TO RE:ALITY...</div>
+                </div>
             </div>
         </div>
         
@@ -363,6 +760,8 @@ async def root():
                     document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
                     this.classList.add('selected');
                     selectedAvatar = this.dataset.avatar;
+                    this.classList.add('pulse');
+                    setTimeout(() => this.classList.remove('pulse'), 500);
                     checkCreateButton();
                 };
             });
@@ -386,7 +785,6 @@ async def root():
                 let left = MAX_POINTS - total;
                 document.getElementById('pointsLeft').textContent = left;
                 
-                // Блокируем кнопки + если нет очков
                 document.querySelectorAll('.stat-btn').forEach(btn => {
                     if (btn.textContent === '+' && left <= 0) {
                         btn.disabled = true;
@@ -439,33 +837,60 @@ async def root():
                 
                 if (character) {
                     document.getElementById('gameAvatar').textContent = character.avatar || '👨';
-                    document.getElementById('gameName').textContent = character.name || 'Игрок';
+                    document.getElementById('gameName').textContent = (character.name || 'PLAYER').toUpperCase();
                     document.getElementById('gameStats').textContent = 
-                        `💪${character.strength} 🧠${character.intelligence} ✨${character.charisma} 🍀${character.luck}`;
+                        `STR:${character.strength} INT:${character.intelligence} CHA:${character.charisma} LCK:${character.luck}`;
                 }
                 
                 updateDisplay();
-                log('Добро пожаловать в RE:ALITY!');
+                log('WELCOME TO THE SIMULATION...', 'success');
             }
             
             function updateDisplay() {
-                document.getElementById('money').textContent = gameState.money + ' ₽';
-                document.getElementById('energy').textContent = gameState.energy + '%';
+                document.getElementById('moneyText').textContent = gameState.money + '₽';
                 document.getElementById('day').textContent = gameState.day;
-                document.getElementById('actions').textContent = gameState.actions + '/3';
+                document.getElementById('actionsText').textContent = gameState.actions + '/3';
                 
+                let energyPercent = gameState.energy;
+                let energyBar = document.getElementById('energyBar');
+                energyBar.style.width = energyPercent + '%';
+                document.getElementById('energyText').textContent = energyPercent + '%';
+                
+                // Цвет энергии
+                energyBar.className = 'stat-bar-fill';
+                if (energyPercent <= 30) energyBar.classList.add('low');
+                else if (energyPercent <= 60) energyBar.classList.add('medium');
+                
+                // Кнопки
                 document.getElementById('btn-work').disabled = gameState.actions <= 0 || gameState.energy < 30;
                 document.getElementById('btn-eat').disabled = gameState.actions <= 0;
             }
             
-            function log(msg) {
+            function log(msg, type = '') {
                 let logDiv = document.getElementById('log');
-                let p = document.createElement('p');
-                p.textContent = new Date().toLocaleTimeString() + ': ' + msg;
-                logDiv.insertBefore(p, logDiv.firstChild);
+                let entry = document.createElement('div');
+                entry.className = 'log-entry log-' + type;
+                
+                let time = new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit'});
+                
+                entry.innerHTML = `
+                    <div class="log-time">${time}</div>
+                    <div>${msg}</div>
+                `;
+                
+                logDiv.insertBefore(entry, logDiv.firstChild);
+                
+                // Ограничиваем количество записей
+                while (logDiv.children.length > 10) {
+                    logDiv.removeChild(logDiv.lastChild);
+                }
             }
             
             async function doAction(action) {
+                let btn = document.getElementById('btn-' + action);
+                btn.classList.add('shake');
+                setTimeout(() => btn.classList.remove('shake'), 300);
+                
                 let response = await fetch('/api/action', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -476,24 +901,27 @@ async def root():
                 if (result.success) {
                     gameState = result.state;
                     updateDisplay();
-                    log(result.message);
+                    
+                    let type = 'success';
+                    if (result.message.includes('Новый день')) type = 'warning';
+                    if (result.message.includes('❌')) type = 'danger';
+                    
+                    log(result.message.toUpperCase(), type);
                 } else {
-                    log('❌ ' + result.message);
+                    log('❌ ' + result.message.toUpperCase(), 'danger');
                 }
             }
             
-            // Проверяем, есть ли персонаж
+            // Инициализация
             async function init() {
                 let response = await fetch(`/api/state?user_id=${userId}`);
                 let data = await response.json();
                 
                 if (data.character) {
-                    // Персонаж есть — сразу в игру
                     document.getElementById('createScreen').classList.add('hidden');
                     document.getElementById('gameScreen').classList.remove('hidden');
                     loadGame();
                 } else {
-                    // Нет персонажа — показываем создание
                     updatePoints();
                 }
             }
