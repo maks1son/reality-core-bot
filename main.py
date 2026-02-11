@@ -2,24 +2,34 @@ import os
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from database import init_db, get_user, save_user
+from database import init_db, get_user, save_user, get_character, save_character
 
 app = FastAPI()
 
-# Инициализация базы при старте
 init_db()
-
-# Статические файлы
 os.makedirs("static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Получение данных пользователя
 @app.get("/api/state")
 async def get_state(user_id: int):
-    state = get_user(user_id)
-    return state
+    user = get_user(user_id)
+    character = get_character(user_id)
+    return {'user': user, 'character': character}
 
-# Сохранение действия
+@app.post("/api/character")
+async def create_character(request: Request):
+    data = await request.json()
+    save_character(
+        data['user_id'],
+        data['name'],
+        data['avatar'],
+        data['strength'],
+        data['intelligence'],
+        data['charisma'],
+        data['luck']
+    )
+    return {'success': True}
+
 @app.post("/api/action")
 async def do_action(request: Request):
     data = await request.json()
@@ -27,13 +37,25 @@ async def do_action(request: Request):
     action = data.get('action')
     
     user = get_user(user_id)
+    character = get_character(user_id)
+    
+    # Бонусы от характеристик
+    work_bonus = character['strength'] * 50 if character else 0
+    luck_chance = character['luck'] * 0.02 if character else 0
+    
+    import random
+    lucky = random.random() < luck_chance
     
     if action == 'work' and user['actions'] > 0 and user['energy'] >= 30:
-        user['money'] += 1500
+        bonus = work_bonus if lucky else 0
+        user['money'] += 1500 + bonus
         user['energy'] -= 30
         user['actions'] -= 1
         save_user(user_id, user['money'], user['energy'], user['day'], user['actions'])
-        return {'success': True, 'message': 'Поработал. +1500₽, -30⚡', 'state': user}
+        msg = f'Поработал. +{1500 + bonus}₽, -30⚡'
+        if lucky:
+            msg += ' 💎 Бонус за силу!'
+        return {'success': True, 'message': msg, 'state': user}
     
     elif action == 'eat' and user['actions'] > 0:
         user['money'] -= 200
@@ -46,13 +68,12 @@ async def do_action(request: Request):
         user['day'] += 1
         user['energy'] = 100
         user['actions'] = 3
-        user['money'] -= 700  # аренда + еда
+        user['money'] -= 700
         save_user(user_id, user['money'], user['energy'], user['day'], user['actions'])
         return {'success': True, 'message': 'Новый день! Расходы: 700₽', 'state': user}
     
     return {'success': False, 'message': 'Недостаточно действий или энергии'}
 
-# Главная страница Mini App
 @app.get("/", response_class=HTMLResponse)
 async def root():
     return """
@@ -73,143 +94,54 @@ async def root():
                 padding: 20px;
             }
             .container { max-width: 400px; margin: 0 auto; }
-            .header { text-align: center; margin-bottom: 30px; }
-            .header h1 { font-size: 28px; margin-bottom: 10px; }
-            .stats {
+            .hidden { display: none !important; }
+            
+            /* Экран создания персонажа */
+            .create-screen { text-align: center; }
+            .create-screen h1 { margin-bottom: 10px; }
+            .create-screen h2 { margin: 20px 0 10px; font-size: 18px; }
+            
+            .avatars {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+                margin: 15px 0;
+            }
+            .avatar-option {
+                font-size: 40px;
+                padding: 10px;
                 background: rgba(255,255,255,0.1);
-                border-radius: 20px;
-                padding: 20px;
-                margin-bottom: 20px;
-                backdrop-filter: blur(10px);
-            }
-            .stat-row {
-                display: flex;
-                justify-content: space-between;
-                margin: 10px 0;
-                font-size: 18px;
-            }
-            .actions { display: grid; gap: 10px; }
-            .btn {
-                background: rgba(255,255,255,0.2);
-                border: none;
-                padding: 15px 20px;
                 border-radius: 15px;
-                color: white;
-                font-size: 16px;
                 cursor: pointer;
                 transition: all 0.3s;
+                border: 3px solid transparent;
             }
-            .btn:hover { background: rgba(255,255,255,0.3); }
-            .btn-primary { background: #4CAF50; }
-            .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-            .log {
-                margin-top: 20px;
+            .avatar-option:hover { background: rgba(255,255,255,0.2); }
+            .avatar-option.selected { border-color: #4CAF50; background: rgba(76,175,80,0.3); }
+            
+            .name-input {
+                width: 100%;
                 padding: 15px;
-                background: rgba(0,0,0,0.2);
-                border-radius: 10px;
-                min-height: 100px;
+                border-radius: 15px;
+                border: none;
+                font-size: 16px;
+                margin: 10px 0;
+                background: rgba(255,255,255,0.1);
+                color: white;
             }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>🎮 RE:ALITY: Core</h1>
-                <p>День <span id="day">1</span></p>
-            </div>
+            .name-input::placeholder { color: rgba(255,255,255,0.5); }
             
-            <div class="stats">
-                <div class="stat-row">
-                    <span>💰 Деньги</span>
-                    <span id="money">5000 ₽</span>
-                </div>
-                <div class="stat-row">
-                    <span>⚡ Энергия</span>
-                    <span id="energy">100%</span>
-                </div>
-                <div class="stat-row">
-                    <span>📅 Действий</span>
-                    <span id="actions">3/3</span>
-                </div>
-            </div>
-            
-            <div class="actions">
-                <button class="btn btn-primary" id="btn-work" onclick="doAction('work')">
-                    💼 Работать
-                </button>
-                <button class="btn" id="btn-eat" onclick="doAction('eat')">
-                    🍜 Есть
-                </button>
-                <button class="btn" id="btn-sleep" onclick="doAction('sleep')">
-                    😴 Спать
-                </button>
-            </div>
-            
-            <div class="log" id="log">
-                <p>Загрузка...</p>
-            </div>
-        </div>
-        
-        <script>
-            let tg = window.Telegram.WebApp;
-            tg.expand();
-            
-            let userId = tg.initDataUnsafe?.user?.id || 1;
-            let gameState = {};
-            
-            async function loadState() {
-                try {
-                    let response = await fetch(`/api/state?user_id=${userId}`);
-                    gameState = await response.json();
-                    updateDisplay();
-                    log('Добро пожаловать! День ' + gameState.day);
-                } catch(e) {
-                    log('Ошибка загрузки: ' + e.message);
-                }
+            .stats-create {
+                background: rgba(255,255,255,0.1);
+                border-radius: 15px;
+                padding: 15px;
+                margin: 15px 0;
             }
-            
-            function updateDisplay() {
-                document.getElementById('money').textContent = gameState.money + ' ₽';
-                document.getElementById('energy').textContent = gameState.energy + '%';
-                document.getElementById('day').textContent = gameState.day;
-                document.getElementById('actions').textContent = gameState.actions + '/3';
-                
-                // Блокируем кнопки если нет действий
-                document.getElementById('btn-work').disabled = gameState.actions <= 0 || gameState.energy < 30;
-                document.getElementById('btn-eat').disabled = gameState.actions <= 0;
+            .stat-row-create {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 10px 0;
             }
-            
-            function log(message) {
-                let logDiv = document.getElementById('log');
-                let p = document.createElement('p');
-                p.textContent = new Date().toLocaleTimeString() + ': ' + message;
-                logDiv.insertBefore(p, logDiv.firstChild);
-            }
-            
-            async function doAction(action) {
-                try {
-                    let response = await fetch('/api/action', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({user_id: userId, action: action})
-                    });
-                    let result = await response.json();
-                    
-                    if (result.success) {
-                        gameState = result.state;
-                        updateDisplay();
-                        log(result.message);
-                    } else {
-                        log('❌ ' + result.message);
-                    }
-                } catch(e) {
-                    log('Ошибка: ' + e.message);
-                }
-            }
-            
-            // Загружаем состояние при старте
-            loadState();
-        </script>
-    </body>
-    </html>
-    """
+            .stat-controls {
+                display
