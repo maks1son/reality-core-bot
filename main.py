@@ -544,24 +544,18 @@ async def root():
                 
                 <div class="heroes-trio">
                     <!-- СЛОТ 1 -->
-                    <div class="hero-slot" data-avatar="🧍‍♂️" data-slot="1">
-                        <span class="slot-number">1</span>
-                        <div class="hero-preview" id="slot1">🧍‍♂️</div>
-                        <div class="slot-label">HERO 1</div>
+                    <div class="hero-preview" id="slot1">
+                        <img src="/hero1.png" width="64" height="64" style="image-rendering: pixelated;">
                     </div>
                     
                     <!-- СЛОТ 2 -->
-                    <div class="hero-slot" data-avatar="🧍‍♀️" data-slot="2">
-                        <span class="slot-number">2</span>
-                        <div class="hero-preview" id="slot2">🧍‍♀️</div>
-                        <div class="slot-label">HERO 2</div>
+                    <div class="hero-preview" id="slot2">
+                        <img src="/hero2.png" width="64" height="64" style="image-rendering: pixelated;">
                     </div>
                     
                     <!-- СЛОТ 3 -->
-                    <div class="hero-slot" data-avatar="🧑" data-slot="3">
-                        <span class="slot-number">3</span>
-                        <div class="hero-preview" id="slot3">🧑</div>
-                        <div class="slot-label">HERO 3</div>
+                    <div class="hero-preview" id="slot3">
+                        <img src="/hero3.png" width="64" height="64" style="image-rendering: pixelated;">
                     </div>
                 </div>
                 
@@ -628,10 +622,9 @@ async def root():
             
             <!-- ОГРОМНЫЙ ПЕРСОНАЖ -->
             <div class="hero-stage">
-                <div class="shadow-platform"></div>
-                <div class="hero-giant" id="gAvatar">🧍‍♂️</div>
-                <div class="hero-badge" id="gName">HERO</div>
-                <div class="hero-stats-row">
+                <div class="hero-giant" id="gAvatar">
+                    <img src="/hero1.png" width="140" height="140" style="image-rendering: pixelated;" id="gameHero">
+                </div>
                     <span class="h-stat">💪<span id="gStr">5</span></span>
                     <span class="h-stat">🧠<span id="gInt">5</span></span>
                     <span class="h-stat">✨<span id="gCha">5</span></span>
