@@ -7,8 +7,8 @@ from database import init_db, get_user, save_user, get_character, save_character
 app = FastAPI()
 
 init_db()
-os.makedirs("static", exist_ok=True)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Убираем static, используем корень для картинок
+app.mount("/", StaticFiles(directory=".", html=True), name="root")
 
 @app.get("/api/state")
 async def get_state(user_id: int):
@@ -39,22 +39,16 @@ async def do_action(request: Request):
     user = get_user(user_id)
     character = get_character(user_id)
     
-    # Бонусы от характеристик
     work_bonus = character['strength'] * 50 if character else 0
-    luck_chance = character['luck'] * 0.02 if character else 0
-    
-    import random
-    lucky = random.random() < luck_chance
     
     if action == 'work' and user['actions'] > 0 and user['energy'] >= 30:
-        bonus = work_bonus if lucky else 0
-        user['money'] += 1500 + bonus
+        user['money'] += 1500 + work_bonus
         user['energy'] -= 30
         user['actions'] -= 1
         save_user(user_id, user['money'], user['energy'], user['day'], user['actions'])
-        msg = f'Поработал. +{1500 + bonus}₽, -30⚡'
-        if lucky:
-            msg += ' 💎 Бонус за силу!'
+        msg = f'Поработал. +{1500 + work_bonus}₽, -30⚡'
+        if work_bonus > 0:
+            msg += ' 💎 Бонус!'
         return {'success': True, 'message': msg, 'state': user}
     
     elif action == 'eat' and user['actions'] > 0:
@@ -72,7 +66,7 @@ async def do_action(request: Request):
         save_user(user_id, user['money'], user['energy'], user['day'], user['actions'])
         return {'success': True, 'message': 'Новый день! Расходы: 700₽', 'state': user}
     
-    return {'success': False, 'message': 'Недостаточно действий или энергии'}
+    return {'success': False, 'message': 'Недостаточно действий'}
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -133,7 +127,7 @@ async def root():
                 box-shadow: 3px 3px 0px #000;
             }
             
-            /* ===== СОЗДАНИЕ - 3 ПЕРСОНАЖА ===== */
+            /* ===== СОЗДАНИЕ ===== */
             .create-screen {
                 display: flex;
                 flex-direction: column;
@@ -217,25 +211,24 @@ async def root():
             }
             
             .hero-preview {
-                font-size: 64px;
-                line-height: 1;
+                width: 64px;
+                height: 64px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 margin-bottom: 8px;
-                filter: contrast(1.2);
+            }
+            
+            .hero-preview img {
+                width: 64px;
+                height: 64px;
+                image-rendering: pixelated;
             }
             
             .slot-label {
                 font-size: 8px;
                 color: #8b7cb0;
                 text-align: center;
-            }
-            
-            .custom-hint {
-                text-align: center;
-                font-size: 7px;
-                color: #666;
-                margin-top: 10px;
-                padding: 8px;
-                border: 2px dashed #444;
             }
             
             /* ИМЯ */
@@ -323,17 +316,12 @@ async def root():
                 cursor: pointer;
             }
             
-            .start-btn:active {
-                transform: translate(2px, 2px);
-                box-shadow: 2px 2px 0px #2d8b84;
-            }
-            
             .start-btn:disabled { 
                 opacity: 0.4;
                 background: #666;
             }
             
-            /* ===== ИГРА - БОЛЬШОЙ ПЕРСОНАЖ ===== */
+            /* ===== ИГРА ===== */
             .game-screen {
                 display: flex;
                 flex-direction: column;
@@ -384,11 +372,20 @@ async def root():
             }
             
             .hero-giant {
-                font-size: 140px;
-                line-height: 1;
+                width: 140px;
+                height: 140px;
                 z-index: 1;
-                filter: contrast(1.3) drop-shadow(4px 4px 0px #000);
                 animation: breathe 2s ease-in-out infinite;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .hero-giant img {
+                width: 140px;
+                height: 140px;
+                image-rendering: pixelated;
+                filter: drop-shadow(4px 4px 0px #000);
             }
             
             @keyframes breathe {
@@ -544,24 +541,31 @@ async def root():
                 
                 <div class="heroes-trio">
                     <!-- СЛОТ 1 -->
-                    <div class="hero-preview" id="slot1">
-                        <img src="/hero1.png" width="64" height="64" style="image-rendering: pixelated;">
+                    <div class="hero-slot" data-slot="1" data-avatar="hero1">
+                        <span class="slot-number">1</span>
+                        <div class="hero-preview">
+                            <img src="/hero1.png" alt="Hero 1">
+                        </div>
+                        <div class="slot-label">HERO 1</div>
                     </div>
                     
                     <!-- СЛОТ 2 -->
-                    <div class="hero-preview" id="slot2">
-                        <img src="/hero2.png" width="64" height="64" style="image-rendering: pixelated;">
+                    <div class="hero-slot" data-slot="2" data-avatar="hero2">
+                        <span class="slot-number">2</span>
+                        <div class="hero-preview">
+                            <img src="/hero2.png" alt="Hero 2">
+                        </div>
+                        <div class="slot-label">HERO 2</div>
                     </div>
                     
                     <!-- СЛОТ 3 -->
-                    <div class="hero-preview" id="slot3">
-                        <img src="/hero3.png" width="64" height="64" style="image-rendering: pixelated;">
+                    <div class="hero-slot" data-slot="3" data-avatar="hero3">
+                        <span class="slot-number">3</span>
+                        <div class="hero-preview">
+                            <img src="/hero3.png" alt="Hero 3">
+                        </div>
+                        <div class="slot-label">HERO 3</div>
                     </div>
-                </div>
-                
-                <div class="custom-hint">
-                    💡 Замени эмодзи в коде на свои спрайты<br>
-                    См. инструкцию ниже
                 </div>
             </div>
             
@@ -622,9 +626,12 @@ async def root():
             
             <!-- ОГРОМНЫЙ ПЕРСОНАЖ -->
             <div class="hero-stage">
-                <div class="hero-giant" id="gAvatar">
-                    <img src="/hero1.png" width="140" height="140" style="image-rendering: pixelated;" id="gameHero">
+                <div class="shadow-platform"></div>
+                <div class="hero-giant">
+                    <img src="/hero1.png" alt="Hero" id="gameHero">
                 </div>
+                <div class="hero-badge" id="gName">HERO</div>
+                <div class="hero-stats-row">
                     <span class="h-stat">💪<span id="gStr">5</span></span>
                     <span class="h-stat">🧠<span id="gInt">5</span></span>
                     <span class="h-stat">✨<span id="gCha">5</span></span>
@@ -684,11 +691,17 @@ async def root():
             let stats = {str:5, int:5, cha:5, lck:5};
             const MAX = 20, MIN = 1;
             
+            // Выбор персонажа
             document.querySelectorAll('.hero-slot').forEach(el => {
                 el.onclick = function() {
                     document.querySelectorAll('.hero-slot').forEach(h => h.classList.remove('selected'));
                     this.classList.add('selected');
                     sel = this.dataset.avatar;
+                    
+                    // Меняем картинку в игре при выборе
+                    let slotNum = this.dataset.slot;
+                    document.getElementById('gameHero').src = '/hero' + slotNum + '.png';
+                    
                     check();
                 };
             });
@@ -745,7 +758,10 @@ async def root():
                 let d = await r.json();
                 state = d.user; hero = d.character;
                 
-                document.getElementById('gAvatar').textContent = hero.avatar;
+                // Устанавливаем правильную картинку
+                let heroNum = hero.avatar.replace('hero', '') || '1';
+                document.getElementById('gameHero').src = '/hero' + heroNum + '.png';
+                
                 document.getElementById('gName').textContent = hero.name.toUpperCase();
                 document.getElementById('gStr').textContent = hero.strength;
                 document.getElementById('gInt').textContent = hero.intelligence;
