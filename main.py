@@ -91,7 +91,6 @@ async def root():
                 padding: 0; 
                 box-sizing: border-box; 
                 image-rendering: pixelated;
-                image-rendering: crisp-edges;
             }
             
             :root {
@@ -104,7 +103,6 @@ async def root():
                 --warning: #ffe66d;
                 --danger: #ff6b6b;
                 --text: #f7f1e3;
-                --shadow: 4px 4px 0px #1a0f2e;
             }
             
             body {
@@ -112,13 +110,13 @@ async def root():
                 background: var(--bg-color);
                 min-height: 100vh;
                 color: var(--text);
-                padding: 15px;
-                font-size: 10px;
+                padding: 10px;
+                font-size: 8px;
                 line-height: 1.6;
             }
             
             .container { 
-                max-width: 380px; 
+                max-width: 360px; 
                 margin: 0 auto; 
             }
             
@@ -128,192 +126,142 @@ async def root():
             .pixel-box {
                 background: var(--panel-bg);
                 border: 4px solid var(--border-color);
-                box-shadow: var(--shadow);
-                position: relative;
-            }
-            
-            .pixel-box::before {
-                content: '';
-                position: absolute;
-                top: -4px; left: -4px; right: -4px; bottom: -4px;
-                border: 2px solid var(--accent);
-                pointer-events: none;
-                opacity: 0;
-                transition: opacity 0.2s;
-            }
-            
-            .pixel-box:hover::before {
-                opacity: 1;
+                box-shadow: 4px 4px 0px #000;
             }
             
             /* Экран создания */
             .create-screen { text-align: center; }
             
             .create-screen h1 { 
-                font-size: 16px; 
+                font-size: 14px; 
                 color: var(--accent);
                 text-shadow: 3px 3px 0px var(--accent-dark);
                 margin-bottom: 15px;
-                animation: blink 2s infinite;
-            }
-            
-            @keyframes blink {
-                0%, 50% { opacity: 1; }
-                51%, 100% { opacity: 0.8; }
             }
             
             .create-screen h2 { 
-                font-size: 10px; 
+                font-size: 8px; 
                 color: var(--warning);
-                margin: 20px 0 10px;
+                margin: 15px 0 10px;
             }
             
-            /* Аватары пиксельные */
             .avatars {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
                 gap: 8px;
-                margin: 15px 0;
+                margin: 10px 0;
             }
             
             .avatar-option {
-                font-size: 32px;
-                padding: 15px 10px;
+                font-size: 28px;
+                padding: 12px 8px;
                 background: var(--panel-bg);
                 border: 4px solid var(--border-color);
-                box-shadow: var(--shadow);
+                box-shadow: 4px 4px 0px #000;
                 cursor: pointer;
                 transition: all 0.1s;
-                image-rendering: pixelated;
             }
             
             .avatar-option:hover { 
                 transform: translate(-2px, -2px);
-                box-shadow: 6px 6px 0px #1a0f2e;
+                box-shadow: 6px 6px 0px #000;
                 border-color: var(--accent);
             }
             
             .avatar-option.selected { 
                 border-color: var(--success);
                 background: #0f3d3e;
-                box-shadow: inset 4px 4px 0px #000;
+                box-shadow: inset 2px 2px 0px #000;
                 transform: translate(2px, 2px);
             }
             
-            /* Пиксельный инпут */
             .name-input {
                 width: 100%;
-                padding: 15px;
+                padding: 12px;
                 font-family: 'Press Start 2P', cursive;
                 font-size: 10px;
                 background: var(--panel-bg);
                 border: 4px solid var(--border-color);
-                box-shadow: var(--shadow);
+                box-shadow: 4px 4px 0px #000;
                 color: var(--text);
                 margin: 10px 0;
                 outline: none;
-            }
-            
-            .name-input:focus {
-                border-color: var(--accent);
+                text-align: center;
             }
             
             .name-input::placeholder { 
                 color: #6b5b8a; 
             }
             
-            /* Статистики создания */
             .stats-create {
                 background: var(--panel-bg);
                 border: 4px solid var(--border-color);
-                box-shadow: var(--shadow);
-                padding: 15px;
-                margin: 15px 0;
+                box-shadow: 4px 4px 0px #000;
+                padding: 12px;
+                margin: 10px 0;
             }
             
             .stat-row-create {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin: 12px 0;
+                margin: 10px 0;
                 font-size: 8px;
-            }
-            
-            .stat-name {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            
-            .stat-icon {
-                font-size: 16px;
             }
             
             .stat-controls {
                 display: flex;
                 align-items: center;
-                gap: 10px;
+                gap: 8px;
             }
             
             .stat-btn {
-                width: 28px;
-                height: 28px;
+                width: 24px;
+                height: 24px;
                 font-family: 'Press Start 2P', cursive;
-                font-size: 12px;
+                font-size: 10px;
                 background: var(--accent);
                 border: none;
-                box-shadow: 3px 3px 0px var(--accent-dark);
+                box-shadow: 2px 2px 0px var(--accent-dark);
                 color: white;
                 cursor: pointer;
-                transition: all 0.1s;
             }
             
             .stat-btn:active {
                 transform: translate(2px, 2px);
-                box-shadow: 1px 1px 0px var(--accent-dark);
+                box-shadow: none;
             }
             
             .stat-btn:disabled { 
                 opacity: 0.3; 
                 cursor: not-allowed;
-                box-shadow: none;
             }
             
             .stat-value { 
-                font-size: 12px; 
-                min-width: 25px;
+                font-size: 10px; 
+                min-width: 20px;
                 color: var(--success);
             }
             
             .points-left { 
-                margin-top: 15px; 
-                font-size: 10px; 
+                margin-top: 10px; 
+                font-size: 8px; 
                 color: var(--warning);
-                text-align: center;
-                padding: 10px;
-                background: rgba(255, 230, 109, 0.1);
+                padding: 8px;
                 border: 2px dashed var(--warning);
             }
             
-            /* Пиксельная кнопка */
             .pixel-btn {
                 width: 100%;
-                padding: 20px;
-                margin-top: 20px;
+                padding: 15px;
+                margin-top: 15px;
                 font-family: 'Press Start 2P', cursive;
-                font-size: 12px;
+                font-size: 10px;
                 background: var(--success);
                 border: none;
                 box-shadow: 4px 4px 0px #2d8b84;
                 color: #1a0f2e;
                 cursor: pointer;
-                transition: all 0.1s;
-                text-transform: uppercase;
-            }
-            
-            .pixel-btn:hover {
-                transform: translate(-2px, -2px);
-                box-shadow: 6px 6px 0px #2d8b84;
             }
             
             .pixel-btn:active {
@@ -323,165 +271,207 @@ async def root():
             
             .pixel-btn:disabled { 
                 opacity: 0.4;
-                cursor: not-allowed;
-                transform: none;
-                box-shadow: 4px 4px 0px #2d8b84;
                 background: #6b5b8a;
             }
             
-            /* Экран игры */
+            /* ЭКРАН ИГРЫ - ПЕРСОНАЖ В ЦЕНТРЕ */
             .game-screen { }
             
             .header { 
                 text-align: center; 
-                margin-bottom: 15px; 
+                margin-bottom: 10px; 
             }
             
             .header h1 { 
-                font-size: 14px; 
+                font-size: 12px; 
                 color: var(--accent);
                 text-shadow: 2px 2px 0px var(--accent-dark);
             }
             
             .day-counter {
-                font-size: 10px;
+                font-size: 8px;
                 color: var(--warning);
                 margin-top: 5px;
             }
             
-            /* Карточка персонажа */
-            .character-card {
+            /* ЦЕНТРАЛЬНАЯ ЗОНА ПЕРСОНАЖА */
+            .character-zone {
                 display: flex;
+                flex-direction: column;
                 align-items: center;
-                                gap: 12px;
-                background: var(--panel-bg);
-                border: 4px solid var(--border-color);
-                box-shadow: var(--shadow);
-                padding: 12px;
-                margin-bottom: 15px;
+                margin: 15px 0;
             }
             
-            .character-avatar { 
-                font-size: 40px;
-                width: 60px;
-                height: 60px;
+            .character-avatar-big {
+                width: 120px;
+                height: 120px;
+                font-size: 80px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: #0f3d3e;
-                border: 3px solid var(--success);
-                image-rendering: pixelated;
+                background: var(--panel-bg);
+                border: 6px solid var(--border-color);
+                box-shadow: 6px 6px 0px #000, inset 0 0 20px rgba(0,0,0,0.5);
+                margin-bottom: 10px;
+                position: relative;
             }
             
-            .character-info { flex: 1; }
-            
-            .character-name { 
-                font-size: 12px; 
+            .character-avatar-big::before {
+                content: '◆';
+                position: absolute;
+                top: -15px;
+                left: 50%;
+                transform: translateX(-50%);
                 color: var(--accent);
+                font-size: 12px;
+            }
+            
+            .character-avatar-big::after {
+                content: '◆';
+                position: absolute;
+                bottom: -15px;
+                left: 50%;
+                transform: translateX(-50%);
+                color: var(--accent);
+                font-size: 12px;
+            }
+            
+            .character-name-plate {
+                background: var(--panel-bg);
+                border: 4px solid var(--border-color);
+                box-shadow: 4px 4px 0px #000;
+                padding: 8px 20px;
+                font-size: 10px;
+                color: var(--accent);
+                margin-bottom: 8px;
+                text-align: center;
+            }
+            
+            .character-stats-bar {
+                display: flex;
+                gap: 15px;
+                font-size: 8px;
+                color: #8b7cb0;
+            }
+            
+            .stat-item {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+            
+            /* ПАНЕЛЬ РЕСУРСОВ */
+            .resources-panel {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+            
+            .resource-box {
+                background: var(--panel-bg);
+                border: 4px solid var(--border-color);
+                box-shadow: 4px 4px 0px #000;
+                padding: 10px;
+                text-align: center;
+            }
+            
+            .resource-icon {
+                font-size: 16px;
                 margin-bottom: 5px;
             }
             
-            .character-stats { 
-                font-size: 8px; 
-                color: #8b7cb0;
-                line-height: 1.8;
+            .resource-value {
+                font-size: 12px;
+                color: var(--success);
             }
             
-            /* Статус бар */
-            .status-panel {
+            .resource-label {
+                font-size: 6px;
+                color: #6b5b8a;
+                margin-top: 3px;
+            }
+            
+            /* ЭНЕРГИЯ ОТДЕЛЬНО */
+            .energy-panel {
                 background: var(--panel-bg);
                 border: 4px solid var(--border-color);
-                box-shadow: var(--shadow);
-                padding: 15px;
-                margin-bottom: 15px;
+                box-shadow: 4px 4px 0px #000;
+                padding: 10px;
+                margin-bottom: 12px;
             }
             
-            .stat-row {
+            .energy-header {
                 display: flex;
                 justify-content: space-between;
-                align-items: center;
-                margin: 10px 0;
-                font-size: 10px;
+                margin-bottom: 8px;
+                font-size: 8px;
             }
             
-            .stat-label {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            
-            .stat-bar {
-                width: 100px;
-                height: 12px;
+            .energy-bar-container {
+                height: 16px;
                 background: #1a0f2e;
                 border: 2px solid var(--border-color);
                 position: relative;
             }
             
-            .stat-bar-fill {
+            .energy-bar-fill {
                 height: 100%;
-                background: var(--success);
+                background: linear-gradient(90deg, var(--danger) 0%, var(--warning) 50%, var(--success) 100%);
                 transition: width 0.3s;
-                box-shadow: inset 0 0 0 2px rgba(255,255,255,0.2);
+                box-shadow: inset 0 0 0 2px rgba(255,255,255,0.1);
             }
             
-            .stat-bar-fill.low { background: var(--danger); }
-            .stat-bar-fill.medium { background: var(--warning); }
-            
-            .stat-text {
-                font-size: 10px;
-                min-width: 60px;
-                text-align: right;
+            .energy-text {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 8px;
+                text-shadow: 1px 1px 0px #000;
             }
             
-            /* Кнопки действий */
-            .actions { 
-                display: grid; 
-                gap: 10px; 
+            /* ДЕЙСТВИЯ */
+            .actions-title {
+                text-align: center;
+                font-size: 8px;
+                color: var(--warning);
+                margin-bottom: 8px;
+            }
+            
+            .actions {
+                display: grid;
+                gap: 8px;
             }
             
             .action-btn {
                 display: flex;
                 align-items: center;
-                gap: 12px;
-                padding: 15px;
+                gap: 10px;
+                padding: 12px;
                 font-family: 'Press Start 2P', cursive;
-                font-size: 10px;
+                font-size: 8px;
                 background: var(--panel-bg);
                 border: 4px solid var(--border-color);
-                box-shadow: var(--shadow);
+                box-shadow: 4px 4px 0px #000;
                 color: var(--text);
                 cursor: pointer;
-                transition: all 0.1s;
                 text-align: left;
-            }
-            
-            .action-btn:hover {
-                transform: translate(-2px, -2px);
-                box-shadow: 6px 6px 0px #1a0f2e;
-                border-color: var(--accent);
             }
             
             .action-btn:active {
                 transform: translate(2px, 2px);
-                box-shadow: 2px 2px 0px #1a0f2e;
+                box-shadow: 2px 2px 0px #000;
             }
             
             .action-btn:disabled { 
                 opacity: 0.4;
-                cursor: not-allowed;
-                transform: none;
-                box-shadow: var(--shadow);
                 border-color: #3d2f5a;
             }
             
             .action-btn.primary {
-                background: #0f3d3e;
                 border-color: var(--success);
-            }
-            
-            .action-btn.primary:hover {
-                border-color: #6ee8df;
+                background: #0f3d3e;
             }
             
             .action-icon {
@@ -497,76 +487,49 @@ async def root():
             .action-name {
                 display: block;
                 margin-bottom: 4px;
+                color: var(--accent);
             }
             
             .action-desc {
-                font-size: 8px;
+                font-size: 6px;
                 color: #8b7cb0;
             }
             
-            /* Лог */
+            /* ЛОГ */
             .log-panel {
-                margin-top: 15px;
+                margin-top: 12px;
                 background: var(--panel-bg);
                 border: 4px solid var(--border-color);
-                box-shadow: var(--shadow);
-                padding: 12px;
-                min-height: 100px;
-                max-height: 140px;
+                box-shadow: 4px 4px 0px #000;
+                padding: 10px;
+                min-height: 80px;
+                max-height: 100px;
                 overflow-y: auto;
             }
             
             .log-entry {
-                margin: 8px 0;
-                padding: 8px;
+                margin: 6px 0;
+                padding: 6px;
                 background: rgba(0,0,0,0.3);
                 border-left: 3px solid var(--accent);
-                font-size: 8px;
-                line-height: 1.6;
-                animation: slideIn 0.3s;
-            }
-            
-            @keyframes slideIn {
-                from {
-                    opacity: 0;
-                    transform: translateX(-10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-            }
-            
-            .log-time {
-                color: #6b5b8a;
                 font-size: 7px;
-                margin-bottom: 3px;
+                line-height: 1.5;
             }
             
             .log-success { border-left-color: var(--success); }
             .log-warning { border-left-color: var(--warning); }
             .log-danger { border-left-color: var(--danger); }
             
-            /* Скроллбар пиксельный */
-            ::-webkit-scrollbar {
-                width: 12px;
-            }
-            
-            ::-webkit-scrollbar-track {
-                background: var(--panel-bg);
-                border: 2px solid var(--border-color);
-            }
-            
-            ::-webkit-scrollbar-thumb {
-                background: var(--accent);
-                border: 2px solid var(--panel-bg);
-            }
-            
-            ::-webkit-scrollbar-thumb:hover {
-                background: var(--accent-dark);
-            }
-            
             /* Анимации */
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-5px); }
+            }
+            
+            .bounce {
+                animation: bounce 0.5s;
+            }
+            
             @keyframes shake {
                 0%, 100% { transform: translateX(0); }
                 25% { transform: translateX(-3px); }
@@ -576,24 +539,15 @@ async def root():
             .shake {
                 animation: shake 0.3s;
             }
-            
-            @keyframes pulse {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-            }
-            
-            .pulse {
-                animation: pulse 0.5s;
-            }
         </style>
     </head>
     <body>
-        <!-- Экран создания персонажа -->
+        <!-- Экран создания -->
         <div class="container create-screen" id="createScreen">
-            <h1>◆ RE:ALITY: CORE ◆</h1>
-            <p style="font-size: 8px; color: #8b7cb0;">CREATE YOUR CHARACTER</p>
+            <h1>◆ RE:ALITY ◆</h1>
+            <p style="font-size: 6px; color: #8b7cb0;">CREATE CHARACTER</p>
             
-            <h2>◆ SELECT AVATAR ◆</h2>
+            <h2>◆ AVATAR ◆</h2>
             <div class="avatars" id="avatars">
                 <div class="avatar-option" data-avatar="👨">👨</div>
                 <div class="avatar-option" data-avatar="👩">👩</div>
@@ -605,16 +559,13 @@ async def root():
                 <div class="avatar-option" data-avatar="👨‍🦲">👨‍🦲</div>
             </div>
             
-            <h2>◆ ENTER NAME ◆</h2>
-            <input type="text" class="name-input" id="charName" placeholder="..." maxlength="12">
+            <h2>◆ NAME ◆</h2>
+            <input type="text" class="name-input" id="charName" placeholder="..." maxlength="10">
             
-            <h2>◆ DISTRIBUTE POINTS ◆</h2>
+            <h2>◆ STATS ◆</h2>
             <div class="stats-create">
                 <div class="stat-row-create">
-                    <span class="stat-name">
-                        <span class="stat-icon">💪</span>
-                        <span>STR</span>
-                    </span>
+                    <span>💪 STR</span>
                     <div class="stat-controls">
                         <button class="stat-btn" onclick="changeStat('strength', -1)">-</button>
                         <span class="stat-value" id="strength">5</span>
@@ -622,10 +573,7 @@ async def root():
                     </div>
                 </div>
                 <div class="stat-row-create">
-                    <span class="stat-name">
-                        <span class="stat-icon">🧠</span>
-                        <span>INT</span>
-                    </span>
+                    <span>🧠 INT</span>
                     <div class="stat-controls">
                         <button class="stat-btn" onclick="changeStat('intelligence', -1)">-</button>
                         <span class="stat-value" id="intelligence">5</span>
@@ -633,10 +581,7 @@ async def root():
                     </div>
                 </div>
                 <div class="stat-row-create">
-                    <span class="stat-name">
-                        <span class="stat-icon">✨</span>
-                        <span>CHA</span>
-                    </span>
+                    <span>✨ CHA</span>
                     <div class="stat-controls">
                         <button class="stat-btn" onclick="changeStat('charisma', -1)">-</button>
                         <span class="stat-value" id="charisma">5</span>
@@ -644,10 +589,7 @@ async def root():
                     </div>
                 </div>
                 <div class="stat-row-create">
-                    <span class="stat-name">
-                        <span class="stat-icon">🍀</span>
-                        <span>LCK</span>
-                    </span>
+                    <span>🍀 LCK</span>
                     <div class="stat-controls">
                         <button class="stat-btn" onclick="changeStat('luck', -1)">-</button>
                         <span class="stat-value" id="luck">5</span>
@@ -660,54 +602,57 @@ async def root():
             </div>
             
             <button class="pixel-btn" id="createBtn" onclick="createCharacter()" disabled>
-                START GAME ▶
+                START ▶
             </button>
         </div>
         
         <!-- Экран игры -->
         <div class="container game-screen hidden" id="gameScreen">
             <div class="header">
-                <h1>◆ RE:ALITY: CORE ◆</h1>
+                <h1>◆ RE:ALITY ◆</h1>
                 <div class="day-counter">DAY <span id="day">1</span></div>
             </div>
             
-            <div class="character-card">
-                <div class="character-avatar" id="gameAvatar">👨</div>
-                <div class="character-info">
-                    <div class="character-name" id="gameName">PLAYER</div>
-                    <div class="character-stats" id="gameStats">
-                        STR:5 INT:5 CHA:5 LCK:5
-                    </div>
+            <!-- ПЕРСОНАЖ В ЦЕНТРЕ -->
+            <div class="character-zone">
+                <div class="character-avatar-big" id="gameAvatar">👨</div>
+                <div class="character-name-plate" id="gameName">PLAYER</div>
+                <div class="character-stats-bar">
+                    <span class="stat-item">💪<span id="strVal">5</span></span>
+                    <span class="stat-item">🧠<span id="intVal">5</span></span>
+                    <span class="stat-item">✨<span id="chaVal">5</span></span>
+                    <span class="stat-item">🍀<span id="lckVal">5</span></span>
                 </div>
             </div>
             
-            <div class="status-panel">
-                <div class="stat-row">
-                    <span class="stat-label">
-                        <span>💰</span>
-                        <span>MONEY</span>
-                    </span>
-                    <span class="stat-text" id="moneyText">5000₽</span>
+            <!-- РЕСУРСЫ -->
+            <div class="resources-panel">
+                <div class="resource-box">
+                    <div class="resource-icon">💰</div>
+                    <div class="resource-value" id="moneyText">5000</div>
+                    <div class="resource-label">MONEY</div>
                 </div>
-                <div class="stat-row">
-                    <span class="stat-label">
-                        <span>⚡</span>
-                        <span>ENERGY</span>
-                    </span>
-                    <div class="stat-bar">
-                        <div class="stat-bar-fill" id="energyBar" style="width: 100%"></div>
-                    </div>
-                    <span class="stat-text" id="energyText">100%</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">
-                        <span>📅</span>
-                        <span>ACTIONS</span>
-                    </span>
-                    <span class="stat-text" id="actionsText">3/3</span>
+                <div class="resource-box">
+                    <div class="resource-icon">📅</div>
+                    <div class="resource-value" id="actionsText">3</div>
+                    <div class="resource-label">ACTIONS</div>
                 </div>
             </div>
             
+            <!-- ЭНЕРГИЯ -->
+            <div class="energy-panel">
+                <div class="energy-header">
+                    <span>⚡ ENERGY</span>
+                    <span id="energyText">100%</span>
+                </div>
+                <div class="energy-bar-container">
+                    <div class="energy-bar-fill" id="energyBar" style="width: 100%"></div>
+                    <span class="energy-text" id="energyBarText">100%</span>
+                </div>
+            </div>
+            
+            <!-- ДЕЙСТВИЯ -->
+            <div class="actions-title">◆ ACTIONS ◆</div>
             <div class="actions">
                 <button class="action-btn primary" id="btn-work" onclick="doAction('work')">
                     <span class="action-icon">💼</span>
@@ -727,16 +672,14 @@ async def root():
                     <span class="action-icon">😴</span>
                     <span class="action-info">
                         <span class="action-name">SLEEP</span>
-                        <span class="action-desc">NEW DAY / -700₽</span>
+                        <span class="action-desc">NEXT DAY / -700₽</span>
                     </span>
                 </button>
             </div>
             
+            <!-- ЛОГ -->
             <div class="log-panel" id="log">
-                <div class="log-entry">
-                    <div class="log-time">--:--</div>
-                    <div>WELCOME TO RE:ALITY...</div>
-                </div>
+                <div class="log-entry">SYSTEM READY...</div>
             </div>
         </div>
         
@@ -749,19 +692,17 @@ async def root():
             let character = {};
             let selectedAvatar = '';
             
-            // Создание персонажа
             let stats = { strength: 5, intelligence: 5, charisma: 5, luck: 5 };
             const MAX_POINTS = 20;
             const MIN_STAT = 1;
             
-            // Выбор аватара
             document.querySelectorAll('.avatar-option').forEach(el => {
                 el.onclick = function() {
                     document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
                     this.classList.add('selected');
                     selectedAvatar = this.dataset.avatar;
-                    this.classList.add('pulse');
-                    setTimeout(() => this.classList.remove('pulse'), 500);
+                    this.classList.add('bounce');
+                    setTimeout(() => this.classList.remove('bounce'), 500);
                     checkCreateButton();
                 };
             });
@@ -798,7 +739,6 @@ async def root():
                 let name = document.getElementById('charName').value.trim();
                 let total = Object.values(stats).reduce((a,b) => a+b, 0);
                 let btn = document.getElementById('createBtn');
-                
                 btn.disabled = !(name && selectedAvatar && total === MAX_POINTS);
             }
             
@@ -828,7 +768,6 @@ async def root():
                 }
             }
             
-            // Игра
             async function loadGame() {
                 let response = await fetch(`/api/state?user_id=${userId}`);
                 let data = await response.json();
@@ -838,30 +777,26 @@ async def root():
                 if (character) {
                     document.getElementById('gameAvatar').textContent = character.avatar || '👨';
                     document.getElementById('gameName').textContent = (character.name || 'PLAYER').toUpperCase();
-                    document.getElementById('gameStats').textContent = 
-                        `STR:${character.strength} INT:${character.intelligence} CHA:${character.charisma} LCK:${character.luck}`;
+                    document.getElementById('strVal').textContent = character.strength;
+                    document.getElementById('intVal').textContent = character.intelligence;
+                    document.getElementById('chaVal').textContent = character.charisma;
+                    document.getElementById('lckVal').textContent = character.luck;
                 }
                 
                 updateDisplay();
-                log('WELCOME TO THE SIMULATION...', 'success');
+                log('WELCOME TO RE:ALITY', 'success');
             }
             
             function updateDisplay() {
-                document.getElementById('moneyText').textContent = gameState.money + '₽';
+                document.getElementById('moneyText').textContent = gameState.money;
                 document.getElementById('day').textContent = gameState.day;
-                document.getElementById('actionsText').textContent = gameState.actions + '/3';
+                document.getElementById('actionsText').textContent = gameState.actions;
                 
-                let energyPercent = gameState.energy;
-                let energyBar = document.getElementById('energyBar');
-                energyBar.style.width = energyPercent + '%';
-                document.getElementById('energyText').textContent = energyPercent + '%';
+                let energy = gameState.energy;
+                document.getElementById('energyText').textContent = energy + '%';
+                document.getElementById('energyBarText').textContent = energy + '%';
+                document.getElementById('energyBar').style.width = energy + '%';
                 
-                // Цвет энергии
-                energyBar.className = 'stat-bar-fill';
-                if (energyPercent <= 30) energyBar.classList.add('low');
-                else if (energyPercent <= 60) energyBar.classList.add('medium');
-                
-                // Кнопки
                 document.getElementById('btn-work').disabled = gameState.actions <= 0 || gameState.energy < 30;
                 document.getElementById('btn-eat').disabled = gameState.actions <= 0;
             }
@@ -870,20 +805,9 @@ async def root():
                 let logDiv = document.getElementById('log');
                 let entry = document.createElement('div');
                 entry.className = 'log-entry log-' + type;
-                
-                let time = new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit'});
-                
-                entry.innerHTML = `
-                    <div class="log-time">${time}</div>
-                    <div>${msg}</div>
-                `;
-                
+                entry.textContent = '> ' + msg;
                 logDiv.insertBefore(entry, logDiv.firstChild);
-                
-                // Ограничиваем количество записей
-                while (logDiv.children.length > 10) {
-                    logDiv.removeChild(logDiv.lastChild);
-                }
+                while (logDiv.children.length > 8) logDiv.removeChild(logDiv.lastChild);
             }
             
             async function doAction(action) {
@@ -901,18 +825,13 @@ async def root():
                 if (result.success) {
                     gameState = result.state;
                     updateDisplay();
-                    
-                    let type = 'success';
-                    if (result.message.includes('Новый день')) type = 'warning';
-                    if (result.message.includes('❌')) type = 'danger';
-                    
+                    let type = result.message.includes('день') ? 'warning' : 'success';
                     log(result.message.toUpperCase(), type);
                 } else {
-                    log('❌ ' + result.message.toUpperCase(), 'danger');
+                    log('ERROR: ' + result.message.toUpperCase(), 'danger');
                 }
             }
             
-            // Инициализация
             async function init() {
                 let response = await fetch(`/api/state?user_id=${userId}`);
                 let data = await response.json();
