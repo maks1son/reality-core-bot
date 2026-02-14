@@ -81,7 +81,7 @@ async def root():
     <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <title>RE:ALITY: Core</title>
         <script src="https://telegram.org/js/telegram-web-app.js"></script>
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -105,66 +105,108 @@ async def root():
                 --text: #f7f1e3;
             }
             
+            html, body {
+                height: 100%;
+                overflow: hidden;
+            }
+            
             body {
                 font-family: 'Press Start 2P', cursive;
                 background: var(--bg-color);
-                min-height: 100vh;
                 color: var(--text);
-                padding: 10px;
                 font-size: 8px;
-                line-height: 1.6;
+                line-height: 1.4;
             }
             
             .container { 
-                max-width: 360px; 
-                margin: 0 auto; 
+                height: 100vh;
+                max-width: 400px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                padding: 8px;
             }
             
             .hidden { display: none !important; }
             
-            /* Пиксельные боксы */
             .pixel-box {
                 background: var(--panel-bg);
-                border: 4px solid var(--border-color);
-                box-shadow: 4px 4px 0px #000;
+                border: 3px solid var(--border-color);
+                box-shadow: 3px 3px 0px #000;
             }
             
-            /* Экран создания */
-            .create-screen { text-align: center; }
+            /* ===== СОЗДАНИЕ ПЕРСОНАЖА ===== */
+            .create-screen {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                gap: 8px;
+            }
             
-            .create-screen h1 { 
-                font-size: 14px; 
+            .create-header {
+                text-align: center;
+                padding: 5px;
+            }
+            
+            .create-header h1 { 
+                font-size: 12px; 
                 color: var(--accent);
-                text-shadow: 3px 3px 0px var(--accent-dark);
-                margin-bottom: 15px;
+                text-shadow: 2px 2px 0px var(--accent-dark);
             }
             
-            .create-screen h2 { 
-                font-size: 8px; 
+            .create-header p { 
+                font-size: 6px; 
+                color: #8b7cb0;
+                margin-top: 3px;
+            }
+            
+            /* ПЕРСОНАЖИ ВО ВЕСЬ РОСТ */
+            .avatar-section {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+            }
+            
+            .section-label {
+                font-size: 7px;
                 color: var(--warning);
-                margin: 15px 0 10px;
+                margin-bottom: 5px;
+                text-align: center;
             }
             
-            .avatars {
+            .avatars-grid {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                gap: 8px;
-                margin: 10px 0;
+                gap: 6px;
+                flex: 1;
             }
             
             .avatar-option {
-                font-size: 28px;
-                padding: 12px 8px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
                 background: var(--panel-bg);
-                border: 4px solid var(--border-color);
-                box-shadow: 4px 4px 0px #000;
+                border: 3px solid var(--border-color);
+                box-shadow: 3px 3px 0px #000;
                 cursor: pointer;
-                transition: all 0.1s;
+                padding: 4px;
+                position: relative;
+            }
+            
+            .avatar-sprite {
+                font-size: 36px;
+                line-height: 1;
+                margin-bottom: 2px;
+            }
+            
+            .avatar-body {
+                font-size: 24px;
+                line-height: 1;
             }
             
             .avatar-option:hover { 
-                transform: translate(-2px, -2px);
-                box-shadow: 6px 6px 0px #000;
                 border-color: var(--accent);
             }
             
@@ -172,54 +214,79 @@ async def root():
                 border-color: var(--success);
                 background: #0f3d3e;
                 box-shadow: inset 2px 2px 0px #000;
-                transform: translate(2px, 2px);
+            }
+            
+            .avatar-name {
+                font-size: 6px;
+                color: #8b7cb0;
+                margin-top: 2px;
+            }
+            
+            /* ИМЯ */
+            .name-section {
+                display: flex;
+                gap: 8px;
+                align-items: center;
             }
             
             .name-input {
-                width: 100%;
-                padding: 12px;
+                flex: 1;
+                padding: 8px;
                 font-family: 'Press Start 2P', cursive;
-                font-size: 10px;
+                font-size: 8px;
                 background: var(--panel-bg);
-                border: 4px solid var(--border-color);
-                box-shadow: 4px 4px 0px #000;
+                border: 3px solid var(--border-color);
+                box-shadow: 3px 3px 0px #000;
                 color: var(--text);
-                margin: 10px 0;
                 outline: none;
-                text-align: center;
             }
             
             .name-input::placeholder { 
                 color: #6b5b8a; 
             }
             
-            .stats-create {
-                background: var(--panel-bg);
-                border: 4px solid var(--border-color);
-                box-shadow: 4px 4px 0px #000;
-                padding: 12px;
-                margin: 10px 0;
+            /* СТАТЫ */
+            .stats-section {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
             }
             
-            .stat-row-create {
+            .stat-box {
+                background: var(--panel-bg);
+                border: 3px solid var(--border-color);
+                box-shadow: 3px 3px 0px #000;
+                padding: 6px;
                 display: flex;
-                justify-content: space-between;
                 align-items: center;
-                margin: 10px 0;
-                font-size: 8px;
+                justify-content: space-between;
+            }
+            
+            .stat-info {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            
+            .stat-icon {
+                font-size: 14px;
+            }
+            
+            .stat-name {
+                font-size: 7px;
             }
             
             .stat-controls {
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                gap: 6px;
             }
             
             .stat-btn {
-                width: 24px;
-                height: 24px;
+                width: 18px;
+                height: 18px;
                 font-family: 'Press Start 2P', cursive;
-                font-size: 10px;
+                font-size: 8px;
                 background: var(--accent);
                 border: none;
                 box-shadow: 2px 2px 0px var(--accent-dark);
@@ -228,8 +295,8 @@ async def root():
             }
             
             .stat-btn:active {
-                transform: translate(2px, 2px);
-                box-shadow: none;
+                transform: translate(1px, 1px);
+                box-shadow: 1px 1px 0px var(--accent-dark);
             }
             
             .stat-btn:disabled { 
@@ -239,34 +306,34 @@ async def root():
             
             .stat-value { 
                 font-size: 10px; 
-                min-width: 20px;
                 color: var(--success);
+                min-width: 16px;
+                text-align: center;
             }
             
-            .points-left { 
-                margin-top: 10px; 
-                font-size: 8px; 
-                color: var(--warning);
-                padding: 8px;
+            .points-box {
+                grid-column: span 2;
+                text-align: center;
+                padding: 6px;
                 border: 2px dashed var(--warning);
+                color: var(--warning);
+                font-size: 8px;
             }
             
             .pixel-btn {
-                width: 100%;
-                padding: 15px;
-                margin-top: 15px;
+                padding: 12px;
                 font-family: 'Press Start 2P', cursive;
                 font-size: 10px;
                 background: var(--success);
                 border: none;
-                box-shadow: 4px 4px 0px #2d8b84;
+                box-shadow: 3px 3px 0px #2d8b84;
                 color: #1a0f2e;
                 cursor: pointer;
             }
             
             .pixel-btn:active {
                 transform: translate(2px, 2px);
-                box-shadow: 2px 2px 0px #2d8b84;
+                box-shadow: 1px 1px 0px #2d8b84;
             }
             
             .pixel-btn:disabled { 
@@ -274,152 +341,131 @@ async def root():
                 background: #6b5b8a;
             }
             
-            /* ЭКРАН ИГРЫ - ПЕРСОНАЖ В ЦЕНТРЕ */
-            .game-screen { }
-            
-            .header { 
-                text-align: center; 
-                margin-bottom: 10px; 
+            /* ===== ЭКРАН ИГРЫ ===== */
+            .game-screen {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                gap: 6px;
             }
             
-            .header h1 { 
-                font-size: 12px; 
+            .game-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 5px 8px;
+            }
+            
+            .game-title {
+                font-size: 10px;
                 color: var(--accent);
                 text-shadow: 2px 2px 0px var(--accent-dark);
             }
             
-            .day-counter {
+            .day-badge {
+                background: var(--warning);
+                color: #1a0f2e;
+                padding: 4px 8px;
                 font-size: 8px;
-                color: var(--warning);
-                margin-top: 5px;
+                box-shadow: 2px 2px 0px #b8a030;
             }
             
-            /* ЦЕНТРАЛЬНАЯ ЗОНА ПЕРСОНАЖА */
-            .character-zone {
+            /* ПЕРСОНАЖ В ЦЕНТРЕ */
+            .hero-section {
+                flex: 1;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                margin: 15px 0;
-            }
-            
-            .character-avatar-big {
-                width: 120px;
-                height: 120px;
-                font-size: 80px;
-                display: flex;
-                align-items: center;
                 justify-content: center;
-                background: var(--panel-bg);
-                border: 6px solid var(--border-color);
-                box-shadow: 6px 6px 0px #000, inset 0 0 20px rgba(0,0,0,0.5);
-                margin-bottom: 10px;
+                min-height: 0;
                 position: relative;
             }
             
-            .character-avatar-big::before {
-                content: '◆';
-                position: absolute;
-                top: -15px;
-                left: 50%;
-                transform: translateX(-50%);
-                color: var(--accent);
-                font-size: 12px;
+            .hero-avatar {
+                font-size: 80px;
+                line-height: 1;
+                text-shadow: 4px 4px 0px #000;
+                animation: breathe 2s ease-in-out infinite;
             }
             
-            .character-avatar-big::after {
-                content: '◆';
-                position: absolute;
-                bottom: -15px;
-                left: 50%;
-                transform: translateX(-50%);
-                color: var(--accent);
-                font-size: 12px;
+            @keyframes breathe {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); }
             }
             
-            .character-name-plate {
+            .hero-platform {
+                width: 120px;
+                height: 20px;
                 background: var(--panel-bg);
-                border: 4px solid var(--border-color);
-                box-shadow: 4px 4px 0px #000;
-                padding: 8px 20px;
+                border: 3px solid var(--border-color);
+                margin-top: -10px;
+                position: relative;
+                z-index: -1;
+            }
+            
+            .hero-name {
+                margin-top: 8px;
+                padding: 6px 16px;
+                background: var(--panel-bg);
+                border: 3px solid var(--border-color);
+                box-shadow: 3px 3px 0px #000;
                 font-size: 10px;
                 color: var(--accent);
-                margin-bottom: 8px;
-                text-align: center;
             }
             
-            .character-stats-bar {
+            .hero-stats {
                 display: flex;
-                gap: 15px;
+                gap: 12px;
+                margin-top: 6px;
                 font-size: 8px;
-                color: #8b7cb0;
             }
             
-            .stat-item {
+            .hero-stat {
                 display: flex;
                 align-items: center;
-                gap: 4px;
+                gap: 3px;
             }
             
-            /* ПАНЕЛЬ РЕСУРСОВ */
-            .resources-panel {
+            /* РЕСУРСЫ */
+            .resources-bar {
                 display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 8px;
-                margin-bottom: 12px;
+                grid-template-columns: 2fr 1fr 1fr;
+                gap: 6px;
             }
             
-            .resource-box {
-                background: var(--panel-bg);
-                border: 4px solid var(--border-color);
-                box-shadow: 4px 4px 0px #000;
-                padding: 10px;
+            .res-box {
+                padding: 6px;
                 text-align: center;
             }
             
-            .resource-icon {
-                font-size: 16px;
-                margin-bottom: 5px;
+            .res-icon {
+                font-size: 12px;
             }
             
-            .resource-value {
+            .res-value {
                 font-size: 12px;
                 color: var(--success);
+                margin: 2px 0;
             }
             
-            .resource-label {
+            .res-label {
                 font-size: 6px;
                 color: #6b5b8a;
-                margin-top: 3px;
             }
             
-            /* ЭНЕРГИЯ ОТДЕЛЬНО */
-            .energy-panel {
-                background: var(--panel-bg);
-                border: 4px solid var(--border-color);
-                box-shadow: 4px 4px 0px #000;
-                padding: 10px;
-                margin-bottom: 12px;
-            }
-            
-            .energy-header {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 8px;
-                font-size: 8px;
-            }
-            
-            .energy-bar-container {
+            /* ЭНЕРГИЯ */
+            .energy-bar {
                 height: 16px;
                 background: #1a0f2e;
-                border: 2px solid var(--border-color);
+                border: 3px solid var(--border-color);
+                box-shadow: 3px 3px 0px #000;
                 position: relative;
             }
             
-            .energy-bar-fill {
+            .energy-fill {
                 height: 100%;
-                background: linear-gradient(90deg, var(--danger) 0%, var(--warning) 50%, var(--success) 100%);
+                background: linear-gradient(90deg, var(--danger), var(--warning), var(--success));
                 transition: width 0.3s;
-                box-shadow: inset 0 0 0 2px rgba(255,255,255,0.1);
             }
             
             .energy-text {
@@ -432,41 +478,34 @@ async def root():
             }
             
             /* ДЕЙСТВИЯ */
-            .actions-title {
-                text-align: center;
-                font-size: 8px;
-                color: var(--warning);
-                margin-bottom: 8px;
-            }
-            
-            .actions {
+            .actions-grid {
                 display: grid;
-                gap: 8px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
             }
             
             .action-btn {
                 display: flex;
+                flex-direction: column;
                 align-items: center;
-                gap: 10px;
-                padding: 12px;
+                padding: 8px 4px;
                 font-family: 'Press Start 2P', cursive;
-                font-size: 8px;
+                font-size: 7px;
                 background: var(--panel-bg);
-                border: 4px solid var(--border-color);
-                box-shadow: 4px 4px 0px #000;
+                border: 3px solid var(--border-color);
+                box-shadow: 3px 3px 0px #000;
                 color: var(--text);
                 cursor: pointer;
-                text-align: left;
+                gap: 4px;
             }
             
             .action-btn:active {
                 transform: translate(2px, 2px);
-                box-shadow: 2px 2px 0px #000;
+                box-shadow: 1px 1px 0px #000;
             }
             
             .action-btn:disabled { 
                 opacity: 0.4;
-                border-color: #3d2f5a;
             }
             
             .action-btn.primary {
@@ -475,128 +514,135 @@ async def root():
             }
             
             .action-icon {
-                font-size: 24px;
-                width: 40px;
-                text-align: center;
-            }
-            
-            .action-info {
-                flex: 1;
-            }
-            
-            .action-name {
-                display: block;
-                margin-bottom: 4px;
-                color: var(--accent);
-            }
-            
-            .action-desc {
-                font-size: 6px;
-                color: #8b7cb0;
+                font-size: 20px;
             }
             
             /* ЛОГ */
-            .log-panel {
-                margin-top: 12px;
-                background: var(--panel-bg);
-                border: 4px solid var(--border-color);
-                box-shadow: 4px 4px 0px #000;
-                padding: 10px;
-                min-height: 80px;
-                max-height: 100px;
+            .log-box {
+                height: 60px;
                 overflow-y: auto;
+                padding: 6px;
+                font-size: 7px;
             }
             
             .log-entry {
-                margin: 6px 0;
-                padding: 6px;
+                margin: 3px 0;
+                padding: 3px 6px;
                 background: rgba(0,0,0,0.3);
-                border-left: 3px solid var(--accent);
-                font-size: 7px;
-                line-height: 1.5;
+                border-left: 2px solid var(--accent);
             }
             
             .log-success { border-left-color: var(--success); }
             .log-warning { border-left-color: var(--warning); }
             .log-danger { border-left-color: var(--danger); }
             
-            /* Анимации */
-            @keyframes bounce {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-5px); }
-            }
-            
-            .bounce {
-                animation: bounce 0.5s;
-            }
-            
             @keyframes shake {
                 0%, 100% { transform: translateX(0); }
-                25% { transform: translateX(-3px); }
-                75% { transform: translateX(3px); }
+                25% { transform: translateX(-2px); }
+                75% { transform: translateX(2px); }
             }
             
             .shake {
-                animation: shake 0.3s;
+                animation: shake 0.2s;
             }
         </style>
     </head>
     <body>
-        <!-- Экран создания -->
+        <!-- СОЗДАНИЕ ПЕРСОНАЖА -->
         <div class="container create-screen" id="createScreen">
-            <h1>◆ RE:ALITY ◆</h1>
-            <p style="font-size: 6px; color: #8b7cb0;">CREATE CHARACTER</p>
-            
-            <h2>◆ AVATAR ◆</h2>
-            <div class="avatars" id="avatars">
-                <div class="avatar-option" data-avatar="👨">👨</div>
-                <div class="avatar-option" data-avatar="👩">👩</div>
-                <div class="avatar-option" data-avatar="🧑">🧑</div>
-                <div class="avatar-option" data-avatar="👱">👱</div>
-                <div class="avatar-option" data-avatar="🧔">🧔</div>
-                <div class="avatar-option" data-avatar="👩‍🦰">👩‍🦰</div>
-                <div class="avatar-option" data-avatar="🧑‍🦱">🧑‍🦱</div>
-                <div class="avatar-option" data-avatar="👨‍🦲">👨‍🦲</div>
+            <div class="create-header">
+                <h1>◆ RE:ALITY ◆</h1>
+                <p>CREATE YOUR HERO</p>
             </div>
             
-            <h2>◆ NAME ◆</h2>
-            <input type="text" class="name-input" id="charName" placeholder="..." maxlength="10">
+            <div class="avatar-section">
+                <div class="section-label">◆ SELECT HERO ◆</div>
+                <div class="avatars-grid" id="avatars">
+                    <div class="avatar-option" data-avatar="🧙‍♂️" data-name="MAGE">
+                        <span class="avatar-sprite">🧙‍♂️</span>
+                        <span class="avatar-name">MAGE</span>
+                    </div>
+                    <div class="avatar-option" data-avatar="⚔️" data-name="WARRIOR">
+                        <span class="avatar-sprite">⚔️</span>
+                        <span class="avatar-name">WARRIOR</span>
+                    </div>
+                    <div class="avatar-option" data-avatar="🏹" data-name="RANGER">
+                        <span class="avatar-sprite">🏹</span>
+                        <span class="avatar-name">RANGER</span>
+                    </div>
+                    <div class="avatar-option" data-avatar="🗡️" data-name="ROGUE">
+                        <span class="avatar-sprite">🗡️</span>
+                        <span class="avatar-name">ROGUE</span>
+                    </div>
+                    <div class="avatar-option" data-avatar="🔨" data-name="SMITH">
+                        <span class="avatar-sprite">🔨</span>
+                        <span class="avatar-name">SMITH</span>
+                    </div>
+                    <div class="avatar-option" data-avatar="📚" data-name="SCHOLAR">
+                        <span class="avatar-sprite">📚</span>
+                        <span class="avatar-name">SCHOLAR</span>
+                    </div>
+                    <div class="avatar-option" data-avatar="🎭" data-name="BARD">
+                        <span class="avatar-sprite">🎭</span>
+                        <span class="avatar-name">BARD</span>
+                    </div>
+                    <div class="avatar-option" data-avatar="🔮" data-name="SEER">
+                        <span class="avatar-sprite">🔮</span>
+                        <span class="avatar-name">SEER</span>
+                    </div>
+                </div>
+            </div>
             
-            <h2>◆ STATS ◆</h2>
-            <div class="stats-create">
-                <div class="stat-row-create">
-                    <span>💪 STR</span>
-                    <div class="stat-controls">
+            <div class="name-section">
+                <input type="text" class="name-input" id="charName" placeholder="NAME..." maxlength="8">
+            </div>
+            
+            <div class="stats-section">
+                <div class="stat-box">
+                    <span class="stat-info">
+                        <span class="stat-icon">💪</span>
+                        <span class="stat-name">STR</span>
+                    </span>
+                    <span class="stat-controls">
                         <button class="stat-btn" onclick="changeStat('strength', -1)">-</button>
                         <span class="stat-value" id="strength">5</span>
                         <button class="stat-btn" onclick="changeStat('strength', 1)">+</button>
-                    </div>
+                    </span>
                 </div>
-                <div class="stat-row-create">
-                    <span>🧠 INT</span>
-                    <div class="stat-controls">
+                <div class="stat-box">
+                    <span class="stat-info">
+                        <span class="stat-icon">🧠</span>
+                        <span class="stat-name">INT</span>
+                    </span>
+                    <span class="stat-controls">
                         <button class="stat-btn" onclick="changeStat('intelligence', -1)">-</button>
                         <span class="stat-value" id="intelligence">5</span>
                         <button class="stat-btn" onclick="changeStat('intelligence', 1)">+</button>
-                    </div>
+                    </span>
                 </div>
-                <div class="stat-row-create">
-                    <span>✨ CHA</span>
-                    <div class="stat-controls">
+                <div class="stat-box">
+                    <span class="stat-info">
+                        <span class="stat-icon">✨</span>
+                        <span class="stat-name">CHA</span>
+                    </span>
+                    <span class="stat-controls">
                         <button class="stat-btn" onclick="changeStat('charisma', -1)">-</button>
                         <span class="stat-value" id="charisma">5</span>
                         <button class="stat-btn" onclick="changeStat('charisma', 1)">+</button>
-                    </div>
+                    </span>
                 </div>
-                <div class="stat-row-create">
-                    <span>🍀 LCK</span>
-                    <div class="stat-controls">
+                <div class="stat-box">
+                    <span class="stat-info">
+                        <span class="stat-icon">🍀</span>
+                        <span class="stat-name">LCK</span>
+                    </span>
+                    <span class="stat-controls">
                         <button class="stat-btn" onclick="changeStat('luck', -1)">-</button>
                         <span class="stat-value" id="luck">5</span>
                         <button class="stat-btn" onclick="changeStat('luck', 1)">+</button>
-                    </div>
+                    </span>
                 </div>
-                <div class="points-left">
+                <div class="points-box">
                     POINTS: <span id="pointsLeft">0</span>/20
                 </div>
             </div>
@@ -606,80 +652,70 @@ async def root():
             </button>
         </div>
         
-        <!-- Экран игры -->
+        <!-- ЭКРАН ИГРЫ -->
         <div class="container game-screen hidden" id="gameScreen">
-            <div class="header">
-                <h1>◆ RE:ALITY ◆</h1>
-                <div class="day-counter">DAY <span id="day">1</span></div>
+            <div class="game-header pixel-box">
+                <span class="game-title">◆ RE:ALITY ◆</span>
+                <span class="day-badge">DAY <span id="day">1</span></span>
             </div>
             
-            <!-- ПЕРСОНАЖ В ЦЕНТРЕ -->
-            <div class="character-zone">
-                <div class="character-avatar-big" id="gameAvatar">👨</div>
-                <div class="character-name-plate" id="gameName">PLAYER</div>
-                <div class="character-stats-bar">
-                    <span class="stat-item">💪<span id="strVal">5</span></span>
-                    <span class="stat-item">🧠<span id="intVal">5</span></span>
-                    <span class="stat-item">✨<span id="chaVal">5</span></span>
-                    <span class="stat-item">🍀<span id="lckVal">5</span></span>
+            <!-- ПЕРСОНАЖ ВО ВЕСЬ РОСТ -->
+            <div class="hero-section">
+                <div class="hero-avatar" id="gameAvatar">🧙‍♂️</div>
+                <div class="hero-platform"></div>
+                <div class="hero-name" id="gameName">HERO</div>
+                <div class="hero-stats">
+                    <span class="hero-stat">💪<span id="strVal">5</span></span>
+                    <span class="hero-stat">🧠<span id="intVal">5</span></span>
+                    <span class="hero-stat">✨<span id="chaVal">5</span></span>
+                    <span class="hero-stat">🍀<span id="lckVal">5</span></span>
                 </div>
             </div>
             
             <!-- РЕСУРСЫ -->
-            <div class="resources-panel">
-                <div class="resource-box">
-                    <div class="resource-icon">💰</div>
-                    <div class="resource-value" id="moneyText">5000</div>
-                    <div class="resource-label">MONEY</div>
+            <div class="resources-bar">
+                <div class="res-box pixel-box">
+                    <div class="res-icon">💰</div>
+                    <div class="res-value" id="moneyText">5000</div>
+                    <div class="res-label">MONEY</div>
                 </div>
-                <div class="resource-box">
-                    <div class="resource-icon">📅</div>
-                    <div class="resource-value" id="actionsText">3</div>
-                    <div class="resource-label">ACTIONS</div>
+                <div class="res-box pixel-box">
+                    <div class="res-icon">⚡</div>
+                    <div class="res-value" id="energyText">100</div>
+                    <div class="res-label">NRG</div>
+                </div>
+                <div class="res-box pixel-box">
+                    <div class="res-icon">📅</div>
+                    <div class="res-value" id="actionsText">3</div>
+                    <div class="res-label">ACT</div>
                 </div>
             </div>
             
-            <!-- ЭНЕРГИЯ -->
-            <div class="energy-panel">
-                <div class="energy-header">
-                    <span>⚡ ENERGY</span>
-                    <span id="energyText">100%</span>
-                </div>
-                <div class="energy-bar-container">
-                    <div class="energy-bar-fill" id="energyBar" style="width: 100%"></div>
-                    <span class="energy-text" id="energyBarText">100%</span>
-                </div>
+            <!-- ЭНЕРГИЯ БАР -->
+            <div class="energy-bar pixel-box">
+                <div class="energy-fill" id="energyBar" style="width: 100%"></div>
+                <span class="energy-text" id="energyBarText">100%</span>
             </div>
             
             <!-- ДЕЙСТВИЯ -->
-            <div class="actions-title">◆ ACTIONS ◆</div>
-            <div class="actions">
+            <div class="actions-grid">
                 <button class="action-btn primary" id="btn-work" onclick="doAction('work')">
                     <span class="action-icon">💼</span>
-                    <span class="action-info">
-                        <span class="action-name">WORK</span>
-                        <span class="action-desc">+1500₽ / -30⚡</span>
-                    </span>
+                    <span>WORK</span>
                 </button>
                 <button class="action-btn" id="btn-eat" onclick="doAction('eat')">
                     <span class="action-icon">🍜</span>
-                    <span class="action-info">
-                        <span class="action-name">EAT</span>
-                        <span class="action-desc">+20⚡ / -200₽</span>
-                    </span>
+                    <span>EAT</span>
                 </button>
                 <button class="action-btn" id="btn-sleep" onclick="doAction('sleep')">
                     <span class="action-icon">😴</span>
-                    <span class="action-info">
-                        <span class="action-name">SLEEP</span>
-                        <span class="action-desc">NEXT DAY / -700₽</span>
-                    </span>
+                    <span>SLEEP</span>
                 </button>
             </div>
             
             <!-- ЛОГ -->
-            <div class="log-panel" id="log">
-                <div class="log-entry">SYSTEM READY...</div>
+            <div class="log-box pixel-box" id="log">
+                <div class="log-entry">> SYSTEM READY...</div>
             </div>
         </div>
         
@@ -691,6 +727,7 @@ async def root():
             let gameState = {};
             let character = {};
             let selectedAvatar = '';
+            let selectedClass = '';
             
             let stats = { strength: 5, intelligence: 5, charisma: 5, luck: 5 };
             const MAX_POINTS = 20;
@@ -701,8 +738,7 @@ async def root():
                     document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
                     this.classList.add('selected');
                     selectedAvatar = this.dataset.avatar;
-                    this.classList.add('bounce');
-                    setTimeout(() => this.classList.remove('bounce'), 500);
+                    selectedClass = this.dataset.name;
                     checkCreateButton();
                 };
             });
@@ -775,8 +811,8 @@ async def root():
                 character = data.character || {};
                 
                 if (character) {
-                    document.getElementById('gameAvatar').textContent = character.avatar || '👨';
-                    document.getElementById('gameName').textContent = (character.name || 'PLAYER').toUpperCase();
+                    document.getElementById('gameAvatar').textContent = character.avatar || '🧙‍♂️';
+                    document.getElementById('gameName').textContent = (character.name || 'HERO').toUpperCase();
                     document.getElementById('strVal').textContent = character.strength;
                     document.getElementById('intVal').textContent = character.intelligence;
                     document.getElementById('chaVal').textContent = character.charisma;
@@ -784,7 +820,7 @@ async def root():
                 }
                 
                 updateDisplay();
-                log('WELCOME TO RE:ALITY', 'success');
+                log('WELCOME HERO', 'success');
             }
             
             function updateDisplay() {
@@ -793,7 +829,7 @@ async def root():
                 document.getElementById('actionsText').textContent = gameState.actions;
                 
                 let energy = gameState.energy;
-                document.getElementById('energyText').textContent = energy + '%';
+                document.getElementById('energyText').textContent = energy;
                 document.getElementById('energyBarText').textContent = energy + '%';
                 document.getElementById('energyBar').style.width = energy + '%';
                 
@@ -807,13 +843,13 @@ async def root():
                 entry.className = 'log-entry log-' + type;
                 entry.textContent = '> ' + msg;
                 logDiv.insertBefore(entry, logDiv.firstChild);
-                while (logDiv.children.length > 8) logDiv.removeChild(logDiv.lastChild);
+                while (logDiv.children.length > 4) logDiv.removeChild(logDiv.lastChild);
             }
             
             async function doAction(action) {
                 let btn = document.getElementById('btn-' + action);
                 btn.classList.add('shake');
-                setTimeout(() => btn.classList.remove('shake'), 300);
+                setTimeout(() => btn.classList.remove('shake'), 200);
                 
                 let response = await fetch('/api/action', {
                     method: 'POST',
