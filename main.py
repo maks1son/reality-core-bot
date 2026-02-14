@@ -133,12 +133,12 @@ async def root():
                 box-shadow: 3px 3px 0px #000;
             }
             
-            /* ===== СОЗДАНИЕ ===== */
+            /* ===== СОЗДАНИЕ - 3 ПЕРСОНАЖА ===== */
             .create-screen {
                 display: flex;
                 flex-direction: column;
                 height: 100%;
-                gap: 6px;
+                gap: 8px;
             }
             
             .create-header {
@@ -147,82 +147,108 @@ async def root():
             }
             
             .create-header h1 { 
-                font-size: 12px; 
+                font-size: 14px; 
                 color: var(--accent);
                 text-shadow: 2px 2px 0px #000;
             }
             
-            /* ПЕРСОНАЖИ ВО ВЕСЬ РОСТ */
-            .heroes-area {
+            .create-header p { 
+                font-size: 7px; 
+                color: #8b7cb0;
+                margin-top: 4px;
+            }
+            
+            .heroes-select {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
-                min-height: 0;
+                justify-content: center;
+                gap: 10px;
+                padding: 10px 0;
             }
             
-            .section-title {
+            .section-label {
                 text-align: center;
                 font-size: 8px;
                 color: var(--warning);
-                margin-bottom: 6px;
             }
             
-            .heroes-grid {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 6px;
-                flex: 1;
+            .heroes-trio {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
             }
             
-            .hero-card {
+            .hero-slot {
+                width: 90px;
+                height: 140px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: flex-end;
                 background: var(--panel-bg);
-                border: 3px solid var(--border-color);
-                box-shadow: 3px 3px 0px #000;
+                border: 4px solid var(--border-color);
+                box-shadow: 4px 4px 0px #000;
                 cursor: pointer;
-                padding: 4px;
+                padding: 8px;
                 position: relative;
-                overflow: hidden;
+                transition: all 0.2s;
             }
             
-            .hero-card:hover { 
+            .hero-slot:hover { 
+                transform: translate(-2px, -2px);
+                box-shadow: 6px 6px 0px #000;
                 border-color: var(--accent);
             }
             
-            .hero-card.selected { 
+            .hero-slot.selected { 
                 border-color: var(--success);
                 background: #0f3d3e;
-                box-shadow: inset 2px 2px 0px #000;
+                box-shadow: inset 3px 3px 0px #000;
+                transform: translate(2px, 2px);
             }
             
-            /* ПИКСЕЛЬНЫЙ ЧЕЛОВЕЧЕК */
-            .pixel-person {
-                font-size: 48px;
+            .slot-number {
+                position: absolute;
+                top: 5px;
+                left: 5px;
+                font-size: 10px;
+                color: #666;
+            }
+            
+            .hero-preview {
+                font-size: 64px;
                 line-height: 1;
+                margin-bottom: 8px;
                 filter: contrast(1.2);
-                image-rendering: pixelated;
             }
             
-            .hero-gender {
+            .slot-label {
                 font-size: 8px;
                 color: #8b7cb0;
-                margin-top: 4px;
+                text-align: center;
+            }
+            
+            .custom-hint {
+                text-align: center;
+                font-size: 7px;
+                color: #666;
+                margin-top: 10px;
+                padding: 8px;
+                border: 2px dashed #444;
             }
             
             /* ИМЯ */
-            .name-row {
+            .name-section {
                 display: flex;
-                gap: 6px;
+                gap: 8px;
             }
             
             .name-input {
                 flex: 1;
-                padding: 8px;
+                padding: 12px;
                 font-family: 'Press Start 2P', cursive;
-                font-size: 10px;
+                font-size: 12px;
                 background: var(--panel-bg);
                 border: 3px solid var(--border-color);
                 box-shadow: 3px 3px 0px #000;
@@ -231,36 +257,33 @@ async def root():
                 text-align: center;
             }
             
-            /* СТАТЫ КОМПАКТНО */
-            .stats-row {
+            /* СТАТЫ */
+            .stats-compact {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
                 gap: 6px;
             }
             
-            .stat-item {
-                background: var(--panel-bg);
-                border: 3px solid var(--border-color);
-                box-shadow: 3px 3px 0px #000;
-                padding: 6px;
+            .stat-box {
+                padding: 8px 4px;
                 text-align: center;
             }
             
-            .stat-header {
-                font-size: 12px;
+            .stat-ico {
+                font-size: 14px;
                 margin-bottom: 4px;
             }
             
-            .stat-controls {
+            .stat-row-mini {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                gap: 6px;
+                gap: 4px;
             }
             
-            .stat-btn {
-                width: 20px;
-                height: 20px;
+            .stat-btn-mini {
+                width: 18px;
+                height: 18px;
                 font-family: 'Press Start 2P', cursive;
                 font-size: 10px;
                 background: var(--accent);
@@ -270,38 +293,39 @@ async def root():
                 cursor: pointer;
             }
             
-            .stat-btn:active {
+            .stat-btn-mini:active {
                 transform: translate(1px, 1px);
                 box-shadow: 1px 1px 0px #000;
             }
             
-            .stat-btn:disabled { 
-                opacity: 0.3; 
-            }
-            
-            .stat-num { 
-                font-size: 12px; 
+            .stat-val {
+                font-size: 12px;
                 color: var(--success);
-                min-width: 20px;
+                min-width: 18px;
             }
             
-            .points-display {
+            .points-bar {
                 text-align: center;
-                padding: 6px;
+                padding: 8px;
                 border: 2px dashed var(--warning);
                 color: var(--warning);
                 font-size: 10px;
             }
             
             .start-btn {
-                padding: 12px;
+                padding: 15px;
                 font-family: 'Press Start 2P', cursive;
-                font-size: 12px;
+                font-size: 14px;
                 background: var(--success);
                 border: none;
-                box-shadow: 3px 3px 0px #2d8b84;
+                box-shadow: 4px 4px 0px #2d8b84;
                 color: #000;
                 cursor: pointer;
+            }
+            
+            .start-btn:active {
+                transform: translate(2px, 2px);
+                box-shadow: 2px 2px 0px #2d8b84;
             }
             
             .start-btn:disabled { 
@@ -309,7 +333,7 @@ async def root():
                 background: #666;
             }
             
-            /* ===== ИГРА ===== */
+            /* ===== ИГРА - БОЛЬШОЙ ПЕРСОНАЖ ===== */
             .game-screen {
                 display: flex;
                 flex-direction: column;
@@ -317,7 +341,7 @@ async def root():
                 gap: 6px;
             }
             
-            .top-bar {
+            .game-top {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -325,21 +349,21 @@ async def root():
             }
             
             .game-title {
-                font-size: 10px;
+                font-size: 12px;
                 color: var(--accent);
                 text-shadow: 2px 2px 0px #000;
             }
             
-            .day-box {
+            .day-pill {
                 background: var(--warning);
                 color: #000;
-                padding: 4px 8px;
-                font-size: 8px;
+                padding: 5px 10px;
+                font-size: 10px;
                 box-shadow: 2px 2px 0px #b8a030;
             }
             
-            /* ЦЕНТР - ПЕРСОНАЖ */
-            .main-stage {
+            /* ЦЕНТР - ОГРОМНЫЙ ПЕРСОНАЖ */
+            .hero-stage {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
@@ -349,87 +373,87 @@ async def root():
                 min-height: 0;
             }
             
-            .stage-floor {
+            .shadow-platform {
                 position: absolute;
-                bottom: 20%;
-                width: 200px;
-                height: 40px;
-                background: var(--panel-bg);
-                border: 3px solid var(--border-color);
+                bottom: 15%;
+                width: 180px;
+                height: 30px;
+                background: rgba(0,0,0,0.3);
                 border-radius: 50%;
                 z-index: 0;
             }
             
-            .hero-figure {
-                font-size: 100px;
+            .hero-giant {
+                font-size: 140px;
                 line-height: 1;
                 z-index: 1;
-                filter: contrast(1.2);
-                animation: idle 2s ease-in-out infinite;
-                text-shadow: 4px 4px 0px #000;
+                filter: contrast(1.3) drop-shadow(4px 4px 0px #000);
+                animation: breathe 2s ease-in-out infinite;
             }
             
-            @keyframes idle {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-5px); }
+            @keyframes breathe {
+                0%, 100% { transform: translateY(0) scale(1); }
+                50% { transform: translateY(-8px) scale(1.02); }
             }
             
-            .hero-tag {
-                margin-top: 8px;
-                padding: 6px 16px;
+            .hero-badge {
+                margin-top: 10px;
+                padding: 8px 20px;
                 background: var(--panel-bg);
                 border: 3px solid var(--border-color);
                 box-shadow: 3px 3px 0px #000;
-                font-size: 10px;
+                font-size: 12px;
                 color: var(--accent);
                 z-index: 1;
             }
             
-            .hero-build {
+            .hero-stats-row {
                 display: flex;
-                gap: 12px;
-                margin-top: 6px;
-                font-size: 10px;
+                gap: 15px;
+                margin-top: 8px;
+                font-size: 12px;
                 z-index: 1;
             }
             
-            .build-stat {
+            .h-stat {
                 display: flex;
                 align-items: center;
-                gap: 2px;
+                gap: 3px;
             }
             
             /* РЕСУРСЫ */
-            .res-row {
+            .res-grid {
                 display: grid;
                 grid-template-columns: 2fr 1fr 1fr;
                 gap: 6px;
             }
             
-            .res-item {
-                padding: 8px;
+            .res-cell {
+                padding: 10px 6px;
                 text-align: center;
             }
             
-            .res-val {
-                font-size: 14px;
+            .res-ico { font-size: 16px; }
+            .res-num { 
+                font-size: 16px; 
                 color: var(--success);
-                margin: 2px 0;
+                margin: 4px 0;
             }
+            .res-lbl { font-size: 6px; color: #666; }
             
             /* ЭНЕРГИЯ */
-            .nrg-bar {
-                height: 20px;
+            .energy-box {
+                height: 24px;
                 position: relative;
             }
             
-            .nrg-fill {
+            .energy-inner {
                 height: 100%;
                 background: linear-gradient(90deg, var(--danger), var(--warning), var(--success));
                 transition: width 0.3s;
             }
             
-            .nrg-text {
+            .energy-txt {
                 position: absolute;
                 top: 50%;
                 left: 50%;
@@ -438,21 +462,21 @@ async def root():
                 text-shadow: 2px 2px 0px #000;
             }
             
-            /* КНОПКИ */
-            .action-row {
+            /* ДЕЙСТВИЯ */
+            .acts-row {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
                 gap: 6px;
             }
             
-            .act-btn {
+            .act-pill {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                padding: 10px 4px;
-                gap: 4px;
+                padding: 12px 4px;
+                gap: 6px;
                 font-family: 'Press Start 2P', cursive;
-                font-size: 8px;
+                font-size: 9px;
                 background: var(--panel-bg);
                 border: 3px solid var(--border-color);
                 box-shadow: 3px 3px 0px #000;
@@ -460,42 +484,42 @@ async def root():
                 cursor: pointer;
             }
             
-            .act-btn:active {
+            .act-pill:active {
                 transform: translate(2px, 2px);
                 box-shadow: 1px 1px 0px #000;
             }
             
-            .act-btn:disabled { 
+            .act-pill:disabled { 
                 opacity: 0.4;
             }
             
-            .act-btn.main {
+            .act-pill.main {
                 border-color: var(--success);
                 background: #0f3d3e;
             }
             
-            .act-ico {
-                font-size: 24px;
+            .act-big-ico {
+                font-size: 28px;
             }
             
             /* ЛОГ */
-            .game-log {
-                height: 50px;
+            .log-compact {
+                height: 45px;
                 overflow-y: auto;
                 padding: 6px;
             }
             
-            .log-line {
+            .log-entry {
                 margin: 2px 0;
-                padding: 3px 6px;
+                padding: 4px 8px;
                 background: rgba(0,0,0,0.3);
                 border-left: 3px solid var(--accent);
-                font-size: 7px;
+                font-size: 8px;
             }
             
-            .good { border-left-color: var(--success); }
-            .bad { border-left-color: var(--danger); }
-            .warn { border-left-color: var(--warning); }
+            .ok { border-left-color: var(--success); }
+            .no { border-left-color: var(--danger); }
+            .at { border-left-color: var(--warning); }
             
             @keyframes shake {
                 0%, 100% { transform: translateX(0); }
@@ -512,88 +536,81 @@ async def root():
         <div class="container create-screen" id="createScreen">
             <div class="create-header">
                 <h1>◆ RE:ALITY ◆</h1>
+                <p>CHOOSE YOUR CHARACTER</p>
             </div>
             
-            <div class="heroes-area">
-                <div class="section-title">◆ CHOOSE YOUR HERO ◆</div>
-                <div class="heroes-grid" id="heroes">
-                    <!-- МУЖЧИНЫ -->
-                    <div class="hero-card" data-avatar="🧍‍♂️" data-type="Классика">
-                        <div class="pixel-person">🧍‍♂️</div>
-                        <div class="hero-gender">MALE</div>
+            <div class="heroes-select">
+                <div class="section-label">◆ SELECT HERO ◆</div>
+                
+                <div class="heroes-trio">
+                    <!-- СЛОТ 1 -->
+                    <div class="hero-slot" data-avatar="🧍‍♂️" data-slot="1">
+                        <span class="slot-number">1</span>
+                        <div class="hero-preview" id="slot1">🧍‍♂️</div>
+                        <div class="slot-label">HERO 1</div>
                     </div>
-                    <div class="hero-card" data-avatar="🧔‍♂️" data-type="Бородач">
-                        <div class="pixel-person">🧔‍♂️</div>
-                        <div class="hero-gender">MALE</div>
+                    
+                    <!-- СЛОТ 2 -->
+                    <div class="hero-slot" data-avatar="🧍‍♀️" data-slot="2">
+                        <span class="slot-number">2</span>
+                        <div class="hero-preview" id="slot2">🧍‍♀️</div>
+                        <div class="slot-label">HERO 2</div>
                     </div>
-                    <div class="hero-card" data-avatar="👨‍🦱" data-type="Кудряш">
-                        <div class="pixel-person">👨‍🦱</div>
-                        <div class="hero-gender">MALE</div>
+                    
+                    <!-- СЛОТ 3 -->
+                    <div class="hero-slot" data-avatar="🧑" data-slot="3">
+                        <span class="slot-number">3</span>
+                        <div class="hero-preview" id="slot3">🧑</div>
+                        <div class="slot-label">HERO 3</div>
                     </div>
-                    <div class="hero-card" data-avatar="👨‍🦲" data-type="Лысый">
-                        <div class="pixel-person">👨‍🦲</div>
-                        <div class="hero-gender">MALE</div>
-                    </div>
-                    <!-- ЖЕНЩИНЫ -->
-                    <div class="hero-card" data-avatar="🧍‍♀️" data-type="Классика">
-                        <div class="pixel-person">🧍‍♀️</div>
-                        <div class="hero-gender">FEMALE</div>
-                    </div>
-                    <div class="hero-card" data-avatar="👩‍🦰" data-type="Рыжая">
-                        <div class="pixel-person">👩‍🦰</div>
-                        <div class="hero-gender">FEMALE</div>
-                    </div>
-                    <div class="hero-card" data-avatar="👱‍♀️" data-type="Блонди">
-                        <div class="pixel-person">👱‍♀️</div>
-                        <div class="hero-gender">FEMALE</div>
-                    </div>
-                    <div class="hero-card" data-avatar="👩‍🦱" data-type="Кудряшка">
-                        <div class="pixel-person">👩‍🦱</div>
-                        <div class="hero-gender">FEMALE</div>
-                    </div>
+                </div>
+                
+                <div class="custom-hint">
+                    💡 Замени эмодзи в коде на свои спрайты<br>
+                    См. инструкцию ниже
                 </div>
             </div>
             
-            <div class="name-row">
+            <div class="name-section">
                 <input type="text" class="name-input pixel-box" id="charName" placeholder="NAME" maxlength="8">
             </div>
             
-            <div class="stats-row">
-                <div class="stat-item">
-                    <div class="stat-header">💪</div>
-                    <div class="stat-controls">
-                        <button class="stat-btn" onclick="chg('str', -1)">-</button>
-                        <span class="stat-num" id="str">5</span>
-                        <button class="stat-btn" onclick="chg('str', 1)">+</button>
+            <div class="stats-compact">
+                <div class="stat-box pixel-box">
+                    <div class="stat-ico">💪</div>
+                    <div class="stat-row-mini">
+                        <button class="stat-btn-mini" onclick="chg('str',-1)">-</button>
+                        <span class="stat-val" id="str">5</span>
+                        <button class="stat-btn-mini" onclick="chg('str',1)">+</button>
                     </div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-header">🧠</div>
-                    <div class="stat-controls">
-                        <button class="stat-btn" onclick="chg('int', -1)">-</button>
-                        <span class="stat-num" id="int">5</span>
-                        <button class="stat-btn" onclick="chg('int', 1)">+</button>
+                <div class="stat-box pixel-box">
+                    <div class="stat-ico">🧠</div>
+                    <div class="stat-row-mini">
+                        <button class="stat-btn-mini" onclick="chg('int',-1)">-</button>
+                        <span class="stat-val" id="int">5</span>
+                        <button class="stat-btn-mini" onclick="chg('int',1)">+</button>
                     </div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-header">✨</div>
-                    <div class="stat-controls">
-                        <button class="stat-btn" onclick="chg('cha', -1)">-</button>
-                        <span class="stat-num" id="cha">5</span>
-                        <button class="stat-btn" onclick="chg('cha', 1)">+</button>
+                <div class="stat-box pixel-box">
+                    <div class="stat-ico">✨</div>
+                    <div class="stat-row-mini">
+                        <button class="stat-btn-mini" onclick="chg('cha',-1)">-</button>
+                        <span class="stat-val" id="cha">5</span>
+                        <button class="stat-btn-mini" onclick="chg('cha',1)">+</button>
                     </div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-header">🍀</div>
-                    <div class="stat-controls">
-                        <button class="stat-btn" onclick="chg('lck', -1)">-</button>
-                        <span class="stat-num" id="lck">5</span>
-                        <button class="stat-btn" onclick="chg('lck', 1)">+</button>
+                <div class="stat-box pixel-box">
+                    <div class="stat-ico">🍀</div>
+                    <div class="stat-row-mini">
+                        <button class="stat-btn-mini" onclick="chg('lck',-1)">-</button>
+                        <span class="stat-val" id="lck">5</span>
+                        <button class="stat-btn-mini" onclick="chg('lck',1)">+</button>
                     </div>
                 </div>
             </div>
             
-            <div class="points-display">
+            <div class="points-bar">
                 POINTS: <span id="pts">0</span>/20
             </div>
             
@@ -604,63 +621,64 @@ async def root():
         
         <!-- ИГРА -->
         <div class="container game-screen hidden" id="gameScreen">
-            <div class="top-bar pixel-box">
+            <div class="game-top pixel-box">
                 <span class="game-title">◆ RE:ALITY ◆</span>
-                <span class="day-box">DAY <span id="day">1</span></span>
+                <span class="day-pill">DAY <span id="day">1</span></span>
             </div>
             
-            <div class="main-stage">
-                <div class="stage-floor"></div>
-                <div class="hero-figure" id="gAvatar">🧍‍♂️</div>
-                <div class="hero-tag" id="gName">HERO</div>
-                <div class="hero-build">
-                    <span class="build-stat">💪<span id="gStr">5</span></span>
-                    <span class="build-stat">🧠<span id="gInt">5</span></span>
-                    <span class="build-stat">✨<span id="gCha">5</span></span>
-                    <span class="build-stat">🍀<span id="gLck">5</span></span>
+            <!-- ОГРОМНЫЙ ПЕРСОНАЖ -->
+            <div class="hero-stage">
+                <div class="shadow-platform"></div>
+                <div class="hero-giant" id="gAvatar">🧍‍♂️</div>
+                <div class="hero-badge" id="gName">HERO</div>
+                <div class="hero-stats-row">
+                    <span class="h-stat">💪<span id="gStr">5</span></span>
+                    <span class="h-stat">🧠<span id="gInt">5</span></span>
+                    <span class="h-stat">✨<span id="gCha">5</span></span>
+                    <span class="h-stat">🍀<span id="gLck">5</span></span>
                 </div>
             </div>
             
-            <div class="res-row">
-                <div class="res-item pixel-box">
-                    <div>💰</div>
-                    <div class="res-val" id="gMoney">5000</div>
-                    <div style="font-size:6px;color:#666">MONEY</div>
+            <div class="res-grid">
+                <div class="res-cell pixel-box">
+                    <div class="res-ico">💰</div>
+                    <div class="res-num" id="gMoney">5000</div>
+                    <div class="res-lbl">MONEY</div>
                 </div>
-                <div class="res-item pixel-box">
-                    <div>⚡</div>
-                    <div class="res-val" id="gNRG">100</div>
-                    <div style="font-size:6px;color:#666">NRG</div>
+                <div class="res-cell pixel-box">
+                    <div class="res-ico">⚡</div>
+                    <div class="res-num" id="gNRG">100</div>
+                    <div class="res-lbl">ENERGY</div>
                 </div>
-                <div class="res-item pixel-box">
-                    <div>📅</div>
-                    <div class="res-val" id="gAct">3</div>
-                    <div style="font-size:6px;color:#666">ACT</div>
+                <div class="res-cell pixel-box">
+                    <div class="res-ico">📅</div>
+                    <div class="res-num" id="gAct">3</div>
+                    <div class="res-lbl">ACTIONS</div>
                 </div>
             </div>
             
-            <div class="nrg-bar pixel-box">
-                <div class="nrg-fill" id="gBar" style="width:100%"></div>
-                <span class="nrg-text" id="gBarTxt">100%</span>
+            <div class="energy-box pixel-box">
+                <div class="energy-inner" id="gBar" style="width:100%"></div>
+                <span class="energy-txt" id="gBarTxt">100%</span>
             </div>
             
-            <div class="action-row">
-                <button class="act-btn main" id="btn-work" onclick="act('work')">
-                    <span class="act-ico">💼</span>
+            <div class="acts-row">
+                <button class="act-pill main" id="btn-work" onclick="act('work')">
+                    <span class="act-big-ico">💼</span>
                     <span>WORK</span>
                 </button>
-                <button class="act-btn" id="btn-eat" onclick="act('eat')">
-                    <span class="act-ico">🍜</span>
+                <button class="act-pill" id="btn-eat" onclick="act('eat')">
+                    <span class="act-big-ico">🍜</span>
                     <span>EAT</span>
                 </button>
-                <button class="act-btn" id="btn-sleep" onclick="act('sleep')">
-                    <span class="act-ico">😴</span>
+                <button class="act-pill" id="btn-sleep" onclick="act('sleep')">
+                    <span class="act-big-ico">😴</span>
                     <span>SLEEP</span>
                 </button>
             </div>
             
-            <div class="game-log pixel-box" id="log">
-                <div class="log-line">> SYSTEM READY...</div>
+            <div class="log-compact pixel-box" id="log">
+                <div class="log-entry">> SYSTEM READY...</div>
             </div>
         </div>
         
@@ -673,9 +691,9 @@ async def root():
             let stats = {str:5, int:5, cha:5, lck:5};
             const MAX = 20, MIN = 1;
             
-            document.querySelectorAll('.hero-card').forEach(el => {
+            document.querySelectorAll('.hero-slot').forEach(el => {
                 el.onclick = function() {
-                    document.querySelectorAll('.hero-card').forEach(h => h.classList.remove('selected'));
+                    document.querySelectorAll('.hero-slot').forEach(h => h.classList.remove('selected'));
                     this.classList.add('selected');
                     sel = this.dataset.avatar;
                     check();
@@ -700,7 +718,7 @@ async def root():
                 let used = Object.values(stats).reduce((a,b)=>a+b,0);
                 document.getElementById('pts').textContent = MAX - used;
                 
-                document.querySelectorAll('.stat-btn').forEach(b => {
+                document.querySelectorAll('.stat-btn-mini').forEach(b => {
                     b.disabled = (b.textContent=='+' && MAX-used<=0);
                 });
             }
@@ -741,11 +759,11 @@ async def root():
                 document.getElementById('gCha').textContent = hero.charisma;
                 document.getElementById('gLck').textContent = hero.luck;
                 
-                updGame();
-                addLog('WELCOME ' + hero.name.toUpperCase(), 'good');
+                updG();
+                log('WELCOME ' + hero.name.toUpperCase(), 'ok');
             }
             
-            function updGame() {
+            function updG() {
                 document.getElementById('gMoney').textContent = state.money;
                 document.getElementById('day').textContent = state.day;
                 document.getElementById('gAct').textContent = state.actions;
@@ -757,10 +775,10 @@ async def root():
                 document.getElementById('btn-eat').disabled = state.actions<=0;
             }
             
-            function addLog(m, c='') {
+            function log(m, c='') {
                 let l = document.getElementById('log');
                 let e = document.createElement('div');
-                e.className = 'log-line ' + c;
+                e.className = 'log-entry ' + c;
                 e.textContent = '> ' + m;
                 l.insertBefore(e, l.firstChild);
                 while(l.children.length>3) l.removeChild(l.lastChild);
@@ -780,11 +798,11 @@ async def root():
                 
                 if(res.success) {
                     state = res.state;
-                    updGame();
-                    let cl = res.message.includes('день')?'warn':'good';
-                    addLog(res.message.toUpperCase(), cl);
+                    updG();
+                    let cl = res.message.includes('день')?'at':'ok';
+                    log(res.message.toUpperCase(), cl);
                 } else {
-                    addLog('ERROR: '+res.message.toUpperCase(), 'bad');
+                    log('ERROR: '+res.message.toUpperCase(), 'no');
                 }
             }
             
