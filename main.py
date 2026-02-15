@@ -29,6 +29,8 @@ async def create_character(request: Request):
         data['charisma'],
         data['luck']
     )
+    # Создаём пользователя сразу
+    save_user(data['user_id'], 0, 100, 1, 5, 0)
     return {'success': True}
 
 @app.post("/api/tap")
@@ -47,71 +49,54 @@ async def do_tap(request: Request):
         return {'success': False, 'message': 'Недостаточно энергии!'}
     
     # === ЗАЩИТА ОТ АВТОКЛИКЕРОВ ===
-    
-    # 1. Проверка времени между запросами (слишком быстро = бот)
     current_time = time.time() * 1000
     time_diff = current_time - timestamp
     
-    # Минимальное время для человеческого клика ~80ms, но учитываем сетевую задержку
-    if time_diff < 50:  # Меньше 50ms - явно автокликер
+    if time_diff < 50:
         return {'success': False, 'message': 'Слишком быстро!', 'cheat_detected': True}
     
-    # 2. Проверка паттерна нажатий (человек не кликает с идеальной частотой)
     if len(pattern) >= 3:
         intervals = []
         for i in range(1, len(pattern)):
             intervals.append(pattern[i] - pattern[i-1])
         
         if len(intervals) >= 2:
-            # Проверка на идеальную регулярность (боты кликают с одинаковым интервалом)
             variance = sum((x - sum(intervals)/len(intervals)) ** 2 for x in intervals) / len(intervals)
-            if variance < 10:  # Слишком регулярно - бот
+            if variance < 10:
                 return {'success': False, 'message': 'Обнаружен автокликер!', 'cheat_detected': True}
             
-            # Проверка на нереалистично быстрые интервалы
-            if min(intervals) < 80:  # Человек не кликает быстрее 80ms
+            if min(intervals) < 80:
                 return {'success': False, 'message': 'Слишком быстро!', 'cheat_detected': True}
     
-    # 3. Проверка на рандомизацию (боты часто шлют одинаковые значения)
     if len(set(pattern[-5:])) == 1 and len(pattern) >= 5:
         return {'success': False, 'message': 'Обнаружен бот!', 'cheat_detected': True}
     
-    # === РАСЧЁТ МНОЖИТЕЛЯ ===
-    
-    # Базовый доход за тап
+    # === РАСЧЁТ НАГРАДЫ ===
     base_reward = 1
     
-    # Множитель за серию (combo)
     if tap_count >= 100:
         multiplier = 2.0
-        bonus_text = " 🔥 x2.0 COMBO!"
     elif tap_count >= 50:
         multiplier = 1.5
-        bonus_text = " ⚡ x1.5 COMBO!"
     elif tap_count >= 30:
         multiplier = 1.3
-        bonus_text = " 💫 x1.3 COMBO!"
     elif tap_count >= 10:
         multiplier = 1.1
-        bonus_text = " ✨ x1.1 COMBO!"
     else:
         multiplier = 1.0
-        bonus_text = ""
     
-    # Бонус от характеристик (удача влияет на критический удар)
     luck_bonus = 0
     crit = False
     if character:
         luck = character.get('luck', 5)
-        crit_chance = luck * 0.02  # 10% при удаче 5, 20% при удаче 10
+        crit_chance = luck * 0.02
         if random.random() < crit_chance:
             crit = True
             luck_bonus = base_reward * multiplier
-            bonus_text += " 🍀 КРИТ!"
     
     total_reward = int(base_reward * multiplier + luck_bonus)
     
-    # Обновление состояния
+    # Обновление
     user['coins'] = user.get('coins', 0) + total_reward
     user['energy'] = max(0, user['energy'] - 1)
     user['total_taps'] = user.get('total_taps', 0) + 1
@@ -122,7 +107,7 @@ async def do_tap(request: Request):
         user['energy'], 
         user['day'], 
         user['actions'],
-        user.get('total_taps', 0)
+        user['total_taps']
     )
     
     return {
@@ -132,7 +117,8 @@ async def do_tap(request: Request):
         'crit': crit,
         'coins': user['coins'],
         'energy': user['energy'],
-        'message': f'+{total_reward} RC{bonus_text}'
+        'day': user['day'],
+        'actions': user['actions']
     }
 
 @app.post("/api/eat")
@@ -145,7 +131,6 @@ async def do_eat(request: Request):
     if user['actions'] <= 0:
         return {'success': False, 'message': 'Нет действий!'}
     
-    # Еда стоит 50 RC
     if user['coins'] < 50:
         return {'success': False, 'message': 'Недостаточно RC!'}
     
@@ -155,7 +140,13 @@ async def do_eat(request: Request):
     
     save_user(user_id, user['coins'], user['energy'], user['day'], user['actions'], user.get('total_taps', 0))
     
-    return {'success': True, 'message': 'Поел. +30⚡, -50 RC', 'state': user}
+    return {
+        'success': True, 
+        'coins': user['coins'],
+        'energy': user['energy'],
+        'actions': user['actions'],
+        'day': user['day']
+    }
 
 @app.post("/api/sleep")
 async def do_sleep(request: Request):
@@ -164,17 +155,22 @@ async def do_sleep(request: Request):
     
     user = get_user(user_id)
     
-    # Расходы на сон (аренда/жильё)
     rent = 100
     
-    user['day'] += 1
+    user['day'] = user['day'] + 1
     user['energy'] = 100
-    user['actions'] = 5  # Больше действий за день
+    user['actions'] = 5
     user['coins'] = max(0, user['coins'] - rent)
     
     save_user(user_id, user['coins'], user['energy'], user['day'], user['actions'], user.get('total_taps', 0))
     
-    return {'success': True, 'message': f'Новый день! Расходы: {rent} RC', 'state': user}
+    return {
+        'success': True, 
+        'coins': user['coins'],
+        'energy': user['energy'],
+        'day': user['day'],
+        'actions': user['actions']
+    }
 
 # === Главная страница ===
 
@@ -189,7 +185,16 @@ async def root():
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; image-rendering: pixelated; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            image-rendering: pixelated; 
+            user-select: none; 
+            -webkit-user-select: none; 
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
         :root {
             --bg-color: #2d1b4e;
             --panel-bg: #1a0f2e;
@@ -201,10 +206,13 @@ async def root():
             --text: #f7f1e3;
             --coin: #ffd700;
         }
-        html, body { height: 100%; overflow: hidden; }
+        html, body { 
+            height: 100%; 
+            overflow: hidden; 
+            background: var(--bg-color);
+        }
         body {
             font-family: 'Press Start 2P', cursive;
-            background: var(--bg-color);
             color: var(--text);
             font-size: 8px;
         }
@@ -214,7 +222,8 @@ async def root():
             margin: 0 auto; 
             display: flex;
             flex-direction: column;
-            padding: 6px;
+            padding: 10px;
+            gap: 10px;
         }
         .hidden { display: none !important; }
         .pixel-box {
@@ -390,34 +399,132 @@ async def root():
             background: #666;
         }
         
-        /* ИГРА */
+        /* ИГРА - НОВАЯ ВЕРСТКА */
         .game-screen {
             display: flex;
             flex-direction: column;
             height: 100%;
-            gap: 6px;
+            gap: 10px;
         }
-        .game-top {
+        
+        /* ВЕРХНЯЯ ПАНЕЛЬ */
+        .top-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 10px;
+            padding: 8px 12px;
         }
-        .game-title {
+        
+        .player-name {
             font-size: 12px;
             color: var(--accent);
             text-shadow: 2px 2px 0px #000;
         }
-        .day-pill {
+        
+        .day-badge {
             background: var(--warning);
             color: #000;
-            padding: 5px 10px;
+            padding: 6px 12px;
             font-size: 10px;
             box-shadow: 2px 2px 0px #b8a030;
         }
         
-        /* ТАП-ЗОНА */
-        .tap-zone {
+        /* Ресурсы в ряд */
+        .resources-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .res-box {
+            padding: 10px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .res-box.coins {
+            background: linear-gradient(135deg, var(--panel-bg), #3d2b1e);
+            border-color: var(--coin);
+        }
+        
+        .res-icon {
+            font-size: 14px;
+        }
+        
+        .res-value {
+            font-size: 14px;
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .res-value.coins {
+            color: var(--coin);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+        
+        .res-label {
+            font-size: 6px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        /* Энергия */
+        .energy-bar-container {
+            height: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .energy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--danger) 0%, var(--warning) 50%, var(--success) 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .energy-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+            text-shadow: 2px 2px 0px #000;
+            color: white;
+        }
+        
+        /* Множители */
+        .multiplier-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 6px;
+        }
+        
+        .multiplier-badge {
+            padding: 6px 10px;
+            font-size: 8px;
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            opacity: 0.4;
+        }
+        
+        .multiplier-badge.active {
+            opacity: 1;
+            border-color: var(--warning);
+            background: #3d3b1e;
+            color: var(--warning);
+            box-shadow: 0 0 8px rgba(255, 230, 109, 0.3);
+        }
+        
+        /* ЦЕНТРАЛЬНАЯ ЗОНА ТАПА */
+        .tap-area {
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -425,281 +532,167 @@ async def root():
             justify-content: center;
             position: relative;
             min-height: 0;
-            cursor: pointer;
-            border: 3px dashed var(--border-color);
-            border-radius: 20px;
-            margin: 10px;
-            transition: all 0.1s;
         }
-        .tap-zone:active {
-            transform: scale(0.98);
-            background: rgba(78, 205, 196, 0.1);
-        }
-        .tap-zone.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .shadow-platform {
-            position: absolute;
-            bottom: 20%;
-            width: 180px;
-            height: 30px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 50%;
-            z-index: 0;
-        }
-        .hero-giant {
-            width: 140px;
-            height: 140px;
-            z-index: 1;
-            animation: breathe 2s ease-in-out infinite;
+        
+        .hero-container {
+            position: relative;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            pointer-events: none;
+            gap: 15px;
+            cursor: pointer;
+            padding: 20px;
         }
-        .hero-giant img {
-            width: 140px;
-            height: 140px;
-            image-rendering: pixelated;
+        
+        .hero-sprite {
+            width: 100px;
+            height: 100px;
+            animation: breathe 2s ease-in-out infinite;
             filter: drop-shadow(4px 4px 0px #000);
-        }
-        @keyframes breathe {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-8px) scale(1.02); }
-        }
-        .tap-hint {
-            position: absolute;
-            bottom: 10%;
-            font-size: 10px;
-            color: var(--warning);
-            text-align: center;
-            z-index: 2;
             pointer-events: none;
         }
         
+        @keyframes breathe {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-6px) scale(1.02); }
+        }
+        
+        .tap-hint {
+            font-size: 8px;
+            color: var(--warning);
+            opacity: 0.7;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
         /* Плавающие числа */
-        .floating-text {
+        .floating-reward {
             position: absolute;
             font-size: 16px;
             font-weight: bold;
             color: var(--coin);
             text-shadow: 2px 2px 0px #000;
             pointer-events: none;
-            animation: floatUp 1s ease-out forwards;
+            animation: floatUp 0.8s ease-out forwards;
             z-index: 100;
         }
+        
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-50px) scale(1.5); }
+            100% { opacity: 0; transform: translateY(-40px) scale(1.3); }
         }
         
-        /* Комбо индикатор */
-        .combo-indicator {
+        /* Комбо текст */
+        .combo-text {
             position: absolute;
-            top: 10%;
-            font-size: 20px;
+            top: -30px;
+            font-size: 14px;
             color: var(--warning);
-            text-shadow: 3px 3px 0px #000;
+            text-shadow: 2px 2px 0px #000;
             opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 10;
-        }
-        .combo-indicator.show {
-            opacity: 1;
-            animation: pulse 0.5s ease-in-out;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
+            transition: all 0.3s;
+            pointer-events: none;
         }
         
-        .hero-badge {
-            margin-top: 10px;
-            padding: 8px 20px;
-            background: var(--panel-bg);
-            border: 3px solid var(--border-color);
-            box-shadow: 3px 3px 0px #000;
-            font-size: 12px;
-            color: var(--accent);
-            z-index: 1;
+        .combo-text.show {
+            opacity: 1;
+            animation: comboPop 0.5s ease-out;
         }
-        .hero-stats-row {
+        
+        @keyframes comboPop {
+            0% { transform: scale(0) rotate(-10deg); }
+            50% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        
+        /* Характеристики */
+        .stats-row {
             display: flex;
-            gap: 15px;
-            margin-top: 8px;
-            font-size: 12px;
-            z-index: 1;
+            justify-content: center;
+            gap: 20px;
+            padding: 8px;
+            font-size: 10px;
         }
-        .h-stat {
+        
+        .stat-item {
             display: flex;
             align-items: center;
-            gap: 3px;
-        }
-        
-        /* Ресурсы */
-        .res-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 6px;
-        }
-        .res-cell {
-            padding: 10px 6px;
-            text-align: center;
-        }
-        .res-cell.coins {
-            background: linear-gradient(135deg, var(--panel-bg), #3d2b1e);
-            border-color: var(--coin);
-        }
-        .res-ico { font-size: 16px; }
-        .res-num { 
-            font-size: 16px; 
-            color: var(--success);
-            margin: 4px 0;
-        }
-        .res-num.coins {
-            color: var(--coin);
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-        .res-lbl { font-size: 6px; color: #666; }
-        
-        .energy-box {
-            height: 24px;
-            position: relative;
-        }
-        .energy-inner {
-            height: 100%;
-            background: linear-gradient(90deg, var(--danger), var(--warning), var(--success));
-            transition: width 0.3s;
-        }
-        .energy-txt {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 10px;
-            text-shadow: 2px 2px 0px #000;
+            gap: 4px;
         }
         
         /* Кнопки действий */
-        .acts-row {
+        .actions-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px;
+            gap: 10px;
         }
-        .act-pill {
+        
+        .action-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 12px 4px;
-            gap: 6px;
+            justify-content: center;
+            padding: 15px 10px;
+            gap: 8px;
             font-family: 'Press Start 2P', cursive;
-            font-size: 9px;
+            font-size: 10px;
             background: var(--panel-bg);
             border: 3px solid var(--border-color);
             box-shadow: 3px 3px 0px #000;
             color: var(--text);
             cursor: pointer;
+            transition: all 0.1s;
         }
-        .act-pill:active {
+        
+        .action-btn:active:not(:disabled) {
             transform: translate(2px, 2px);
             box-shadow: 1px 1px 0px #000;
         }
-        .act-pill:disabled { 
-            opacity: 0.4;
+        
+        .action-btn:disabled {
+            opacity: 0.3;
             cursor: not-allowed;
         }
-        .act-big-ico {
-            font-size: 28px;
+        
+        .action-btn.danger {
+            border-color: var(--danger);
         }
         
-        /* Множитель */
-        .multiplier-bar {
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            padding: 8px;
-            font-size: 8px;
-        }
-        .multiplier-step {
-            padding: 4px 8px;
-            background: var(--panel-bg);
-            border: 2px solid var(--border-color);
-            opacity: 0.5;
-        }
-        .multiplier-step.active {
-            opacity: 1;
-            border-color: var(--warning);
-            background: #3d3b1e;
-            color: var(--warning);
-        }
-        .multiplier-step.current {
-            animation: glow 1s ease-in-out infinite alternate;
-        }
-        @keyframes glow {
-            from { box-shadow: 0 0 5px var(--warning); }
-            to { box-shadow: 0 0 15px var(--warning); }
+        .action-icon {
+            font-size: 24px;
         }
         
-        .log-compact {
-            height: 45px;
-            overflow-y: auto;
-            padding: 6px;
-        }
-        .log-entry {
-            margin: 2px 0;
-            padding: 4px 8px;
-            background: rgba(0,0,0,0.3);
-            border-left: 3px solid var(--accent);
-            font-size: 8px;
-        }
-        .log-entry.cheat {
-            border-left-color: var(--danger);
-            color: var(--danger);
-        }
-        .ok { border-left-color: var(--success); }
-        .no { border-left-color: var(--danger); }
-        .at { border-left-color: var(--warning); }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(-3px); }
-        }
-        .shake {
-            animation: shake 0.15s;
-        }
-        
-        /* Анти-чит предупреждение */
-        .cheat-warning {
+        /* Предупреждение */
+        .cheat-alert {
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(0);
             background: var(--danger);
             color: white;
             padding: 20px;
             border: 4px solid #000;
             box-shadow: 8px 8px 0px #000;
-            font-size: 12px;
+            font-size: 10px;
             text-align: center;
             z-index: 1000;
-            display: none;
+            transition: transform 0.3s;
         }
-        .cheat-warning.show {
-            display: block;
-            animation: popIn 0.3s ease-out;
-        }
-        @keyframes popIn {
-            0% { transform: translate(-50%, -50%) scale(0); }
-            100% { transform: translate(-50%, -50%) scale(1); }
+        
+        .cheat-alert.show {
+            transform: translate(-50%, -50%) scale(1);
         }
     </style>
 </head>
 <body>
-    <!-- Предупреждение о чите -->
-    <div class="cheat-warning" id="cheatWarning">
-        ⚠️ АВТОКЛИКЕР ОБНАРУЖЕН!<br>
-        <span style="font-size: 8px;">Играй честно 😉</span>
+    <!-- Предупреждение -->
+    <div class="cheat-alert" id="cheatAlert">
+        ⚠️ АВТОКЛИКЕР!<br>
+        <span style="font-size: 7px;">Играй честно</span>
     </div>
 
     <!-- СОЗДАНИЕ -->
@@ -789,74 +782,72 @@ async def root():
     
     <!-- ИГРА -->
     <div class="container game-screen hidden" id="gameScreen">
-        <div class="game-top pixel-box">
-            <span class="game-title">◆ RE:ALITY ◆</span>
-            <span class="day-pill">DAY <span id="day">1</span></span>
-        </div>
-        
-        <!-- Множители -->
-        <div class="multiplier-bar pixel-box">
-            <div class="multiplier-step" id="m1">x1.0</div>
-            <div class="multiplier-step" id="m2">x1.1</div>
-            <div class="multiplier-step" id="m3">x1.3</div>
-            <div class="multiplier-step" id="m4">x1.5</div>
-            <div class="multiplier-step" id="m5">x2.0</div>
-        </div>
-        
-        <!-- ТАП-ЗОНА -->
-        <div class="tap-zone" id="tapZone" onclick="handleTap(event)">
-            <div class="combo-indicator" id="comboIndicator">COMBO!</div>
-            <div class="shadow-platform"></div>
-            <div class="hero-giant">
-                <img src="/hero1.png" alt="Hero" id="gameHero">
+        <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+        <div class="top-panel">
+            <div class="header-row pixel-box">
+                <span class="player-name" id="displayName">HERO</span>
+                <span class="day-badge">DAY <span id="displayDay">1</span></span>
             </div>
-            <div class="tap-hint">👆 ТАПАЙ ПО ПЕРСОНАЖУ!</div>
-        </div>
-        
-        <div class="hero-badge" id="gName">HERO</div>
-        <div class="hero-stats-row">
-            <span class="h-stat">💪<span id="gStr">5</span></span>
-            <span class="h-stat">🧠<span id="gInt">5</span></span>
-            <span class="h-stat">✨<span id="gCha">5</span></span>
-            <span class="h-stat">🍀<span id="gLck">5</span></span>
-        </div>
-        
-        <div class="res-grid">
-            <div class="res-cell pixel-box coins">
-                <div class="res-ico">🪙</div>
-                <div class="res-num coins" id="gCoins">0</div>
-                <div class="res-lbl">REALITY COINS</div>
+            
+            <div class="resources-row">
+                <div class="res-box pixel-box coins">
+                    <div class="res-icon">🪙</div>
+                    <div class="res-value coins" id="displayCoins">0</div>
+                    <div class="res-label">REALITY COINS</div>
+                </div>
+                <div class="res-box pixel-box">
+                    <div class="res-icon">⚡</div>
+                    <div class="res-value" id="displayEnergy">100</div>
+                    <div class="res-label">ENERGY</div>
+                </div>
+                <div class="res-box pixel-box">
+                    <div class="res-icon">📅</div>
+                    <div class="res-value" id="displayActions">5</div>
+                    <div class="res-label">ACTIONS</div>
+                </div>
             </div>
-            <div class="res-cell pixel-box">
-                <div class="res-ico">⚡</div>
-                <div class="res-num" id="gNRG">100</div>
-                <div class="res-lbl">ENERGY</div>
+            
+            <div class="energy-bar-container pixel-box">
+                <div class="energy-fill" id="energyBar" style="width:100%"></div>
+                <span class="energy-text" id="energyText">100/100</span>
             </div>
-            <div class="res-cell pixel-box">
-                <div class="res-ico">📅</div>
-                <div class="res-num" id="gAct">5</div>
-                <div class="res-lbl">ACTIONS</div>
+            
+            <div class="multiplier-row pixel-box">
+                <div class="multiplier-badge" id="mb1">x1.0</div>
+                <div class="multiplier-badge" id="mb2">x1.1</div>
+                <div class="multiplier-badge" id="mb3">x1.3</div>
+                <div class="multiplier-badge" id="mb4">x1.5</div>
+                <div class="multiplier-badge" id="mb5">x2.0</div>
             </div>
         </div>
         
-        <div class="energy-box pixel-box">
-            <div class="energy-inner" id="gBar" style="width:100%"></div>
-            <span class="energy-txt" id="gBarTxt">100%</span>
+        <!-- ЗОНА ТАПА -->
+        <div class="tap-area" id="tapArea" onclick="handleTap(event)">
+            <div class="hero-container" id="heroContainer">
+                <div class="combo-text" id="comboText">COMBO!</div>
+                <img src="/hero1.png" alt="Hero" class="hero-sprite" id="gameHero">
+                <div class="tap-hint">👆 ТАПАЙ ПО ПЕРСОНАЖУ</div>
+            </div>
         </div>
         
-        <div class="acts-row">
-            <button class="act-pill" id="btn-eat" onclick="act('eat')">
-                <span class="act-big-ico">🍜</span>
+        <!-- ХАРАКТЕРИСТИКИ -->
+        <div class="stats-row pixel-box">
+            <span class="stat-item">💪 <span id="statStr">5</span></span>
+            <span class="stat-item">🧠 <span id="statInt">5</span></span>
+            <span class="stat-item">✨ <span id="statCha">5</span></span>
+            <span class="stat-item">🍀 <span id="statLck">5</span></span>
+        </div>
+        
+        <!-- КНОПКИ -->
+        <div class="actions-row">
+            <button class="action-btn" id="btnEat" onclick="doEat()">
+                <span class="action-icon">🍜</span>
                 <span>EAT (-50 RC)</span>
             </button>
-            <button class="act-pill" id="btn-sleep" onclick="act('sleep')">
-                <span class="act-big-ico">😴</span>
-                <span>SLEEP</span>
+            <button class="action-btn danger" id="btnSleep" onclick="doSleep()">
+                <span class="action-icon">😴</span>
+                <span>SLEEP (-100 RC)</span>
             </button>
-        </div>
-        
-        <div class="log-compact pixel-box" id="log">
-            <div class="log-entry">> SYSTEM READY...</div>
         </div>
     </div>
     
@@ -869,11 +860,9 @@ async def root():
         let stats = {str:5, int:5, cha:5, lck:5};
         const MAX = 20, MIN = 1;
         
-        // Тап-переменные
         let tapCount = 0;
         let tapPattern = [];
         let lastTapTime = 0;
-        let comboMultiplier = 1.0;
         let isProcessing = false;
         
         document.querySelectorAll('.hero-slot').forEach(el => {
@@ -881,10 +870,8 @@ async def root():
                 document.querySelectorAll('.hero-slot').forEach(h => h.classList.remove('selected'));
                 this.classList.add('selected');
                 sel = this.dataset.avatar;
-                
                 let slotNum = this.dataset.slot;
                 document.getElementById('gameHero').src = '/hero' + slotNum + '.png';
-                
                 check();
             };
         });
@@ -893,10 +880,8 @@ async def root():
             let cur = stats[s];
             let used = Object.values(stats).reduce((a,b)=>a+b,0);
             let left = MAX - used;
-            
             if (d>0 && left<=0) return;
             if (d<0 && cur<=MIN) return;
-            
             stats[s] += d;
             document.getElementById(s).textContent = stats[s];
             upd();
@@ -906,7 +891,6 @@ async def root():
         function upd() {
             let used = Object.values(stats).reduce((a,b)=>a+b,0);
             document.getElementById('pts').textContent = MAX - used;
-            
             document.querySelectorAll('.stat-btn-mini').forEach(b => {
                 b.disabled = (b.textContent=='+' && MAX-used<=0);
             });
@@ -939,97 +923,61 @@ async def root():
         async function load() {
             let r = await fetch(`/api/state?user_id=${uid}`);
             let d = await r.json();
-            state = d.user; hero = d.character;
+            state = d.user; 
+            hero = d.character;
             
             let heroNum = hero.avatar.replace('hero', '') || '1';
             document.getElementById('gameHero').src = '/hero' + heroNum + '.png';
             
-            document.getElementById('gName').textContent = hero.name.toUpperCase();
-            document.getElementById('gStr').textContent = hero.strength;
-            document.getElementById('gInt').textContent = hero.intelligence;
-            document.getElementById('gCha').textContent = hero.charisma;
-            document.getElementById('gLck').textContent = hero.luck;
+            document.getElementById('displayName').textContent = hero.name.toUpperCase();
+            document.getElementById('statStr').textContent = hero.strength;
+            document.getElementById('statInt').textContent = hero.intelligence;
+            document.getElementById('statCha').textContent = hero.charisma;
+            document.getElementById('statLck').textContent = hero.luck;
             
             tapCount = state.total_taps || 0;
-            updateMultiplierUI();
-            updG();
-            log('WELCOME ' + hero.name.toUpperCase(), 'ok');
+            updateUI();
         }
         
-        function updG() {
-            document.getElementById('gCoins').textContent = state.coins || 0;
-            document.getElementById('day').textContent = state.day;
-            document.getElementById('gAct').textContent = state.actions;
-            document.getElementById('gNRG').textContent = state.energy;
-            document.getElementById('gBar').style.width = state.energy+'%';
-            document.getElementById('gBarTxt').textContent = state.energy+'%';
+        function updateUI() {
+            document.getElementById('displayCoins').textContent = state.coins || 0;
+            document.getElementById('displayDay').textContent = state.day || 1;
+            document.getElementById('displayEnergy').textContent = state.energy || 0;
+            document.getElementById('displayActions').textContent = state.actions || 0;
             
-            document.getElementById('btn-eat').disabled = state.actions<=0 || (state.coins || 0) < 50;
+            let energyPct = (state.energy || 0);
+            document.getElementById('energyBar').style.width = energyPct + '%';
+            document.getElementById('energyText').textContent = (state.energy || 0) + '/100';
             
-            // Обновление тап-зоны
-            const tapZone = document.getElementById('tapZone');
-            if (state.energy <= 0) {
-                tapZone.classList.add('disabled');
-                tapZone.style.pointerEvents = 'none';
+            // Множители
+            document.querySelectorAll('.multiplier-badge').forEach(b => b.classList.remove('active'));
+            if (tapCount >= 100) document.getElementById('mb5').classList.add('active');
+            else if (tapCount >= 50) document.getElementById('mb4').classList.add('active');
+            else if (tapCount >= 30) document.getElementById('mb3').classList.add('active');
+            else if (tapCount >= 10) document.getElementById('mb2').classList.add('active');
+            else document.getElementById('mb1').classList.add('active');
+            
+            // Кнопки
+            document.getElementById('btnEat').disabled = (state.actions <= 0) || ((state.coins || 0) < 50);
+            document.getElementById('btnSleep').disabled = false;
+            
+            // Зона тапа
+            const tapArea = document.getElementById('tapArea');
+            if ((state.energy || 0) <= 0) {
+                tapArea.style.opacity = '0.5';
+                tapArea.style.pointerEvents = 'none';
             } else {
-                tapZone.classList.remove('disabled');
-                tapZone.style.pointerEvents = 'auto';
+                tapArea.style.opacity = '1';
+                tapArea.style.pointerEvents = 'auto';
             }
         }
-        
-        function updateMultiplierUI() {
-            // Сброс всех
-            document.querySelectorAll('.multiplier-step').forEach(el => {
-                el.classList.remove('active', 'current');
-            });
-            
-            // Определение текущего множителя
-            let steps = [10, 30, 50, 100];
-            let currentStep = 0;
-            
-            for (let i = 0; i < steps.length; i++) {
-                if (tapCount >= steps[i]) {
-                    currentStep = i + 1;
-                    document.getElementById('m' + (i + 2)).classList.add('active');
-                }
-            }
-            
-            // Текущий активный
-            if (currentStep > 0) {
-                document.getElementById('m' + (currentStep + 1)).classList.add('current');
-            } else {
-                document.getElementById('m1').classList.add('current');
-            }
-            
-            // Обновление комбо индикатора
-            const comboEl = document.getElementById('comboIndicator');
-            if (tapCount >= 10) {
-                comboEl.textContent = 'COMBO x' + (tapCount >= 100 ? '2.0' : tapCount >= 50 ? '1.5' : tapCount >= 30 ? '1.3' : '1.1');
-                comboEl.classList.add('show');
-            } else {
-                comboEl.classList.remove('show');
-            }
-        }
-        
-        function log(m, c='') {
-            let l = document.getElementById('log');
-            let e = document.createElement('div');
-            e.className = 'log-entry ' + c;
-            e.textContent = '> ' + m;
-            l.insertBefore(e, l.firstChild);
-            while(l.children.length>3) l.removeChild(l.lastChild);
-        }
-        
-        // === ОБРАБОТКА ТАПОВ ===
         
         async function handleTap(event) {
-            if (isProcessing || state.energy <= 0) return;
+            if (isProcessing || (state.energy || 0) <= 0) return;
             
             const now = Date.now();
-            
-            // Анти-спам: минимум 80ms между тапами на клиенте
             if (now - lastTapTime < 80) {
-                showCheatWarning();
+                showCheatAlert();
                 return;
             }
             
@@ -1037,14 +985,12 @@ async def root():
             lastTapTime = now;
             tapCount++;
             
-            // Запись паттерна для анализа на сервере
             tapPattern.push(now);
-            if (tapPattern.length > 10) tapPattern.shift(); // Храним последние 10
+            if (tapPattern.length > 10) tapPattern.shift();
             
             // Визуальный эффект
             createFloatingText(event);
             
-            // Отправка на сервер
             try {
                 let r = await fetch('/api/tap', {
                     method: 'POST',
@@ -1062,79 +1008,93 @@ async def root():
                 if (res.success) {
                     state.coins = res.coins;
                     state.energy = res.energy;
-                    updG();
-                    updateMultiplierUI();
+                    state.day = res.day;
+                    state.actions = res.actions;
+                    updateUI();
                     
-                    // Показать бонус если есть
                     if (res.multiplier > 1 || res.crit) {
-                        showBonus(res.message);
+                        showCombo(res.multiplier, res.crit);
                     }
                 } else {
                     if (res.cheat_detected) {
-                        showCheatWarning();
-                        tapCount--; // Откат счётчика
+                        showCheatAlert();
+                        tapCount--;
                     }
-                    log(res.message, res.cheat_detected ? 'cheat' : 'no');
                 }
             } catch (e) {
-                console.error('Tap error:', e);
+                console.error('Error:', e);
             }
             
             isProcessing = false;
         }
         
         function createFloatingText(event) {
-            const tapZone = document.getElementById('tapZone');
-            const rect = tapZone.getBoundingClientRect();
-            
-            // Позиция клика относительно зоны
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
+            const container = document.getElementById('heroContainer');
+            const rect = container.getBoundingClientRect();
             
             const floatEl = document.createElement('div');
-            floatEl.className = 'floating-text';
-            floatEl.textContent = '+' + (comboMultiplier >= 1.1 ? Math.floor(comboMultiplier * 1) : 1);
-            floatEl.style.left = x + 'px';
-            floatEl.style.top = y + 'px';
+            floatEl.className = 'floating-reward';
+            floatEl.textContent = '+1';
+            floatEl.style.left = (event.clientX - rect.left) + 'px';
+            floatEl.style.top = (event.clientY - rect.top - 50) + 'px';
             
-            tapZone.appendChild(floatEl);
-            
-            setTimeout(() => floatEl.remove(), 1000);
+            container.appendChild(floatEl);
+            setTimeout(() => floatEl.remove(), 800);
         }
         
-        function showBonus(message) {
-            const comboEl = document.getElementById('comboIndicator');
-            comboEl.textContent = message.replace(/[^🔥⚡💫✨🍀]/g, '').trim();
+        function showCombo(multiplier, crit) {
+            const comboEl = document.getElementById('comboText');
+            let text = 'x' + multiplier;
+            if (crit) text += ' 🍀';
+            comboEl.textContent = text;
             comboEl.classList.add('show');
-            setTimeout(() => comboEl.classList.remove('show'), 1000);
+            setTimeout(() => comboEl.classList.remove('show'), 600);
         }
         
-        function showCheatWarning() {
-            const warn = document.getElementById('cheatWarning');
-            warn.classList.add('show');
-            setTimeout(() => warn.classList.remove('show'), 2000);
-            log('АНТИ-ЧИТ: Обнаружена подозрительная активность!', 'cheat');
+        function showCheatAlert() {
+            const alert = document.getElementById('cheatAlert');
+            alert.classList.add('show');
+            setTimeout(() => alert.classList.remove('show'), 1500);
         }
         
-        async function act(a) {
-            let b = document.getElementById('btn-'+a);
-            b.classList.add('shake');
-            setTimeout(()=>b.classList.remove('shake'), 150);
+        async function doEat() {
+            if (state.actions <= 0 || state.coins < 50) return;
             
-            let r = await fetch('/api/action', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({user_id: uid, action: a})
-            });
-            let res = await r.json();
-            
-            if(res.success) {
-                state = res.state;
-                updG();
-                let cl = res.message.includes('день')?'at':'ok';
-                log(res.message.toUpperCase(), cl);
-            } else {
-                log('ERROR: '+res.message.toUpperCase(), 'no');
+            try {
+                let r = await fetch('/api/eat', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({user_id: uid})
+                });
+                let res = await r.json();
+                if (res.success) {
+                    state.coins = res.coins;
+                    state.energy = res.energy;
+                    state.actions = res.actions;
+                    updateUI();
+                }
+            } catch (e) {
+                console.error('Error:', e);
+            }
+        }
+        
+        async function doSleep() {
+            try {
+                let r = await fetch('/api/sleep', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({user_id: uid})
+                });
+                let res = await r.json();
+                if (res.success) {
+                    state.coins = res.coins;
+                    state.energy = res.energy;
+                    state.day = res.day;
+                    state.actions = res.actions;
+                    updateUI();
+                }
+            } catch (e) {
+                console.error('Error:', e);
             }
         }
         
@@ -1155,8 +1115,6 @@ async def root():
     </script>
 </body>
 </html>"""
-
-# === Статические файлы ===
 
 @app.get("/hero1.png")
 async def hero1():
