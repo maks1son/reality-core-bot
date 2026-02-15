@@ -9,10 +9,11 @@ def init_db():
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY,
-            money INTEGER DEFAULT 5000,
+            coins INTEGER DEFAULT 0,
             energy INTEGER DEFAULT 100,
             day INTEGER DEFAULT 1,
-            actions INTEGER DEFAULT 3,
+            actions INTEGER DEFAULT 5,
+            total_taps INTEGER DEFAULT 0,
             last_update TEXT
         )
     ''')
@@ -37,28 +38,29 @@ def init_db():
 def get_user(user_id):
     conn = sqlite3.connect('reality.db')
     c = conn.cursor()
-    c.execute('SELECT money, energy, day, actions FROM users WHERE user_id = ?', (user_id,))
+    c.execute('SELECT coins, energy, day, actions, total_taps FROM users WHERE user_id = ?', (user_id,))
     result = c.fetchone()
     conn.close()
     
     if result:
         return {
-            'money': result[0],
+            'coins': result[0],
             'energy': result[1],
             'day': result[2],
-            'actions': result[3]
+            'actions': result[3],
+            'total_taps': result[4]
         }
     else:
-        save_user(user_id, 5000, 100, 1, 3)
-        return {'money': 5000, 'energy': 100, 'day': 1, 'actions': 3}
+        save_user(user_id, 0, 100, 1, 5, 0)
+        return {'coins': 0, 'energy': 100, 'day': 1, 'actions': 5, 'total_taps': 0}
 
-def save_user(user_id, money, energy, day, actions):
+def save_user(user_id, coins, energy, day, actions, total_taps=0):
     conn = sqlite3.connect('reality.db')
     c = conn.cursor()
     c.execute('''
-        INSERT OR REPLACE INTO users (user_id, money, energy, day, actions, last_update)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (user_id, money, energy, day, actions, datetime.now().isoformat()))
+        INSERT OR REPLACE INTO users (user_id, coins, energy, day, actions, total_taps, last_update)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (user_id, coins, energy, day, actions, total_taps, datetime.now().isoformat()))
     conn.commit()
     conn.close()
 
