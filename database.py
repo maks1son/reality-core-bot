@@ -5,7 +5,6 @@ def init_db():
     conn = sqlite3.connect('reality.db')
     c = conn.cursor()
     
-    # Таблица пользователей
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY,
@@ -18,7 +17,6 @@ def init_db():
         )
     ''')
     
-    # Таблица персонажей
     c.execute('''
         CREATE TABLE IF NOT EXISTS characters (
             user_id INTEGER PRIMARY KEY,
@@ -51,6 +49,7 @@ def get_user(user_id):
             'total_taps': result[4]
         }
     else:
+        # Создаём нового пользователя
         save_user(user_id, 0, 100, 1, 5, 0)
         return {'coins': 0, 'energy': 100, 'day': 1, 'actions': 5, 'total_taps': 0}
 
