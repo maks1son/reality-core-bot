@@ -10,8 +10,9 @@ def init_db():
             user_id INTEGER PRIMARY KEY,
             coins INTEGER DEFAULT 0,
             energy INTEGER DEFAULT 100,
-            day INTEGER DEFAULT 1,
             actions INTEGER DEFAULT 5,
+            xp INTEGER DEFAULT 0,
+            level INTEGER DEFAULT 1,
             total_taps INTEGER DEFAULT 0,
             last_update TEXT
         )
@@ -36,7 +37,7 @@ def init_db():
 def get_user(user_id):
     conn = sqlite3.connect('reality.db')
     c = conn.cursor()
-    c.execute('SELECT coins, energy, day, actions, total_taps FROM users WHERE user_id = ?', (user_id,))
+    c.execute('SELECT coins, energy, actions, xp, level, total_taps FROM users WHERE user_id = ?', (user_id,))
     result = c.fetchone()
     conn.close()
     
@@ -44,22 +45,22 @@ def get_user(user_id):
         return {
             'coins': result[0],
             'energy': result[1],
-            'day': result[2],
-            'actions': result[3],
-            'total_taps': result[4]
+            'actions': result[2],
+            'xp': result[3],
+            'level': result[4],
+            'total_taps': result[5]
         }
     else:
-        # Создаём нового пользователя
-        save_user(user_id, 0, 100, 1, 5, 0)
-        return {'coins': 0, 'energy': 100, 'day': 1, 'actions': 5, 'total_taps': 0}
+        save_user(user_id, 0, 100, 5, 0, 1, 0)
+        return {'coins': 0, 'energy': 100, 'actions': 5, 'xp': 0, 'level': 1, 'total_taps': 0}
 
-def save_user(user_id, coins, energy, day, actions, total_taps=0):
+def save_user(user_id, coins, energy, actions, xp, level, total_taps):
     conn = sqlite3.connect('reality.db')
     c = conn.cursor()
     c.execute('''
-        INSERT OR REPLACE INTO users (user_id, coins, energy, day, actions, total_taps, last_update)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (user_id, coins, energy, day, actions, total_taps, datetime.now().isoformat()))
+        INSERT OR REPLACE INTO users (user_id, coins, energy, actions, xp, level, total_taps, last_update)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (user_id, coins, energy, actions, xp, level, total_taps, datetime.now().isoformat()))
     conn.commit()
     conn.close()
 
