@@ -4,13 +4,13 @@ import random
 import threading
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
-from database import init_db, get_user, save_user, get_character, save_character
+from database import init_db, get_user, save_user, get_character, save_character, get_professions, unlock_profession
 
 app = FastAPI()
 
 init_db()
 
-# Хранилище сессий для отслеживания бездействия
+# Хранилище сессий
 sessions = {}
 session_lock = threading.Lock()
 
@@ -19,22 +19,11 @@ def get_session(user_id):
         if user_id not in sessions:
             sessions[user_id] = {
                 'last_tap': time.time(),
-                'combo_start': None,
+                'combo_taps': 0,
                 'current_multiplier': 1.0,
-                'combo_taps': 0
+                'last_energy_update': time.time()
             }
         return sessions[user_id]
-
-def update_session(user_id):
-    session = get_session(user_id)
-    session['last_tap'] = time.time()
-    return session
-
-def check_afk(user_id):
-    """Проверка бездействия для сброса комбо и восстановления энергии"""
-    session = get_session(user_id)
-    afk_time = time.time() - session['last_tap']
-    return afk_time
 
 # === API маршруты ===
 
@@ -43,45 +32,47 @@ async def get_state(user_id: int):
     user = get_user(user_id)
     character = get_character(user_id)
     session = get_session(user_id)
+    professions = get_professions(user_id)
     
-    # Проверяем бездействие
-    afk = check_afk(user_id)
+    # Плавное восстановление энергии
+    now = time.time()
+    time_passed = now - session['last_energy_update']
+    energy_recovered = int(time_passed * 2)  # 2 энергии в секунду
     
-    # Восстановление энергии: 10 энергии каждые 5 секунд бездействия
-    energy_recovered = min(100 - user['energy'], int(afk / 5) * 10)
-    if energy_recovered > 0:
-        user['energy'] += energy_recovered
-        save_user(user_id, user['coins'], user['energy'], user['actions'], user['xp'], user['level'], user['total_taps'])
+    if energy_recovered > 0 and user['energy'] < 100:
+        old_energy = user['energy']
+        user['energy'] = min(100, user['energy'] + energy_recovered)
+        actual_recovered = user['energy'] - old_energy
+        
+        if actual_recovered > 0:
+            save_user(user_id, user['coins'], user['energy'], user['xp'], user['level'], 
+                     user['total_taps'], user['tokens'])
+            session['last_energy_update'] = now
+        else:
+            session['last_energy_update'] = now
     
-    # Сброс комбо при 10+ секундах бездействия
-    combo_reset = afk > 10
+    # Проверка сброса комбо (5 секунд бездействия)
+    afk_time = now - session['last_tap']
+    combo_reset = afk_time > 5
+    
+    if combo_reset and session['combo_taps'] > 0:
+        session['combo_taps'] = 0
+        session['current_multiplier'] = 1.0
+    
+    # Проверка полного восстановления
+    full_recovery = user['energy'] >= 100 and energy_recovered > 0
     
     return {
         'user': user, 
         'character': character,
-        'afk_time': afk,
-        'energy_recovered': energy_recovered,
+        'professions': professions,
+        'full_recovery': full_recovery,
         'combo_reset': combo_reset,
         'session': {
             'current_multiplier': session['current_multiplier'],
             'combo_taps': session['combo_taps']
         }
     }
-
-@app.post("/api/character")
-async def create_character(request: Request):
-    data = await request.json()
-    save_character(
-        data['user_id'],
-        data['name'],
-        data['avatar'],
-        data['strength'],
-        data['intelligence'],
-        data['charisma'],
-        data['luck']
-    )
-    save_user(data['user_id'], 0, 100, 5, 0, 1, 0)
-    return {'success': True}
 
 @app.post("/api/tap")
 async def do_tap(request: Request):
@@ -93,12 +84,14 @@ async def do_tap(request: Request):
     
     user = get_user(user_id)
     character = get_character(user_id)
-    session = update_session(user_id)
+    session = get_session(user_id)
+    session['last_tap'] = time.time()
+    session['last_energy_update'] = time.time()
     
     if user['energy'] < fingers:
         return {'success': False, 'message': 'Недостаточно энергии!'}
     
-    # === ЗАЩИТА ОТ АВТОКЛИКЕРОВ ===
+    # Защита от автокликеров
     current_time = time.time() * 1000
     time_diff = current_time - timestamp
     
@@ -114,52 +107,30 @@ async def do_tap(request: Request):
             variance = sum((x - sum(intervals)/len(intervals)) ** 2 for x in intervals) / len(intervals)
             if variance < 10:
                 return {'success': False, 'message': 'Обнаружен автокликер!', 'cheat_detected': True}
-            
             if min(intervals) < 60:
                 return {'success': False, 'message': 'Слишком быстро!', 'cheat_detected': True}
     
-    if len(set(pattern[-5:])) == 1 and len(pattern) >= 5:
-        return {'success': False, 'message': 'Обнаружен бот!', 'cheat_detected': True}
-    
-    # === СИСТЕМА КОМБО С ГЕОМЕТРИЧЕСКОЙ ПРОГРЕССИЕЙ ===
-    # Лёгкие множители: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9
-    # Сложные множители: 2.0+, требуют в 2 раза больше кликов каждый уровень
-    
+    # Система комбо
     easy_multipliers = [1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9]
-    # Базовые пороги для лёгких: 5, 15, 30, 50, 75, 105, 140, 180, 225
     easy_thresholds = [5, 15, 30, 50, 75, 105, 140, 180, 225]
-    
-    # Если комбо сброшено, начинаем заново
-    if session['combo_start'] is None or (current_time/1000 - session['last_tap']) > 10:
-        session['combo_start'] = current_time / 1000
-        session['combo_taps'] = 0
-        session['current_multiplier'] = 1.0
     
     session['combo_taps'] += fingers
     
-    # Определение множителя
     multiplier = 1.0
-    
-    # Проверяем лёгкие множители
     for i, thresh in enumerate(easy_thresholds):
         if session['combo_taps'] >= thresh:
             multiplier = easy_multipliers[i]
     
-    # Проверяем сложные множители (2.0+)
-    if session['combo_taps'] >= 300:  # Первый сложный порог
+    if session['combo_taps'] >= 300:
         extra = session['combo_taps'] - 300
-        # Каждые 150 тапов дают +0.1 после 2.0
         bonus_levels = extra // 150
         multiplier = 2.0 + (bonus_levels * 0.1)
-        # Макс 5.0
         multiplier = min(multiplier, 5.0)
     
     session['current_multiplier'] = multiplier
     
-    # === РАСЧЁТ НАГРАДЫ ===
+    # Награда
     base_reward = 1 * fingers
-    
-    # Крит от удачи
     luck_bonus = 0
     crit = False
     if character:
@@ -171,24 +142,28 @@ async def do_tap(request: Request):
     
     total_reward = int(base_reward * multiplier + luck_bonus)
     
-    # === ОПЫТ ===
-    # За каждые 50 тапов даём 10 XP
+    # Опыт: 5 XP за каждый тап
     new_total_taps = user.get('total_taps', 0) + fingers
-    xp_gained = 0
-    level_up = False
-    
-    # Считаем XP от накопленных тапов
-    prev_50s = user.get('total_taps', 0) // 50
-    new_50s = new_total_taps // 50
-    if new_50s > prev_50s:
-        xp_gained = (new_50s - prev_50s) * 10
-    
+    xp_gained = fingers * 5
     new_xp = user.get('xp', 0) + xp_gained
     
-    # Проверка уровня (каждые 100 XP = новый уровень)
-    new_level = (new_xp // 100) + 1
-    if new_level > user.get('level', 1):
+    # Уровень: 50 XP для 2 уровня, далее +100 каждый уровень
+    def xp_for_level(lvl):
+        if lvl == 1:
+            return 0
+        elif lvl == 2:
+            return 50
+        else:
+            return 50 + (lvl - 2) * 100
+    
+    new_level = user.get('level', 1)
+    tokens_gained = 0
+    level_up = False
+    
+    while new_xp >= xp_for_level(new_level + 1):
+        new_level += 1
         level_up = True
+        tokens_gained += 1  # 1 токен за уровень
     
     # Обновление
     user['coins'] = user.get('coins', 0) + total_reward
@@ -196,16 +171,15 @@ async def do_tap(request: Request):
     user['total_taps'] = new_total_taps
     user['xp'] = new_xp
     user['level'] = new_level
+    user['tokens'] = user.get('tokens', 0) + tokens_gained
     
-    save_user(
-        user_id, 
-        user['coins'], 
-        user['energy'], 
-        user['actions'],
-        user['xp'],
-        user['level'],
-        user['total_taps']
-    )
+    save_user(user_id, user['coins'], user['energy'], user['xp'], user['level'], 
+             user['total_taps'], user['tokens'])
+    
+    # Проверка открытия профессий при достижении 2 уровня
+    professions_unlocked = False
+    if new_level >= 2 and user.get('level', 1) < 2:
+        professions_unlocked = True
     
     return {
         'success': True, 
@@ -218,9 +192,31 @@ async def do_tap(request: Request):
         'level': user['level'],
         'xp_gained': xp_gained,
         'level_up': level_up,
+        'tokens_gained': tokens_gained,
         'total_taps': user['total_taps'],
-        'combo_taps': session['combo_taps']
+        'combo_taps': session['combo_taps'],
+        'professions_unlocked': professions_unlocked
     }
+
+@app.post("/api/character")
+async def create_character(request: Request):
+    data = await request.json()
+    save_character(
+        data['user_id'],
+        data['name'],
+        data['avatar'],
+        data['strength'],
+        data['intelligence'],
+        data['charisma'],
+        data['luck']
+    )
+    save_user(data['user_id'], 0, 100, 0, 1, 0, 0)
+    return {'success': True}
+
+@app.get("/api/professions")
+async def get_professions_data(user_id: int):
+    professions = get_professions(user_id)
+    return {'professions': professions}
 
 # === Главная страница ===
 
@@ -256,6 +252,7 @@ async def root():
             --text: #f7f1e3;
             --coin: #ffd700;
             --xp: #9b59b6;
+            --token: #3498db;
         }
         html, body { 
             height: 100%; 
@@ -275,6 +272,7 @@ async def root():
             flex-direction: column;
             padding: 10px;
             gap: 10px;
+            position: relative;
         }
         .hidden { display: none !important; }
         .pixel-box {
@@ -458,6 +456,38 @@ async def root():
             gap: 10px;
         }
         
+        /* Кнопка профессий слева */
+        .prof-btn-side {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            padding: 15px 8px;
+            background: var(--token);
+            border: 3px solid #000;
+            border-left: none;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.5);
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.2s;
+        }
+        .prof-btn-side:active {
+            transform: translateY(-50%) translateX(2px);
+        }
+        .prof-btn-side.new {
+            animation: pulse-border 1s infinite;
+            background: var(--success);
+        }
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 3px 3px 0px rgba(0,0,0,0.5), 0 0 10px var(--success); }
+            50% { box-shadow: 3px 3px 0px rgba(0,0,0,0.5), 0 0 20px var(--success); }
+        }
+        
         /* ВЕРХНЯЯ ПАНЕЛЬ */
         .top-panel {
             display: flex;
@@ -506,16 +536,16 @@ async def root():
         /* Ресурсы */
         .resources-row {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 8px;
         }
         
         .res-box {
-            padding: 10px;
+            padding: 8px;
             text-align: center;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 3px;
         }
         
         .res-box.coins {
@@ -523,12 +553,17 @@ async def root():
             border-color: var(--coin);
         }
         
+        .res-box.tokens {
+            background: linear-gradient(135deg, var(--panel-bg), #1e3d5c);
+            border-color: var(--token);
+        }
+        
         .res-icon {
-            font-size: 14px;
+            font-size: 12px;
         }
         
         .res-value {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--success);
             font-weight: bold;
         }
@@ -538,13 +573,24 @@ async def root():
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
         
+        .res-value.tokens {
+            color: var(--token);
+            text-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+        }
+        
         .res-label {
-            font-size: 6px;
+            font-size: 5px;
             color: #666;
             text-transform: uppercase;
         }
         
         /* Энергия */
+        .energy-section {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
         .energy-bar-container {
             height: 20px;
             position: relative;
@@ -554,7 +600,7 @@ async def root():
         .energy-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--danger) 0%, var(--warning) 50%, var(--success) 100%);
-            transition: width 0.3s ease;
+            transition: width 0.5s ease;
         }
         
         .energy-text {
@@ -567,18 +613,30 @@ async def root():
             color: white;
         }
         
+        .recovery-status {
+            text-align: center;
+            font-size: 7px;
+            color: var(--success);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .recovery-status.show {
+            opacity: 1;
+        }
+        
         /* Множители */
         .multiplier-row {
             display: flex;
             justify-content: center;
-            gap: 4px;
+            gap: 3px;
             padding: 6px;
             flex-wrap: wrap;
         }
         
         .multiplier-badge {
-            padding: 4px 6px;
-            font-size: 7px;
+            padding: 3px 5px;
+            font-size: 6px;
             background: var(--panel-bg);
             border: 2px solid var(--border-color);
             opacity: 0.3;
@@ -589,7 +647,6 @@ async def root():
             border-color: var(--warning);
             background: #3d3b1e;
             color: var(--warning);
-            box-shadow: 0 0 8px rgba(255, 230, 109, 0.3);
         }
         
         .multiplier-badge.current {
@@ -680,90 +737,212 @@ async def root():
             gap: 4px;
         }
         
-        /* Предупреждение */
-        .cheat-alert {
+        /* Модальные окна */
+        .modal-overlay {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: var(--danger);
-            color: white;
-            padding: 20px;
-            border: 4px solid #000;
-            box-shadow: 8px 8px 0px #000;
-            font-size: 10px;
-            text-align: center;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
             z-index: 1000;
-            transition: transform 0.3s;
         }
         
-        .cheat-alert.show {
-            transform: translate(-50%, -50%) scale(1);
+        .modal-overlay.show {
+            display: flex;
         }
         
-        /* Уведомление о восстановлении */
-        .recovery-notice {
+        .modal-content {
+            background: var(--panel-bg);
+            border: 4px solid var(--border-color);
+            box-shadow: 8px 8px 0px #000;
+            padding: 20px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 12px;
+            color: var(--success);
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0px #000;
+        }
+        
+        .modal-text {
+            font-size: 8px;
+            color: var(--text);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .modal-btn {
+            padding: 12px 24px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            background: var(--success);
+            border: none;
+            box-shadow: 4px 4px 0px #2d8b84;
+            color: #000;
+            cursor: pointer;
+        }
+        
+        .modal-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #2d8b84;
+        }
+        
+        /* Страница профессий */
+        .professions-screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            gap: 10px;
+        }
+        
+        .professions-screen.show {
+            display: flex;
+        }
+        
+        .prof-header {
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .prof-header h2 {
+            font-size: 12px;
+            color: var(--token);
+        }
+        
+        .tokens-display {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+        }
+        
+        .token-badge {
+            padding: 8px 15px;
+            background: linear-gradient(135deg, var(--panel-bg), #1e3d5c);
+            border: 2px solid var(--token);
+            color: var(--token);
+            font-size: 10px;
+        }
+        
+        .professions-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        
+        .profession-node {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .profession-node.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+        
+        .profession-node.available {
+            border-color: var(--success);
+            animation: pulse-available 2s infinite;
+        }
+        
+        @keyframes pulse-available {
+            0%, 100% { box-shadow: 0 0 5px var(--success); }
+            50% { box-shadow: 0 0 15px var(--success); }
+        }
+        
+        .profession-node.unlocked {
+            border-color: var(--token);
+            background: linear-gradient(135deg, var(--panel-bg), #1e3d5c);
+        }
+        
+        .prof-icon {
+            font-size: 32px;
+        }
+        
+        .prof-name {
+            font-size: 8px;
+            text-align: center;
+        }
+        
+        .prof-cost {
+            font-size: 6px;
+            color: var(--token);
+        }
+        
+        .back-btn {
+            padding: 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            background: var(--panel-bg);
+            border: 3px solid var(--border-color);
+            color: var(--text);
+            cursor: pointer;
+        }
+        
+        /* Уведомления */
+        .toast {
             position: fixed;
             top: 20%;
             left: 50%;
             transform: translateX(-50%) scale(0);
-            background: var(--success);
-            color: #000;
             padding: 10px 20px;
             border: 3px solid #000;
             box-shadow: 4px 4px 0px #000;
             font-size: 8px;
-            text-align: center;
             z-index: 999;
             transition: transform 0.3s;
         }
         
-        .recovery-notice.show {
+        .toast.show {
             transform: translateX(-50%) scale(1);
         }
         
-        /* Level Up анимация */
-        .level-up {
-            position: fixed;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: var(--xp);
-            color: white;
-            padding: 20px;
-            border: 4px solid #000;
-            box-shadow: 8px 8px 0px #000;
-            font-size: 14px;
-            text-align: center;
-            z-index: 1001;
-            transition: transform 0.5s;
+        .toast.success {
+            background: var(--success);
+            color: #000;
         }
         
-        .level-up.show {
-            transform: translate(-50%, -50%) scale(1);
-            animation: levelUpPop 1s ease-out;
-        }
-        
-        @keyframes levelUpPop {
-            0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); }
-            50% { transform: translate(-50%, -50%) scale(1.2) rotate(5deg); }
-            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        .toast.warning {
+            background: var(--warning);
+            color: #000;
         }
     </style>
 </head>
 <body>
-    <div class="cheat-alert" id="cheatAlert">
-        ⚠️ АВТОКЛИКЕР!<br>
-        <span style="font-size: 7px;">Играй честно</span>
-    </div>
+    <!-- Уведомления -->
+    <div class="toast success" id="toast">Энергия восстановлена!</div>
     
-    <div class="recovery-notice" id="recoveryNotice">
-        ⚡ Энергия восстановлена!
-    </div>
-    
-    <div class="level-up" id="levelUp">
-        🎉 LEVEL UP!<br>
-        <span id="newLevel" style="font-size: 20px;">2</span>
+    <!-- Модальное окно открытия профессий -->
+    <div class="modal-overlay" id="unlockModal">
+        <div class="modal-content">
+            <div class="modal-title">🎉 ОТКРЫТ ВЫБОР ПРОФЕССИЙ!</div>
+            <div class="modal-text">
+                Поздравляем с достижением 2 уровня!<br><br>
+                Теперь ты можешь исследовать различные профессии и найти своё призвание.<br><br>
+                Получено: <span style="color: var(--token);">1 ТОКЕН ИССЛЕДОВАНИЯ</span>
+            </div>
+            <button class="modal-btn" onclick="goToProfessions()">ПРОДОЛЖИТЬ ➤</button>
+        </div>
     </div>
 
     <!-- СОЗДАНИЕ -->
@@ -852,7 +1031,12 @@ async def root():
     </div>
     
     <!-- ИГРА -->
-    <div class="container game-screen hidden" id="gameScreen">
+    <div class="container game-screen" id="gameScreen" style="display: none;">
+        <!-- Кнопка профессий -->
+        <button class="prof-btn-side" id="profBtn" onclick="openProfessions()">
+            ПРОФЕССИИ
+        </button>
+        
         <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
         <div class="top-panel">
             <div class="header-row pixel-box">
@@ -871,6 +1055,11 @@ async def root():
                     <div class="res-value coins" id="displayCoins">0</div>
                     <div class="res-label">REALITY COINS</div>
                 </div>
+                <div class="res-box pixel-box tokens">
+                    <div class="res-icon">🔷</div>
+                    <div class="res-value tokens" id="displayTokens">0</div>
+                    <div class="res-label">ТОКЕНЫ</div>
+                </div>
                 <div class="res-box pixel-box">
                     <div class="res-icon">⚡</div>
                     <div class="res-value" id="displayEnergy">100</div>
@@ -878,9 +1067,12 @@ async def root():
                 </div>
             </div>
             
-            <div class="energy-bar-container pixel-box">
-                <div class="energy-fill" id="energyBar" style="width:100%"></div>
-                <span class="energy-text" id="energyText">100/100</span>
+            <div class="energy-section">
+                <div class="energy-bar-container pixel-box">
+                    <div class="energy-fill" id="energyBar" style="width:100%"></div>
+                    <span class="energy-text" id="energyText">100/100</span>
+                </div>
+                <div class="recovery-status" id="recoveryStatus">⚡ ЭНЕРГИЯ ВОССТАНОВЛЕНА</div>
             </div>
             
             <div class="multiplier-row pixel-box" id="multiplierRow">
@@ -915,6 +1107,61 @@ async def root():
         </div>
     </div>
     
+    <!-- СТРАНИЦА ПРОФЕССИЙ -->
+    <div class="container professions-screen" id="professionsScreen">
+        <div class="prof-header pixel-box">
+            <h2>◆ ПРОФЕССИИ ◆</h2>
+        </div>
+        
+        <div class="tokens-display">
+            <div class="token-badge">
+                🔷 ТОКЕНОВ: <span id="profTokens">0</span>
+            </div>
+        </div>
+        
+        <div class="professions-grid" id="professionsGrid">
+            <!-- IT - доступно сразу -->
+            <div class="profession-node unlocked pixel-box" onclick="exploreProfession('it')">
+                <div class="prof-icon">💻</div>
+                <div class="prof-name">СФЕРА IT</div>
+                <div class="prof-cost">ОТКРЫТО</div>
+            </div>
+            
+            <!-- Остальные закрыты -->
+            <div class="profession-node locked pixel-box">
+                <div class="prof-icon">🔒</div>
+                <div class="prof-name">МЕДИЦИНА</div>
+                <div class="prof-cost">1 ТОКЕН</div>
+            </div>
+            
+            <div class="profession-node locked pixel-box">
+                <div class="prof-icon">🔒</div>
+                <div class="prof-name">ИНЖЕНЕРИЯ</div>
+                <div class="prof-cost">1 ТОКЕН</div>
+            </div>
+            
+            <div class="profession-node locked pixel-box">
+                <div class="prof-icon">🔒</div>
+                <div class="prof-name">ИСКУССТВО</div>
+                <div class="prof-cost">1 ТОКЕН</div>
+            </div>
+            
+            <div class="profession-node locked pixel-box">
+                <div class="prof-icon">🔒</div>
+                <div class="prof-name">БИЗНЕС</div>
+                <div class="prof-cost">1 ТОКЕН</div>
+            </div>
+            
+            <div class="profession-node locked pixel-box">
+                <div class="prof-icon">🔒</div>
+                <div class="prof-name">НАУКА</div>
+                <div class="prof-cost">1 ТОКЕН</div>
+            </div>
+        </div>
+        
+        <button class="back-btn" onclick="backToGame()">◀ НАЗАД</button>
+    </div>
+    
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -927,11 +1174,10 @@ async def root():
         let tapPattern = [];
         let lastTapTime = 0;
         let isProcessing = false;
-        let comboTaps = 0;
         let currentMultiplier = 1.0;
         let lastAfkCheck = 0;
+        let professionsUnlockedShown = false;
         
-        // Мультипликаторы и пороги
         const multipliers = [1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0];
         const thresholds = [5, 15, 30, 50, 75, 105, 140, 180, 225, 300];
         
@@ -985,8 +1231,8 @@ async def root():
                     charisma: stats.cha, luck: stats.lck
                 })
             });
-            document.getElementById('createScreen').classList.add('hidden');
-            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('createScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'flex';
             load();
         }
         
@@ -1005,29 +1251,36 @@ async def root():
             document.getElementById('statCha').textContent = hero.charisma;
             document.getElementById('statLck').textContent = hero.luck;
             
-            comboTaps = d.session.combo_taps;
             currentMultiplier = d.session.current_multiplier;
             
             updateUI();
             
-            // Запускаем проверку бездействия
+            // Показываем уведомление о полном восстановлении
+            if (d.full_recovery) {
+                showRecovery();
+            }
+            
             setInterval(checkAfk, 1000);
         }
         
         function updateUI() {
             document.getElementById('displayCoins').textContent = state.coins || 0;
+            document.getElementById('displayTokens').textContent = state.tokens || 0;
             document.getElementById('displayEnergy').textContent = state.energy || 0;
             document.getElementById('displayLevel').textContent = state.level || 1;
             
-            // XP бар (0-99 в текущем уровне)
-            let xpInLevel = (state.xp || 0) % 100;
-            document.getElementById('xpBar').style.width = xpInLevel + '%';
+            // XP: для 1→2 нужно 50 XP, потом +100 каждый уровень
+            let xpForNext = state.level === 1 ? 50 : 50 + (state.level - 1) * 100;
+            let xpInLevel = (state.xp || 0) - ((state.level - 1) * 50 + Math.max(0, state.level - 2) * 50);
+            if (state.level === 1) xpInLevel = state.xp || 0;
+            let xpPercent = Math.min(100, (xpInLevel / xpForNext) * 100);
+            document.getElementById('xpBar').style.width = xpPercent + '%';
             
             let energyPct = state.energy || 0;
             document.getElementById('energyBar').style.width = energyPct + '%';
             document.getElementById('energyText').textContent = (state.energy || 0) + '/100';
             
-            // Обновление множителей
+            // Множители
             document.querySelectorAll('.multiplier-badge').forEach(badge => {
                 badge.classList.remove('active', 'current');
                 let m = parseFloat(badge.dataset.m);
@@ -1050,46 +1303,53 @@ async def root():
                 tapArea.style.pointerEvents = 'auto';
                 document.querySelector('.tap-hint').textContent = '👆 ТАПАЙ ПО ПЕРСОНАЖУ';
             }
+            
+            // Подсветка кнопки профессий если есть токены
+            const profBtn = document.getElementById('profBtn');
+            if ((state.tokens || 0) > 0) {
+                profBtn.classList.add('new');
+            } else {
+                profBtn.classList.remove('new');
+            }
+        }
+        
+        function showRecovery() {
+            const status = document.getElementById('recoveryStatus');
+            status.classList.add('show');
+            setTimeout(() => status.classList.remove('show'), 3000);
+            
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
         }
         
         async function checkAfk() {
             let now = Date.now();
-            if (now - lastAfkCheck < 5000) return; // Проверяем каждые 5 сек
+            if (now - lastAfkCheck < 2000) return;
             lastAfkCheck = now;
             
             let r = await fetch(`/api/state?user_id=${uid}`);
             let d = await r.json();
             
-            // Обновляем энергию если восстановилась
-            if (d.energy_recovered > 0) {
+            // Обновляем энергию
+            if (d.user.energy !== state.energy) {
                 state.energy = d.user.energy;
-                showRecoveryNotice();
                 updateUI();
             }
             
-            // Сброс комбо при бездействии
-            if (d.combo_reset && comboTaps > 0) {
-                comboTaps = 0;
+            // Показываем полное восстановление
+            if (d.full_recovery && state.energy >= 100) {
+                showRecovery();
+            }
+            
+            // Сброс комбо
+            if (d.combo_reset) {
                 currentMultiplier = 1.0;
                 updateUI();
             }
         }
         
-        function showRecoveryNotice() {
-            const notice = document.getElementById('recoveryNotice');
-            notice.classList.add('show');
-            setTimeout(() => notice.classList.remove('show'), 2000);
-        }
-        
-        function showLevelUp(level) {
-            const el = document.getElementById('levelUp');
-            document.getElementById('newLevel').textContent = level;
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 2000);
-        }
-        
-        // === МУЛЬТИ-ТАЧ ОБРАБОТКА ===
-        const tapArea = document.getElementById('tapArea');
+        // === ОБРАБОТКА ТАПОВ ===
         const heroContainer = document.getElementById('heroContainer');
         
         heroContainer.addEventListener('touchstart', handleTouch, {passive: false});
@@ -1114,21 +1374,14 @@ async def root():
             if (isProcessing || (state.energy || 0) < fingers) return;
             
             const now = Date.now();
-            if (now - lastTapTime < 60) return; // Анти-спам
+            if (now - lastTapTime < 60) return;
             
             isProcessing = true;
             lastTapTime = now;
             
-            // Обновляем комбо локально
-            comboTaps += fingers;
-            
-            // Расчёт множителя локально для мгновенной обратной связи
-            updateLocalMultiplier();
-            
             tapPattern.push(now);
             if (tapPattern.length > 10) tapPattern.shift();
             
-            // Визуальный эффект
             createFloatingText(clientX, clientY, fingers);
             
             try {
@@ -1150,45 +1403,24 @@ async def root():
                     state.energy = res.energy;
                     state.xp = res.xp;
                     state.level = res.level;
-                    state.total_taps = res.total_taps;
-                    comboTaps = res.combo_taps;
+                    state.tokens = res.tokens;
                     currentMultiplier = res.multiplier;
                     
                     updateUI();
                     
-                    if (res.level_up) {
-                        showLevelUp(res.level);
+                    // Показываем окно профессий при достижении 2 уровня
+                    if (res.level_up && res.level === 2 && !professionsUnlockedShown) {
+                        professionsUnlockedShown = true;
+                        document.getElementById('unlockModal').classList.add('show');
                     }
-                } else {
-                    if (res.cheat_detected) {
-                        showCheatAlert();
-                        comboTaps -= fingers;
-                    }
+                } else if (res.cheat_detected) {
+                    showCheatAlert();
                 }
             } catch (e) {
                 console.error('Error:', e);
             }
             
             isProcessing = false;
-        }
-        
-        function updateLocalMultiplier() {
-            // Локальный расчёт для UI
-            let m = 1.0;
-            for (let i = 0; i < thresholds.length; i++) {
-                if (comboTaps >= thresholds[i]) {
-                    m = multipliers[i];
-                }
-            }
-            // После 2.0 геометрическая прогрессия
-            if (comboTaps >= 300) {
-                let extra = comboTaps - 300;
-                let bonus = Math.floor(extra / 150) * 0.1;
-                m = 2.0 + bonus;
-                m = Math.min(m, 5.0);
-            }
-            currentMultiplier = m;
-            updateUI();
         }
         
         function createFloatingText(x, y, fingers) {
@@ -1206,9 +1438,31 @@ async def root():
         }
         
         function showCheatAlert() {
-            const alert = document.getElementById('cheatAlert');
-            alert.classList.add('show');
-            setTimeout(() => alert.classList.remove('show'), 1500);
+            // Просто игнорируем читерские клики без показа окна
+        }
+        
+        // === НАВИГАЦИЯ ===
+        
+        function openProfessions() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('professionsScreen').classList.add('show');
+            document.getElementById('profTokens').textContent = state.tokens || 0;
+        }
+        
+        function backToGame() {
+            document.getElementById('professionsScreen').classList.remove('show');
+            document.getElementById('gameScreen').style.display = 'flex';
+        }
+        
+        function goToProfessions() {
+            document.getElementById('unlockModal').classList.remove('show');
+            openProfessions();
+        }
+        
+        function exploreProfession(prof) {
+            if (prof === 'it') {
+                alert('IT Сфера: Программист, DevOps, Data Scientist, UX/UI дизайнер...');
+            }
         }
         
         async function init() {
@@ -1216,8 +1470,8 @@ async def root():
             let d = await r.json();
             
             if(d.character) {
-                document.getElementById('createScreen').classList.add('hidden');
-                document.getElementById('gameScreen').classList.remove('hidden');
+                document.getElementById('createScreen').style.display = 'none';
+                document.getElementById('gameScreen').style.display = 'flex';
                 load();
             } else {
                 upd();
