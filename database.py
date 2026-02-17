@@ -5,19 +5,21 @@ def init_db():
     conn = sqlite3.connect('reality.db')
     c = conn.cursor()
     
+    # Пользователи
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY,
             coins INTEGER DEFAULT 0,
             energy INTEGER DEFAULT 100,
-            actions INTEGER DEFAULT 5,
             xp INTEGER DEFAULT 0,
             level INTEGER DEFAULT 1,
             total_taps INTEGER DEFAULT 0,
+            tokens INTEGER DEFAULT 0,
             last_update TEXT
         )
     ''')
     
+    # Персонажи
     c.execute('''
         CREATE TABLE IF NOT EXISTS characters (
             user_id INTEGER PRIMARY KEY,
@@ -31,13 +33,25 @@ def init_db():
         )
     ''')
     
+    # Профессии (изученные)
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS professions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            profession_key TEXT,
+            unlocked_at TEXT,
+            progress INTEGER DEFAULT 0,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+    ''')
+    
     conn.commit()
     conn.close()
 
 def get_user(user_id):
     conn = sqlite3.connect('reality.db')
     c = conn.cursor()
-    c.execute('SELECT coins, energy, actions, xp, level, total_taps FROM users WHERE user_id = ?', (user_id,))
+    c.execute('SELECT coins, energy, xp, level, total_taps, tokens FROM users WHERE user_id = ?', (user_id,))
     result = c.fetchone()
     conn.close()
     
@@ -45,22 +59,22 @@ def get_user(user_id):
         return {
             'coins': result[0],
             'energy': result[1],
-            'actions': result[2],
-            'xp': result[3],
-            'level': result[4],
-            'total_taps': result[5]
+            'xp': result[2],
+            'level': result[3],
+            'total_taps': result[4],
+            'tokens': result[5]
         }
     else:
-        save_user(user_id, 0, 100, 5, 0, 1, 0)
-        return {'coins': 0, 'energy': 100, 'actions': 5, 'xp': 0, 'level': 1, 'total_taps': 0}
+        save_user(user_id, 0, 100, 0, 1, 0, 0)
+        return {'coins': 0, 'energy': 100, 'xp': 0, 'level': 1, 'total_taps': 0, 'tokens': 0}
 
-def save_user(user_id, coins, energy, actions, xp, level, total_taps):
+def save_user(user_id, coins, energy, xp, level, total_taps, tokens):
     conn = sqlite3.connect('reality.db')
     c = conn.cursor()
     c.execute('''
-        INSERT OR REPLACE INTO users (user_id, coins, energy, actions, xp, level, total_taps, last_update)
+        INSERT OR REPLACE INTO users (user_id, coins, energy, xp, level, total_taps, tokens, last_update)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (user_id, coins, energy, actions, xp, level, total_taps, datetime.now().isoformat()))
+    ''', (user_id, coins, energy, xp, level, total_taps, tokens, datetime.now().isoformat()))
     conn.commit()
     conn.close()
 
@@ -89,5 +103,27 @@ def save_character(user_id, name, avatar, strength, intelligence, charisma, luck
         INSERT OR REPLACE INTO characters (user_id, name, avatar, strength, intelligence, charisma, luck)
         VALUES (?, ?, ?, ?, ?, ?, ?)
     ''', (user_id, name, avatar, strength, intelligence, charisma, luck))
+    conn.commit()
+    conn.close()
+
+def get_professions(user_id):
+    conn = sqlite3.connect('reality.db')
+    c = conn.cursor()
+    c.execute('SELECT profession_key, progress FROM professions WHERE user_id = ?', (user_id,))
+    results = c.fetchall()
+    conn.close()
+    
+    profs = {}
+    for row in results:
+        profs[row[0]] = {'progress': row[1]}
+    return profs
+
+def unlock_profession(user_id, profession_key):
+    conn = sqlite3.connect('reality.db')
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO professions (user_id, profession_key, unlocked_at, progress)
+        VALUES (?, ?, ?, ?)
+    ''', (user_id, profession_key, datetime.now().isoformat(), 0))
     conn.commit()
     conn.close()
