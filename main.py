@@ -21,7 +21,8 @@ def get_session(user_id):
                 'last_tap': time.time(),
                 'combo_taps': 0,
                 'current_multiplier': 1.0,
-                'last_energy_update': time.time()
+                'last_energy_update': time.time(),
+                'was_full': True  # Отслеживаем было ли полное восстановление
             }
         return sessions[user_id]
 
@@ -39,6 +40,8 @@ async def get_state(user_id: int):
     time_passed = now - session['last_energy_update']
     energy_recovered = int(time_passed * 2)  # 2 энергии в секунду
     
+    full_recovery = False
+    
     if energy_recovered > 0 and user['energy'] < 100:
         old_energy = user['energy']
         user['energy'] = min(100, user['energy'] + energy_recovered)
@@ -48,8 +51,18 @@ async def get_state(user_id: int):
             save_user(user_id, user['coins'], user['energy'], user['xp'], user['level'], 
                      user['total_taps'], user['tokens'])
             session['last_energy_update'] = now
+            
+            # Проверяем только что достигли 100
+            if user['energy'] >= 100 and not session['was_full']:
+                full_recovery = True
+                session['was_full'] = True
         else:
             session['last_energy_update'] = now
+    elif user['energy'] >= 100:
+        session['was_full'] = True
+        session['last_energy_update'] = now
+    else:
+        session['was_full'] = False
     
     # Проверка сброса комбо (5 секунд бездействия)
     afk_time = now - session['last_tap']
@@ -58,9 +71,6 @@ async def get_state(user_id: int):
     if combo_reset and session['combo_taps'] > 0:
         session['combo_taps'] = 0
         session['current_multiplier'] = 1.0
-    
-    # Проверка полного восстановления
-    full_recovery = user['energy'] >= 100 and energy_recovered > 0
     
     return {
         'user': user, 
@@ -87,6 +97,7 @@ async def do_tap(request: Request):
     session = get_session(user_id)
     session['last_tap'] = time.time()
     session['last_energy_update'] = time.time()
+    session['was_full'] = user['energy'] >= 100  # Сбрасываем флаг полной энергии
     
     if user['energy'] < fingers:
         return {'success': False, 'message': 'Недостаточно энергии!'}
@@ -156,14 +167,17 @@ async def do_tap(request: Request):
         else:
             return 50 + (lvl - 2) * 100
     
-    new_level = user.get('level', 1)
+    old_level = user.get('level', 1)
+    new_level = old_level
     tokens_gained = 0
     level_up = False
     
     while new_xp >= xp_for_level(new_level + 1):
         new_level += 1
-        level_up = True
         tokens_gained += 1  # 1 токен за уровень
+    
+    if new_level > old_level:
+        level_up = True
     
     # Обновление
     user['coins'] = user.get('coins', 0) + total_reward
@@ -177,9 +191,7 @@ async def do_tap(request: Request):
              user['total_taps'], user['tokens'])
     
     # Проверка открытия профессий при достижении 2 уровня
-    professions_unlocked = False
-    if new_level >= 2 and user.get('level', 1) < 2:
-        professions_unlocked = True
+    professions_unlocked = level_up and new_level == 2
     
     return {
         'success': True, 
@@ -195,7 +207,8 @@ async def do_tap(request: Request):
         'tokens_gained': tokens_gained,
         'total_taps': user['total_taps'],
         'combo_taps': session['combo_taps'],
-        'professions_unlocked': professions_unlocked
+        'professions_unlocked': professions_unlocked,
+        'tokens': user['tokens']
     }
 
 @app.post("/api/character")
@@ -253,6 +266,7 @@ async def root():
             --coin: #ffd700;
             --xp: #9b59b6;
             --token: #3498db;
+            --it: #00d4aa;
         }
         html, body { 
             height: 100%; 
@@ -450,13 +464,16 @@ async def root():
         
         /* ИГРА */
         .game-screen {
-            display: flex;
+            display: none;
             flex-direction: column;
             height: 100%;
             gap: 10px;
         }
+        .game-screen.show {
+            display: flex;
+        }
         
-        /* Кнопка профессий слева */
+        /* Кнопка профессий */
         .prof-btn-side {
             position: fixed;
             left: 0;
@@ -619,6 +636,7 @@ async def root():
             color: var(--success);
             opacity: 0;
             transition: opacity 0.3s;
+            height: 10px;
         }
         
         .recovery-status.show {
@@ -744,7 +762,7 @@ async def root():
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             display: none;
             align-items: center;
             justify-content: center;
@@ -757,12 +775,18 @@ async def root():
         
         .modal-content {
             background: var(--panel-bg);
-            border: 4px solid var(--border-color);
+            border: 4px solid var(--success);
             box-shadow: 8px 8px 0px #000;
             padding: 20px;
             max-width: 350px;
             width: 90%;
             text-align: center;
+            animation: modalPop 0.3s ease-out;
+        }
+        
+        @keyframes modalPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
         
         .modal-title {
@@ -795,15 +819,15 @@ async def root():
             box-shadow: 2px 2px 0px #2d8b84;
         }
         
-        /* Страница профессий */
-        .professions-screen {
+        /* СТРАНИЦЫ ПРОФЕССИЙ */
+        .professions-hub-screen, .it-professions-screen {
             display: none;
             flex-direction: column;
             height: 100%;
             gap: 10px;
         }
         
-        .professions-screen.show {
+        .professions-hub-screen.show, .it-professions-screen.show {
             display: flex;
         }
         
@@ -865,14 +889,25 @@ async def root():
             animation: pulse-available 2s infinite;
         }
         
-        @keyframes pulse-available {
-            0%, 100% { box-shadow: 0 0 5px var(--success); }
-            50% { box-shadow: 0 0 15px var(--success); }
-        }
-        
         .profession-node.unlocked {
             border-color: var(--token);
             background: linear-gradient(135deg, var(--panel-bg), #1e3d5c);
+        }
+        
+        .profession-node.it-core {
+            border-color: var(--it);
+            background: linear-gradient(135deg, var(--panel-bg), #0f3d3e);
+            animation: it-glow 2s infinite;
+        }
+        
+        @keyframes it-glow {
+            0%, 100% { box-shadow: 0 0 5px var(--it); border-color: var(--it); }
+            50% { box-shadow: 0 0 20px var(--it); border-color: #00ffaa; }
+        }
+        
+        @keyframes pulse-available {
+            0%, 100% { box-shadow: 0 0 5px var(--success); }
+            50% { box-shadow: 0 0 15px var(--success); }
         }
         
         .prof-icon {
@@ -897,6 +932,60 @@ async def root():
             border: 3px solid var(--border-color);
             color: var(--text);
             cursor: pointer;
+        }
+        
+        .back-btn:active {
+            transform: translate(2px, 2px);
+        }
+        
+        /* IT Профессии сетка */
+        .it-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        
+        .it-prof-card {
+            background: var(--panel-bg);
+            border: 3px solid var(--it);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .it-prof-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0px #000;
+        }
+        
+        .it-prof-icon {
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        .it-prof-name {
+            font-size: 8px;
+            color: var(--it);
+            text-align: center;
+        }
+        
+        .it-prof-desc {
+            font-size: 6px;
+            color: #888;
+            text-align: center;
+            line-height: 1.4;
+        }
+        
+        .it-prof-salary {
+            font-size: 7px;
+            color: var(--coin);
+            text-align: center;
         }
         
         /* Уведомления */
@@ -1031,7 +1120,7 @@ async def root():
     </div>
     
     <!-- ИГРА -->
-    <div class="container game-screen" id="gameScreen" style="display: none;">
+    <div class="container game-screen" id="gameScreen">
         <!-- Кнопка профессий -->
         <button class="prof-btn-side" id="profBtn" onclick="openProfessions()">
             ПРОФЕССИИ
@@ -1107,21 +1196,21 @@ async def root():
         </div>
     </div>
     
-    <!-- СТРАНИЦА ПРОФЕССИЙ -->
-    <div class="container professions-screen" id="professionsScreen">
+    <!-- ХАБ ПРОФЕССИЙ -->
+    <div class="container professions-hub-screen" id="professionsHubScreen">
         <div class="prof-header pixel-box">
-            <h2>◆ ПРОФЕССИИ ◆</h2>
+            <h2>◆ ВЫБОР СФЕРЫ ◆</h2>
         </div>
         
         <div class="tokens-display">
             <div class="token-badge">
-                🔷 ТОКЕНОВ: <span id="profTokens">0</span>
+                🔷 ТОКЕНОВ: <span id="hubTokens">0</span>
             </div>
         </div>
         
         <div class="professions-grid" id="professionsGrid">
             <!-- IT - доступно сразу -->
-            <div class="profession-node unlocked pixel-box" onclick="exploreProfession('it')">
+            <div class="profession-node it-core pixel-box" onclick="openITProfessions()">
                 <div class="prof-icon">💻</div>
                 <div class="prof-name">СФЕРА IT</div>
                 <div class="prof-cost">ОТКРЫТО</div>
@@ -1159,7 +1248,80 @@ async def root():
             </div>
         </div>
         
-        <button class="back-btn" onclick="backToGame()">◀ НАЗАД</button>
+        <button class="back-btn" onclick="backToGame()">◀ НАЗАД В ИГРУ</button>
+    </div>
+    
+    <!-- IT ПРОФЕССИИ -->
+    <div class="container it-professions-screen" id="itProfessionsScreen">
+        <div class="prof-header pixel-box">
+            <h2 style="color: var(--it);">◆ СФЕРА IT ◆</h2>
+        </div>
+        
+        <div class="tokens-display">
+            <div class="token-badge" style="border-color: var(--it); color: var(--it);">
+                🔷 ТОКЕНОВ: <span id="itTokens">0</span>
+            </div>
+        </div>
+        
+        <div class="it-grid" id="itGrid">
+            <div class="it-prof-card" onclick="showProfDetail('frontend')">
+                <div class="it-prof-icon">🎨</div>
+                <div class="it-prof-name">FRONTEND DEV</div>
+                <div class="it-prof-desc">Создание интерфейсов и визуальной части приложений</div>
+                <div class="it-prof-salary">💰 80-150к ₽</div>
+            </div>
+            
+            <div class="it-prof-card" onclick="showProfDetail('backend')">
+                <div class="it-prof-icon">⚙️</div>
+                <div class="it-prof-name">BACKEND DEV</div>
+                <div class="it-prof-desc">Серверная логика, базы данных, API</div>
+                <div class="it-prof-salary">💰 100-200к ₽</div>
+            </div>
+            
+            <div class="it-prof-card" onclick="showProfDetail('mobile')">
+                <div class="it-prof-icon">📱</div>
+                <div class="it-prof-name">MOBILE DEV</div>
+                <div class="it-prof-desc">Приложения для iOS и Android</div>
+                <div class="it-prof-salary">💰 90-180к ₽</div>
+            </div>
+            
+            <div class="it-prof-card" onclick="showProfDetail('devops')">
+                <div class="it-prof-icon">🚀</div>
+                <div class="it-prof-name">DEVOPS</div>
+                <div class="it-prof-desc">Автоматизация, облака, инфраструктура</div>
+                <div class="it-prof-salary">💰 120-250к ₽</div>
+            </div>
+            
+            <div class="it-prof-card" onclick="showProfDetail('data')">
+                <div class="it-prof-icon">📊</div>
+                <div class="it-prof-name">DATA SCIENTIST</div>
+                <div class="it-prof-desc">Анализ данных, машинное обучение, AI</div>
+                <div class="it-prof-salary">💰 150-300к ₽</div>
+            </div>
+            
+            <div class="it-prof-card" onclick="showProfDetail('security')">
+                <div class="it-prof-icon">🔒</div>
+                <div class="it-prof-name">CYBERSECURITY</div>
+                <div class="it-prof-desc">Защита систем, этичный хакинг</div>
+                <div class="it-prof-salary">💰 130-280к ₽</div>
+            </div>
+            
+            <div class="it-prof-card" onclick="showProfDetail('game')">
+                <div class="it-prof-icon">🎮</div>
+                <div class="it-prof-name">GAME DEV</div>
+                <div class="it-prof-desc">Разработка игр, геймдизайн</div>
+                <div class="it-prof-salary">💰 70-200к ₽</div>
+            </div>
+            
+            <div class="it-prof-card" onclick="showProfDetail('qa')">
+                <div class="it-prof-icon">🐞</div>
+                <div class="it-prof-name">QA ENGINEER</div>
+                <div class="it-prof-desc">Тестирование, автоматизация проверок</div>
+                <div class="it-prof-salary">💰 60-140к ₽</div>
+            </div>
+        </div>
+        
+        <button class="back-btn" onclick="backToProfessions()" style="border-color: var(--it);">◀ НАЗАД К СФЕРАМ</button>
     </div>
     
     <script>
@@ -1232,7 +1394,7 @@ async def root():
                 })
             });
             document.getElementById('createScreen').style.display = 'none';
-            document.getElementById('gameScreen').style.display = 'flex';
+            document.getElementById('gameScreen').classList.add('show');
             load();
         }
         
@@ -1255,7 +1417,6 @@ async def root():
             
             updateUI();
             
-            // Показываем уведомление о полном восстановлении
             if (d.full_recovery) {
                 showRecovery();
             }
@@ -1269,10 +1430,10 @@ async def root():
             document.getElementById('displayEnergy').textContent = state.energy || 0;
             document.getElementById('displayLevel').textContent = state.level || 1;
             
-            // XP: для 1→2 нужно 50 XP, потом +100 каждый уровень
+            // XP расчёт
             let xpForNext = state.level === 1 ? 50 : 50 + (state.level - 1) * 100;
-            let xpInLevel = (state.xp || 0) - ((state.level - 1) * 50 + Math.max(0, state.level - 2) * 50);
-            if (state.level === 1) xpInLevel = state.xp || 0;
+            let currentLevelXp = state.level === 1 ? 0 : 50 + (state.level - 2) * 100;
+            let xpInLevel = (state.xp || 0) - currentLevelXp;
             let xpPercent = Math.min(100, (xpInLevel / xpForNext) * 100);
             document.getElementById('xpBar').style.width = xpPercent + '%';
             
@@ -1304,7 +1465,7 @@ async def root():
                 document.querySelector('.tap-hint').textContent = '👆 ТАПАЙ ПО ПЕРСОНАЖУ';
             }
             
-            // Подсветка кнопки профессий если есть токены
+            // Подсветка кнопки профессий
             const profBtn = document.getElementById('profBtn');
             if ((state.tokens || 0) > 0) {
                 profBtn.classList.add('new');
@@ -1337,7 +1498,7 @@ async def root():
                 updateUI();
             }
             
-            // Показываем полное восстановление
+            // Показываем полное восстановление только один раз
             if (d.full_recovery && state.energy >= 100) {
                 showRecovery();
             }
@@ -1409,12 +1570,10 @@ async def root():
                     updateUI();
                     
                     // Показываем окно профессий при достижении 2 уровня
-                    if (res.level_up && res.level === 2 && !professionsUnlockedShown) {
+                    if (res.professions_unlocked && !professionsUnlockedShown) {
                         professionsUnlockedShown = true;
                         document.getElementById('unlockModal').classList.add('show');
                     }
-                } else if (res.cheat_detected) {
-                    showCheatAlert();
                 }
             } catch (e) {
                 console.error('Error:', e);
@@ -1437,21 +1596,28 @@ async def root():
             setTimeout(() => floatEl.remove(), 800);
         }
         
-        function showCheatAlert() {
-            // Просто игнорируем читерские клики без показа окна
-        }
-        
         // === НАВИГАЦИЯ ===
         
         function openProfessions() {
-            document.getElementById('gameScreen').style.display = 'none';
-            document.getElementById('professionsScreen').classList.add('show');
-            document.getElementById('profTokens').textContent = state.tokens || 0;
+            document.getElementById('gameScreen').classList.remove('show');
+            document.getElementById('professionsHubScreen').classList.add('show');
+            document.getElementById('hubTokens').textContent = state.tokens || 0;
+        }
+        
+        function openITProfessions() {
+            document.getElementById('professionsHubScreen').classList.remove('show');
+            document.getElementById('itProfessionsScreen').classList.add('show');
+            document.getElementById('itTokens').textContent = state.tokens || 0;
         }
         
         function backToGame() {
-            document.getElementById('professionsScreen').classList.remove('show');
-            document.getElementById('gameScreen').style.display = 'flex';
+            document.getElementById('professionsHubScreen').classList.remove('show');
+            document.getElementById('gameScreen').classList.add('show');
+        }
+        
+        function backToProfessions() {
+            document.getElementById('itProfessionsScreen').classList.remove('show');
+            document.getElementById('professionsHubScreen').classList.add('show');
         }
         
         function goToProfessions() {
@@ -1459,10 +1625,18 @@ async def root():
             openProfessions();
         }
         
-        function exploreProfession(prof) {
-            if (prof === 'it') {
-                alert('IT Сфера: Программист, DevOps, Data Scientist, UX/UI дизайнер...');
-            }
+        function showProfDetail(prof) {
+            const details = {
+                'frontend': 'Frontend Developer создаёт визуальную часть сайтов и приложений. Нужно знать HTML, CSS, JavaScript и React.',
+                'backend': 'Backend Developer работает с серверами, базами данных и логикой приложений. Стек: Python, Java, Go, SQL.',
+                'mobile': 'Mobile Developer создаёт приложения для смартфонов. Swift для iOS, Kotlin для Android, или Flutter для обоих.',
+                'devops': 'DevOps Engineer автоматизирует развёртывание и поддерживает инфраструктуру. Docker, Kubernetes, AWS, CI/CD.',
+                'data': 'Data Scientist анализирует данные и строит модели ML. Python, математика, статистика, нейросети.',
+                'security': 'Security Specialist защищает системы от взлома. Этичный хакинг, тестирование на проникновение, криптография.',
+                'game': 'Game Developer создаёт игры. Unity, Unreal Engine, C#, C++, геймдизайн.',
+                'qa': 'QA Engineer тестирует ПО и находит баги. Автоматизация тестов, Selenium, ручное тестирование.'
+            };
+            alert(details[prof] || 'Информация о профессии');
         }
         
         async function init() {
@@ -1471,7 +1645,7 @@ async def root():
             
             if(d.character) {
                 document.getElementById('createScreen').style.display = 'none';
-                document.getElementById('gameScreen').style.display = 'flex';
+                document.getElementById('gameScreen').classList.add('show');
                 load();
             } else {
                 upd();
