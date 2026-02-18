@@ -1,7 +1,7 @@
 import os
 import time
 import random
-import json
+import threading
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from database import init_db, get_user, save_user, get_character, save_character, get_professions, unlock_profession, get_tasks, complete_task
@@ -64,286 +64,46 @@ PROFESSIONS_DATA = {
 
 TASKS_DATA = {
     'frontend': [
-        {
-            'id': 'fe_1',
-            'title': 'Первый HTML',
-            'description': 'Создай простую страницу с заголовком и параграфом. Это основа всего веба.',
-            'difficulty': 1,
-            'reward_coins': 100,
-            'reward_xp': 20,
-            'check': 'html_basics'
-        },
-        {
-            'id': 'fe_2',
-            'title': 'CSS стили',
-            'description': 'Сделай кнопку красной и круглой. Научись менять внешний вид элементов.',
-            'difficulty': 2,
-            'reward_coins': 150,
-            'reward_xp': 30,
-            'check': 'css_styling'
-        },
-        {
-            'id': 'fe_3',
-            'title': 'JavaScript интерактив',
-            'description': 'Сделай так, чтобы при клике на кнопку менялся текст. Первая интерактивность!',
-            'difficulty': 3,
-            'reward_coins': 250,
-            'reward_xp': 50,
-            'check': 'js_click'
-        },
-        {
-            'id': 'fe_4',
-            'title': 'Адаптивный дизайн',
-            'description': 'Сделай страницу, которая красиво выглядит и на телефоне, и на компьютере.',
-            'difficulty': 4,
-            'reward_coins': 400,
-            'reward_xp': 80,
-            'check': 'responsive'
-        },
-        {
-            'id': 'fe_5',
-            'title': 'Мини-приложение',
-            'description': 'Создай калькулятор или todo-лист. Полноценное приложение с логикой.',
-            'difficulty': 5,
-            'reward_coins': 800,
-            'reward_xp': 150,
-            'check': 'mini_app'
-        }
+        {'id': 'fe_1', 'title': 'Первый HTML', 'description': 'Создай простую страницу с заголовком и параграфом. Это основа всего веба.', 'difficulty': 1, 'reward_coins': 100, 'reward_xp': 20},
+        {'id': 'fe_2', 'title': 'CSS стили', 'description': 'Сделай кнопку красной и круглой. Научись менять внешний вид элементов.', 'difficulty': 2, 'reward_coins': 150, 'reward_xp': 30},
+        {'id': 'fe_3', 'title': 'JavaScript интерактив', 'description': 'Сделай так, чтобы при клике на кнопку менялся текст. Первая интерактивность!', 'difficulty': 3, 'reward_coins': 250, 'reward_xp': 50},
+        {'id': 'fe_4', 'title': 'Адаптивный дизайн', 'description': 'Сделай страницу, которая красиво выглядит и на телефоне, и на компьютере.', 'difficulty': 4, 'reward_coins': 400, 'reward_xp': 80},
+        {'id': 'fe_5', 'title': 'Мини-приложение', 'description': 'Создай калькулятор или todo-лист. Полноценное приложение с логикой.', 'difficulty': 5, 'reward_coins': 800, 'reward_xp': 150}
     ],
     'backend': [
-        {
-            'id': 'be_1',
-            'title': 'Первая API',
-            'description': 'Создай endpoint, который возвращает "Hello, World!"',
-            'difficulty': 1,
-            'reward_coins': 100,
-            'reward_xp': 20,
-            'check': 'api_hello'
-        },
-        {
-            'id': 'be_2',
-            'title': 'Работа с данными',
-            'description': 'Сделай API, которое принимает имя и возвращает персонализированное приветствие.',
-            'difficulty': 2,
-            'reward_coins': 150,
-            'reward_xp': 30,
-            'check': 'api_data'
-        },
-        {
-            'id': 'be_3',
-            'title': 'База данных',
-            'description': 'Подключи базу данных и сделай CRUD операции (создание, чтение, обновление, удаление).',
-            'difficulty': 3,
-            'reward_coins': 300,
-            'reward_xp': 60,
-            'check': 'database_crud'
-        },
-        {
-            'id': 'be_4',
-            'title': 'Аутентификация',
-            'description': 'Реализуй регистрацию и вход пользователей с хешированием паролей.',
-            'difficulty': 4,
-            'reward_coins': 500,
-            'reward_xp': 100,
-            'check': 'auth'
-        },
-        {
-            'id': 'be_5',
-            'title': 'Масштабирование',
-            'description': 'Оптимизируй запросы и добавь кэширование для высокой нагрузки.',
-            'difficulty': 5,
-            'reward_coins': 1000,
-            'reward_xp': 200,
-            'check': 'scaling'
-        }
+        {'id': 'be_1', 'title': 'Первая API', 'description': 'Создай endpoint, который возвращает "Hello, World!"', 'difficulty': 1, 'reward_coins': 100, 'reward_xp': 20},
+        {'id': 'be_2', 'title': 'Работа с данными', 'description': 'Сделай API, которое принимает имя и возвращает персонализированное приветствие.', 'difficulty': 2, 'reward_coins': 150, 'reward_xp': 30},
+        {'id': 'be_3', 'title': 'База данных', 'description': 'Подключи базу данных и сделай CRUD операции.', 'difficulty': 3, 'reward_coins': 300, 'reward_xp': 60},
+        {'id': 'be_4', 'title': 'Аутентификация', 'description': 'Реализуй регистрацию и вход пользователей с хешированием паролей.', 'difficulty': 4, 'reward_coins': 500, 'reward_xp': 100},
+        {'id': 'be_5', 'title': 'Масштабирование', 'description': 'Оптимизируй запросы и добавь кэширование для высокой нагрузки.', 'difficulty': 5, 'reward_coins': 1000, 'reward_xp': 200}
     ],
     'mobile': [
-        {
-            'id': 'mob_1',
-            'title': 'Hello Mobile',
-            'description': 'Создай первое приложение с одним экраном и текстом.',
-            'difficulty': 1,
-            'reward_coins': 100,
-            'reward_xp': 20,
-            'check': 'hello_mobile'
-        },
-        {
-            'id': 'mob_2',
-            'title': 'Навигация',
-            'description': 'Сделай переход между двумя экранами с кнопкой "Назад".',
-            'difficulty': 2,
-            'reward_coins': 180,
-            'reward_xp': 35,
-            'check': 'navigation'
-        },
-        {
-            'id': 'mob_3',
-            'title': 'Сенсоры',
-            'description': 'Используй акселерометр или камеру в приложении.',
-            'difficulty': 3,
-            'reward_coins': 350,
-            'reward_xp': 70,
-            'check': 'sensors'
-        },
-        {
-            'id': 'mob_4',
-            'title': 'Офлайн-режим',
-            'description': 'Сделай так, чтобы приложение работало без интернета и синхронизировалось.',
-            'difficulty': 4,
-            'reward_coins': 600,
-            'reward_xp': 120,
-            'check': 'offline'
-        },
-        {
-            'id': 'mob_5',
-            'title': 'Публикация',
-            'description': 'Подготовь приложение к публикации в App Store или Google Play.',
-            'difficulty': 5,
-            'reward_coins': 1200,
-            'reward_xp': 250,
-            'check': 'publish'
-        }
+        {'id': 'mob_1', 'title': 'Hello Mobile', 'description': 'Создай первое приложение с одним экраном и текстом.', 'difficulty': 1, 'reward_coins': 100, 'reward_xp': 20},
+        {'id': 'mob_2', 'title': 'Навигация', 'description': 'Сделай переход между двумя экранами с кнопкой "Назад".', 'difficulty': 2, 'reward_coins': 180, 'reward_xp': 35},
+        {'id': 'mob_3', 'title': 'Сенсоры', 'description': 'Используй акселерометр или камеру в приложении.', 'difficulty': 3, 'reward_coins': 350, 'reward_xp': 70},
+        {'id': 'mob_4', 'title': 'Офлайн-режим', 'description': 'Сделай так, чтобы приложение работало без интернета.', 'difficulty': 4, 'reward_coins': 600, 'reward_xp': 120},
+        {'id': 'mob_5', 'title': 'Публикация', 'description': 'Подготовь приложение к публикации в App Store или Google Play.', 'difficulty': 5, 'reward_coins': 1200, 'reward_xp': 250}
     ],
     'devops': [
-        {
-            'id': 'do_1',
-            'title': 'Linux basics',
-            'description': 'Освой базовые команды Linux: навигация, файлы, права доступа.',
-            'difficulty': 1,
-            'reward_coins': 150,
-            'reward_xp': 30,
-            'check': 'linux_basic'
-        },
-        {
-            'id': 'do_2',
-            'title': 'Docker контейнер',
-            'description': 'Запусти приложение в Docker-контейнере.',
-            'difficulty': 2,
-            'reward_coins': 250,
-            'reward_xp': 50,
-            'check': 'docker_run'
-        },
-        {
-            'id': 'do_3',
-            'title': 'CI/CD Pipeline',
-            'description': 'Настрой автоматическую сборку и деплой при пуше в git.',
-            'difficulty': 3,
-            'reward_coins': 500,
-            'reward_xp': 100,
-            'check': 'cicd'
-        },
-        {
-            'id': 'do_4',
-            'title': 'Kubernetes',
-            'description': 'Разверни приложение в Kubernetes кластере.',
-            'difficulty': 4,
-            'reward_coins': 900,
-            'reward_xp': 180,
-            'check': 'k8s'
-        },
-        {
-            'id': 'do_5',
-            'title': 'Мониторинг',
-            'description': 'Настрой логирование, метрики и алерты для системы.',
-            'difficulty': 5,
-            'reward_coins': 1500,
-            'reward_xp': 300,
-            'check': 'monitoring'
-        }
+        {'id': 'do_1', 'title': 'Linux basics', 'description': 'Освой базовые команды Linux: навигация, файлы, права доступа.', 'difficulty': 1, 'reward_coins': 150, 'reward_xp': 30},
+        {'id': 'do_2', 'title': 'Docker контейнер', 'description': 'Запусти приложение в Docker-контейнере.', 'difficulty': 2, 'reward_coins': 250, 'reward_xp': 50},
+        {'id': 'do_3', 'title': 'CI/CD Pipeline', 'description': 'Настрой автоматическую сборку и деплой при пуше в git.', 'difficulty': 3, 'reward_coins': 500, 'reward_xp': 100},
+        {'id': 'do_4', 'title': 'Kubernetes', 'description': 'Разверни приложение в Kubernetes кластере.', 'difficulty': 4, 'reward_coins': 900, 'reward_xp': 180},
+        {'id': 'do_5', 'title': 'Мониторинг', 'description': 'Настрой логирование, метрики и алерты для системы.', 'difficulty': 5, 'reward_coins': 1500, 'reward_xp': 300}
     ],
     'data': [
-        {
-            'id': 'ds_1',
-            'title': 'Первый датасет',
-            'description': 'Загрузи данные и выведи базовую статистику.',
-            'difficulty': 1,
-            'reward_coins': 150,
-            'reward_xp': 30,
-            'check': 'dataset_load'
-        },
-        {
-            'id': 'ds_2',
-            'title': 'Визуализация',
-            'description': 'Построй графики и диаграммы для данных.',
-            'difficulty': 2,
-            'reward_coins': 250,
-            'reward_xp': 50,
-            'check': 'visualization'
-        },
-        {
-            'id': 'ds_3',
-            'title': 'Предсказание',
-            'description': 'Обучи простую модель линейной регрессии.',
-            'difficulty': 3,
-            'reward_coins': 500,
-            'reward_xp': 100,
-            'check': 'prediction'
-        },
-        {
-            'id': 'ds_4',
-            'title': 'Нейросеть',
-            'description': 'Создай и обучи нейросеть для классификации.',
-            'difficulty': 4,
-            'reward_coins': 1000,
-            'reward_xp': 200,
-            'check': 'neural_net'
-        },
-        {
-            'id': 'ds_5',
-            'title': 'Production ML',
-            'description': 'Разверни модель как API сервис с мониторингом качества.',
-            'difficulty': 5,
-            'reward_coins': 2000,
-            'reward_xp': 400,
-            'check': 'ml_prod'
-        }
+        {'id': 'ds_1', 'title': 'Первый датасет', 'description': 'Загрузи данные и выведи базовую статистику.', 'difficulty': 1, 'reward_coins': 150, 'reward_xp': 30},
+        {'id': 'ds_2', 'title': 'Визуализация', 'description': 'Построй графики и диаграммы для данных.', 'difficulty': 2, 'reward_coins': 250, 'reward_xp': 50},
+        {'id': 'ds_3', 'title': 'Предсказание', 'description': 'Обучи простую модель линейной регрессии.', 'difficulty': 3, 'reward_coins': 500, 'reward_xp': 100},
+        {'id': 'ds_4', 'title': 'Нейросеть', 'description': 'Создай и обучи нейросеть для классификации.', 'difficulty': 4, 'reward_coins': 1000, 'reward_xp': 200},
+        {'id': 'ds_5', 'title': 'Production ML', 'description': 'Разверни модель как API сервис с мониторингом качества.', 'difficulty': 5, 'reward_coins': 2000, 'reward_xp': 400}
     ],
     'security': [
-        {
-            'id': 'sec_1',
-            'title': 'Сканирование',
-            'description': 'Просканируй сайт на открытые порты и версии ПО.',
-            'difficulty': 1,
-            'reward_coins': 150,
-            'reward_xp': 30,
-            'check': 'scanning'
-        },
-        {
-            'id': 'sec_2',
-            'title': 'SQL Injection',
-            'description': 'Найди и исправь уязвимость SQL-инъекции.',
-            'difficulty': 2,
-            'reward_coins': 300,
-            'reward_xp': 60,
-            'check': 'sql_inject'
-        },
-        {
-            'id': 'sec_3',
-            'title': 'XSS атака',
-            'description': 'Продемонстрируй и защити от XSS-уязвимости.',
-            'difficulty': 3,
-            'reward_coins': 600,
-            'reward_xp': 120,
-            'check': 'xss'
-        },
-        {
-            'id': 'sec_4',
-            'title': 'Reverse Engineering',
-            'description': 'Проанализируй бинарный файл и найди скрытую функцию.',
-            'difficulty': 4,
-            'reward_coins': 1200,
-            'reward_xp': 250,
-            'check': 'reverse'
-        },
-        {
-            'id': 'sec_5',
-            'title': 'Red Team',
-            'description': 'Проведи полноценный тест на проникновение системы.',
-            'difficulty': 5,
-            'reward_coins': 2500,
-            'reward_xp': 500,
-            'check': 'redteam'
-        }
+        {'id': 'sec_1', 'title': 'Сканирование', 'description': 'Просканируй сайт на открытые порты и версии ПО.', 'difficulty': 1, 'reward_coins': 150, 'reward_xp': 30},
+        {'id': 'sec_2', 'title': 'SQL Injection', 'description': 'Найди и исправь уязвимость SQL-инъекции.', 'difficulty': 2, 'reward_coins': 300, 'reward_xp': 60},
+        {'id': 'sec_3', 'title': 'XSS атака', 'description': 'Продемонстрируй и защити от XSS-уязвимости.', 'difficulty': 3, 'reward_coins': 600, 'reward_xp': 120},
+        {'id': 'sec_4', 'title': 'Reverse Engineering', 'description': 'Проанализируй бинарный файл и найди скрытую функцию.', 'difficulty': 4, 'reward_coins': 1200, 'reward_xp': 250},
+        {'id': 'sec_5', 'title': 'Red Team', 'description': 'Проведи полноценный тест на проникновение системы.', 'difficulty': 5, 'reward_coins': 2500, 'reward_xp': 500}
     ]
 }
 
@@ -566,7 +326,6 @@ async def get_profession_tasks(prof_key: str, user_id: int):
     completed = get_tasks(user_id)
     tasks = TASKS_DATA[prof_key]
     
-    # Отмечаем выполненные
     for task in tasks:
         task['completed'] = task['id'] in completed
     
@@ -589,12 +348,10 @@ async def api_unlock_profession(request: Request):
     if user['tokens'] < cost:
         return {'success': False, 'message': 'Недостаточно токенов!'}
     
-    # Проверяем не открыта ли уже
     existing = get_professions(user_id)
     if prof_key in existing:
         return {'success': False, 'message': 'Already unlocked'}
     
-    # Списываем токены и открываем
     user['tokens'] -= cost
     save_user(user_id, user['coins'], user['energy'], user['xp'], user['level'], 
              user['total_taps'], user['tokens'])
@@ -615,7 +372,6 @@ async def api_complete_task(request: Request):
     
     user = get_user(user_id)
     
-    # Находим задание
     if prof_key not in TASKS_DATA:
         return {'success': False, 'message': 'Profession not found'}
     
@@ -628,16 +384,21 @@ async def api_complete_task(request: Request):
     if not task:
         return {'success': False, 'message': 'Task not found'}
     
-    # Проверяем не выполнено ли уже
     completed = get_tasks(user_id)
     if task_id in completed:
         return {'success': False, 'message': 'Already completed'}
     
-    # Выдаём награду
+    # Проверяем предыдущие задания
+    tasks = TASKS_DATA[prof_key]
+    task_idx = tasks.index(task)
+    if task_idx > 0:
+        prev_task = tasks[task_idx - 1]
+        if prev_task['id'] not in completed:
+            return {'success': False, 'message': 'Complete previous task first'}
+    
     user['coins'] += task['reward_coins']
     user['xp'] += task['reward_xp']
     
-    # Проверяем повышение уровня
     def xp_for_level(lvl):
         if lvl == 1:
             return 0
@@ -673,11 +434,8 @@ async def api_complete_task(request: Request):
         }
     }
 
-# === Главная страница ===
-
-@app.get("/", response_class=HTMLResponse)
-async def root():
-    return """<!DOCTYPE html>
+# === HTML Template ===
+HTML_TEMPLATE = '''<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -736,8 +494,6 @@ async def root():
             border: 3px solid var(--border-color);
             box-shadow: 3px 3px 0px #000;
         }
-        
-        /* ЭКРАНЫ */
         .screen {
             display: none;
             flex-direction: column;
@@ -747,8 +503,6 @@ async def root():
         .screen.show {
             display: flex;
         }
-        
-        /* БОКОВЫЕ КНОПКИ */
         .side-buttons {
             position: fixed;
             left: 0;
@@ -759,7 +513,6 @@ async def root():
             gap: 10px;
             z-index: 100;
         }
-        
         .side-btn {
             writing-mode: vertical-rl;
             text-orientation: mixed;
@@ -773,30 +526,23 @@ async def root():
             cursor: pointer;
             transition: all 0.2s;
         }
-        
         .side-btn:active {
             transform: translateX(2px);
         }
-        
         .side-btn.prof {
             background: var(--token);
         }
-        
         .side-btn.tasks {
             background: var(--warning);
             color: #000;
         }
-        
         .side-btn.new {
             animation: pulse-border 1s infinite;
         }
-        
         @keyframes pulse-border {
             0%, 100% { box-shadow: 3px 3px 0px rgba(0,0,0,0.5), 0 0 10px var(--success); }
             50% { box-shadow: 3px 3px 0px rgba(0,0,0,0.5), 0 0 20px var(--success); }
         }
-        
-        /* СОЗДАНИЕ */
         .create-header {
             text-align: center;
             padding: 4px;
@@ -917,79 +663,64 @@ async def root():
             opacity: 0.4;
             background: #666;
         }
-        
-        /* ИГРОВОЙ ЭКРАН */
         .top-panel {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-        
         .header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 8px 12px;
         }
-        
         .player-name {
             font-size: 12px;
             color: var(--accent);
             text-shadow: 2px 2px 0px #000;
         }
-        
         .player-level {
             font-size: 8px;
             color: var(--xp);
         }
-        
         .xp-bar-container {
             width: 100px;
             height: 8px;
             background: #000;
             border: 1px solid var(--border-color);
         }
-        
         .xp-fill {
             height: 100%;
             background: var(--xp);
             transition: width 0.3s;
         }
-        
         .resources-row {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 8px;
         }
-        
         .res-box {
             padding: 8px;
             text-align: center;
         }
-        
         .res-box.coins { border-color: var(--coin); }
         .res-box.tokens { border-color: var(--token); }
-        
         .res-value {
             font-size: 12px;
             color: var(--success);
         }
-        
         .res-value.coins { color: var(--coin); }
         .res-value.tokens { color: var(--token); }
-        
         .energy-bar-container {
             height: 20px;
             position: relative;
             overflow: hidden;
         }
-        
         .energy-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--danger), var(--warning), var(--success));
             transition: width 0.5s;
         }
-        
         .recovery-status {
             text-align: center;
             font-size: 7px;
@@ -997,16 +728,13 @@ async def root():
             opacity: 0;
             height: 10px;
         }
-        
         .recovery-status.show { opacity: 1; }
-        
         .tap-area {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        
         .hero-container {
             display: flex;
             flex-direction: column;
@@ -1015,19 +743,16 @@ async def root():
             cursor: pointer;
             padding: 20px;
         }
-        
         .hero-sprite {
             width: 80px;
             height: 80px;
             animation: breathe 2s ease-in-out infinite;
             filter: drop-shadow(4px 4px 0px #000);
         }
-        
         @keyframes breathe {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-6px); }
         }
-        
         .floating-reward {
             position: absolute;
             font-size: 14px;
@@ -1036,13 +761,10 @@ async def root():
             pointer-events: none;
             animation: floatUp 0.8s forwards;
         }
-        
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0); }
             100% { opacity: 0; transform: translateY(-40px); }
         }
-        
-        /* ПРОФЕССИИ */
         .professions-grid {
             flex: 1;
             display: grid;
@@ -1051,7 +773,6 @@ async def root():
             padding: 10px;
             overflow-y: auto;
         }
-        
         .profession-card {
             aspect-ratio: 1;
             display: flex;
@@ -1063,33 +784,26 @@ async def root():
             cursor: pointer;
             transition: all 0.2s;
         }
-        
         .profession-card.locked {
             opacity: 0.4;
             filter: grayscale(1);
             cursor: not-allowed;
         }
-        
         .profession-card.available {
             border-color: var(--token);
             animation: glow 2s infinite;
         }
-        
         .profession-card.unlocked {
             border-color: var(--success);
             background: linear-gradient(135deg, var(--panel-bg), #0f3d3e);
         }
-        
         @keyframes glow {
             0%, 100% { box-shadow: 0 0 5px var(--token); }
             50% { box-shadow: 0 0 15px var(--token); }
         }
-        
         .prof-icon { font-size: 32px; }
         .prof-name { font-size: 8px; text-align: center; }
         .prof-cost { font-size: 7px; color: var(--token); }
-        
-        /* ГАЙД ПРОФЕССИИ */
         .guide-modal {
             position: fixed;
             top: 0;
@@ -1103,9 +817,7 @@ async def root():
             z-index: 2000;
             padding: 20px;
         }
-        
         .guide-modal.show { display: flex; }
-        
         .guide-content {
             background: var(--panel-bg);
             border: 4px solid var(--success);
@@ -1115,42 +827,35 @@ async def root():
             max-height: 80vh;
             overflow-y: auto;
         }
-        
         .guide-title {
             font-size: 12px;
             color: var(--success);
             margin-bottom: 15px;
             text-align: center;
         }
-        
         .guide-section {
             margin-bottom: 15px;
         }
-        
         .guide-section h4 {
             font-size: 8px;
             color: var(--warning);
             margin-bottom: 5px;
         }
-        
         .guide-section p {
             font-size: 7px;
             line-height: 1.6;
             color: #aaa;
         }
-        
         .guide-tools {
             display: flex;
             flex-wrap: wrap;
             gap: 5px;
         }
-        
         .tool-tag {
             padding: 4px 8px;
             background: var(--border-color);
             font-size: 6px;
         }
-        
         .guide-btn {
             width: 100%;
             padding: 12px;
@@ -1163,8 +868,6 @@ async def root():
             color: #000;
             cursor: pointer;
         }
-        
-        /* ЗАДАНИЯ */
         .tasks-list {
             flex: 1;
             overflow-y: auto;
@@ -1173,74 +876,56 @@ async def root():
             gap: 10px;
             padding: 10px;
         }
-        
         .task-card {
             padding: 15px;
             border: 3px solid var(--border-color);
             cursor: pointer;
             transition: all 0.2s;
+            position: relative;
         }
-        
-        .task-card:hover:not(.completed) {
+        .task-card:hover:not(.completed):not(.locked) {
             border-color: var(--warning);
             transform: translate(-2px, -2px);
         }
-        
         .task-card.completed {
             opacity: 0.5;
             border-color: var(--success);
             cursor: default;
         }
-        
         .task-card.locked {
             opacity: 0.3;
             cursor: not-allowed;
         }
-        
         .task-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
-        
         .task-title {
             font-size: 10px;
             color: var(--text);
         }
-        
         .task-difficulty {
             font-size: 7px;
             padding: 3px 6px;
             background: var(--warning);
             color: #000;
         }
-        
         .task-desc {
             font-size: 7px;
             color: #888;
             margin-bottom: 10px;
             line-height: 1.4;
         }
-        
         .task-reward {
             display: flex;
             gap: 15px;
             font-size: 8px;
         }
-        
         .task-reward span {
             color: var(--coin);
         }
-        
-        .task-status {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-        }
-        
         .back-btn {
             padding: 15px;
             font-family: 'Press Start 2P', cursive;
@@ -1250,8 +935,6 @@ async def root():
             color: var(--text);
             cursor: pointer;
         }
-        
-        /* МОДАЛЬНЫЕ ОКНА */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -1264,9 +947,7 @@ async def root():
             justify-content: center;
             z-index: 1000;
         }
-        
         .modal-overlay.show { display: flex; }
-        
         .modal-content {
             background: var(--panel-bg);
             border: 4px solid var(--success);
@@ -1274,19 +955,16 @@ async def root():
             max-width: 350px;
             text-align: center;
         }
-        
         .modal-title {
             font-size: 12px;
             color: var(--success);
             margin-bottom: 15px;
         }
-        
         .modal-text {
             font-size: 8px;
             margin-bottom: 20px;
             line-height: 1.6;
         }
-        
         .modal-btn {
             padding: 12px 24px;
             font-family: 'Press Start 2P', cursive;
@@ -1297,8 +975,6 @@ async def root():
             color: #000;
             cursor: pointer;
         }
-        
-        /* УВЕДОМЛЕНИЯ */
         .toast {
             position: fixed;
             top: 20%;
@@ -1313,15 +989,12 @@ async def root():
             z-index: 999;
             transition: transform 0.3s;
         }
-        
         .toast.show { transform: translateX(-50%) scale(1); }
     </style>
 </head>
 <body>
-    <!-- Уведомления -->
     <div class="toast" id="toast"></div>
     
-    <!-- Модальное окно открытия профессий -->
     <div class="modal-overlay" id="unlockModal">
         <div class="modal-content">
             <div class="modal-title">🎉 ОТКРЫТ ВЫБОР ПРОФЕССИЙ!</div>
@@ -1334,7 +1007,6 @@ async def root():
         </div>
     </div>
     
-    <!-- Гайд профессии -->
     <div class="guide-modal" id="guideModal">
         <div class="guide-content">
             <div class="guide-title" id="guideTitle">PROFESSION GUIDE</div>
@@ -1355,7 +1027,6 @@ async def root():
         </div>
     </div>
 
-    <!-- СОЗДАНИЕ ПЕРСОНАЖА -->
     <div class="container screen show" id="createScreen">
         <div class="create-header">
             <h1>◆ RE:ALITY ◆</h1>
@@ -1429,7 +1100,6 @@ async def root():
         <button class="start-btn" id="startBtn" onclick="create()" disabled>START ▶</button>
     </div>
     
-    <!-- ИГРОВОЙ ЭКРАН -->
     <div class="container screen" id="gameScreen">
         <div class="side-buttons">
             <button class="side-btn prof" id="profBtn" onclick="openProfessions()">ПРОФЕССИИ</button>
@@ -1485,7 +1155,6 @@ async def root():
         </div>
     </div>
     
-    <!-- ЭКРАН ПРОФЕССИЙ -->
     <div class="container screen" id="professionsScreen">
         <div class="pixel-box" style="padding: 15px; text-align: center;">
             <h2 style="font-size: 12px; color: var(--token);">◆ ИССЛЕДОВАНИЕ ПРОФЕССИЙ ◆</h2>
@@ -1499,7 +1168,6 @@ async def root():
         <button class="back-btn" onclick="backToGame()">◀ НАЗАД</button>
     </div>
     
-    <!-- ЭКРАН ЗАДАНИЙ -->
     <div class="container screen" id="tasksScreen">
         <div class="pixel-box" style="padding: 15px; text-align: center;">
             <h2 style="font-size: 12px; color: var(--warning);">◆ ЗАДАНИЯ ◆</h2>
@@ -1525,6 +1193,9 @@ async def root():
         let currentGuideProf = null;
         let unlockedProfs = {};
         let completedTasks = [];
+        let currentTaskProf = null;
+        
+        const MAX = 20, MIN = 1;
         
         const professionsData = {
             'frontend': {name: 'FRONTEND DEV', icon: '🎨', cost: 1},
@@ -1535,7 +1206,6 @@ async def root():
             'security': {name: 'SECURITY', icon: '🔒', cost: 2}
         };
         
-        // Инициализация создания персонажа
         document.querySelectorAll('.hero-slot').forEach(el => {
             el.onclick = function() {
                 document.querySelectorAll('.hero-slot').forEach(h => h.classList.remove('selected'));
@@ -1611,21 +1281,17 @@ async def root():
             document.getElementById('displayEnergy').textContent = state.energy || 0;
             document.getElementById('displayLevel').textContent = state.level || 1;
             
-            // XP
             let xpForNext = state.level === 1 ? 50 : 50 + (state.level - 1) * 100;
             let currentBase = state.level === 1 ? 0 : 50 + (state.level - 2) * 100;
             let xpPercent = Math.min(100, ((state.xp - currentBase) / (xpForNext - currentBase)) * 100);
             document.getElementById('xpBar').style.width = xpPercent + '%';
             
-            // Energy
             document.getElementById('energyBar').style.width = (state.energy || 0) + '%';
             
-            // Side buttons highlight
             if ((state.tokens || 0) > 0) {
                 document.getElementById('profBtn').classList.add('new');
             }
             
-            // Check professions unlock
             if (state.level >= 2 && !professionsUnlockedShown) {
                 professionsUnlockedShown = true;
                 document.getElementById('unlockModal').classList.add('show');
@@ -1658,7 +1324,6 @@ async def root():
             if (d.full_recovery) showRecovery();
         }
         
-        // TAP SYSTEM
         const heroContainer = document.getElementById('heroContainer');
         heroContainer.addEventListener('touchstart', handleTouch, {passive: false});
         heroContainer.addEventListener('click', handleClick);
@@ -1685,7 +1350,6 @@ async def root():
             tapPattern.push(now);
             if (tapPattern.length > 10) tapPattern.shift();
             
-            // Visual
             const floatEl = document.createElement('div');
             floatEl.className = 'floating-reward';
             floatEl.textContent = '+' + fingers;
@@ -1694,7 +1358,6 @@ async def root():
             heroContainer.appendChild(floatEl);
             setTimeout(() => floatEl.remove(), 800);
             
-            // API
             let r = await fetch('/api/tap', {
                 method: 'POST',
                 headers: {'Content-Type':'application/json'},
@@ -1715,7 +1378,6 @@ async def root():
             isProcessing = false;
         }
         
-        // NAVIGATION
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('show'));
             document.getElementById(id).classList.add('show');
@@ -1731,7 +1393,6 @@ async def root():
             openProfessions();
         }
         
-        // PROFESSIONS
         async function openProfessions() {
             showScreen('professionsScreen');
             document.getElementById('profScreenTokens').textContent = state.tokens || 0;
@@ -1822,10 +1483,8 @@ async def root():
             }
         }
         
-        // TASKS
         async function openTasks() {
             showScreen('tasksScreen');
-            // Показываем список открытых профессий для выбора
             const list = document.getElementById('tasksList');
             list.innerHTML = '';
             
@@ -1834,6 +1493,8 @@ async def root():
                 list.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Сначала открой профессию в разделе ПРОФЕССИИ</div>';
                 return;
             }
+            
+            document.getElementById('tasksSubtitle').textContent = 'Выбери профессию для просмотра заданий';
             
             unlocked.forEach(profKey => {
                 const data = professionsData[profKey];
@@ -1851,6 +1512,7 @@ async def root():
         }
         
         async function openProfessionTasks(profKey) {
+            currentTaskProf = profKey;
             document.getElementById('tasksSubtitle').textContent = professionsData[profKey].name;
             const list = document.getElementById('tasksList');
             list.innerHTML = '';
@@ -1868,7 +1530,94 @@ async def root():
                 
                 const card = document.createElement('div');
                 card.className = 'task-card pixel-box ' + (isCompleted ? 'completed' : isLocked ? 'locked' : '');
-                card.style.position = 'relative';
+                
+                let statusIcon = isCompleted ? '✓' : isLocked ? '🔒' : '▶';
+                let diffColor = task.difficulty === 1 ? '#4ecdc4' : task.difficulty === 2 ? '#ffe66d' : task.difficulty === 3 ? '#ff6b6b' : task.difficulty === 4 ? '#9b59b6' : '#e74c3c';
                 
                 card.innerHTML = `
-                    <div class="task
+                    <div class="task-header">
+                        <span class="task-title">${statusIcon} ${task.title}</span>
+                        <span class="task-difficulty" style="background: ${diffColor}">★${task.difficulty}</span>
+                    </div>
+                    <div class="task-desc">${task.description}</div>
+                    <div class="task-reward">
+                        <span>🪙 ${task.reward_coins}</span>
+                        <span>✨ ${task.reward_xp} XP</span>
+                    </div>
+                `;
+                
+                if (!isCompleted && !isLocked) {
+                    card.onclick = () => completeTask(task.id);
+                }
+                
+                list.appendChild(card);
+                
+                if (!isCompleted) prevCompleted = false;
+            });
+        }
+        
+        async function completeTask(taskId) {
+            if (!currentTaskProf) return;
+            
+            const r = await fetch('/api/complete_task', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    user_id: uid,
+                    task_id: taskId,
+                    prof_key: currentTaskProf
+                })
+            });
+            
+            const d = await r.json();
+            if (d.success) {
+                state.coins = d.coins;
+                state.xp = d.xp;
+                state.level = d.level;
+                state.tokens = d.tokens;
+                
+                let msg = `✓ Задание выполнено! +${d.reward.coins} 🪙 +${d.reward.xp} XP`;
+                if (d.level_up) {
+                    msg += ` 🎉 Уровень ${d.level}!`;
+                }
+                showToast(msg);
+                
+                openProfessionTasks(currentTaskProf);
+                updateUI();
+            } else {
+                showToast('✗ ' + d.message);
+            }
+        }
+        
+        async function init() {
+            let r = await fetch(`/api/state?user_id=${uid}`);
+            let d = await r.json();
+            
+            if(d.character) {
+                showScreen('gameScreen');
+                loadGame();
+            } else {
+                updatePoints();
+            }
+        }
+        
+        init();
+    </script>
+</body>
+</html>'''
+
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    return HTML_TEMPLATE
+
+@app.get("/hero1.png")
+async def hero1():
+    return FileResponse("hero1.png")
+
+@app.get("/hero2.png")
+async def hero2():
+    return FileResponse("hero2.png")
+
+@app.get("/hero3.png")
+async def hero3():
+    return FileResponse("hero3.png")
