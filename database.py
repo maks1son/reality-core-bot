@@ -5,7 +5,6 @@ def init_db():
     conn = sqlite3.connect('reality.db')
     c = conn.cursor()
     
-    # Пользователи
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY,
@@ -19,7 +18,6 @@ def init_db():
         )
     ''')
     
-    # Персонажи
     c.execute('''
         CREATE TABLE IF NOT EXISTS characters (
             user_id INTEGER PRIMARY KEY,
@@ -33,7 +31,6 @@ def init_db():
         )
     ''')
     
-    # Профессии (изученные)
     c.execute('''
         CREATE TABLE IF NOT EXISTS professions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,6 +38,16 @@ def init_db():
             profession_key TEXT,
             unlocked_at TEXT,
             progress INTEGER DEFAULT 0,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+    ''')
+    
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            task_id TEXT,
+            completed_at TEXT,
             FOREIGN KEY (user_id) REFERENCES users(user_id)
         )
     ''')
@@ -125,5 +132,24 @@ def unlock_profession(user_id, profession_key):
         INSERT INTO professions (user_id, profession_key, unlocked_at, progress)
         VALUES (?, ?, ?, ?)
     ''', (user_id, profession_key, datetime.now().isoformat(), 0))
+    conn.commit()
+    conn.close()
+
+def get_tasks(user_id):
+    conn = sqlite3.connect('reality.db')
+    c = conn.cursor()
+    c.execute('SELECT task_id FROM tasks WHERE user_id = ?', (user_id,))
+    results = c.fetchall()
+    conn.close()
+    
+    return [row[0] for row in results]
+
+def complete_task(user_id, task_id):
+    conn = sqlite3.connect('reality.db')
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO tasks (user_id, task_id, completed_at)
+        VALUES (?, ?, ?)
+    ''', (user_id, task_id, datetime.now().isoformat()))
     conn.commit()
     conn.close()
