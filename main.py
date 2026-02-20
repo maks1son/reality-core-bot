@@ -18,7 +18,15 @@ PROFESSIONS_DATA = {
         'description': 'Создание визуальной части веб-приложений',
         'guide': 'Frontend-разработчик отвечает за то, что видит пользователь. Он превращает дизайн в работающий код, делает кнопки кликабельными, анимации плавными, а интерфейс удобным.',
         'tools': ['HTML', 'CSS', 'JavaScript', 'React'],
-        'cost': 1
+        'cost': 1,
+        'sphere': 'tech',
+        'mini_game': {
+            'type': 'code_puzzle',
+            'title': 'HTML Puzzle',
+            'description': 'Собери правильную структуру HTML страницы',
+            'reward_coins': 200,
+            'reward_xp': 50
+        }
     },
     'backend': {
         'name': 'BACKEND DEVELOPER',
@@ -26,7 +34,15 @@ PROFESSIONS_DATA = {
         'description': 'Серверная логика и базы данных',
         'guide': 'Backend-разработчик строит "мозг" приложения. Он создаёт API, работает с базами данных, обеспечивает безопасность и производительность.',
         'tools': ['Python', 'SQL', 'API', 'Docker'],
-        'cost': 1
+        'cost': 1,
+        'sphere': 'tech',
+        'mini_game': {
+            'type': 'logic_gate',
+            'title': 'Logic Gates',
+            'description': 'Реши логические задачи для работы сервера',
+            'reward_coins': 200,
+            'reward_xp': 50
+        }
     },
     'mobile': {
         'name': 'MOBILE DEVELOPER',
@@ -34,7 +50,15 @@ PROFESSIONS_DATA = {
         'description': 'Приложения для iOS и Android',
         'guide': 'Mobile-разработчик создаёт приложения для смартфонов. Он должен учитывать особенности touch-интерфейса, ограничения батареи и разные размеры экранов.',
         'tools': ['Swift', 'Kotlin', 'Flutter', 'Firebase'],
-        'cost': 1
+        'cost': 1,
+        'sphere': 'tech',
+        'mini_game': {
+            'type': 'responsive_design',
+            'title': 'Screen Adapt',
+            'description': 'Подстрой интерфейс под разные экраны',
+            'reward_coins': 250,
+            'reward_xp': 60
+        }
     },
     'devops': {
         'name': 'DEVOPS ENGINEER',
@@ -42,7 +66,15 @@ PROFESSIONS_DATA = {
         'description': 'Автоматизация и инфраструктура',
         'guide': 'DevOps-инженер делает так, чтобы код быстро и надёжно попадал на сервера. Он автоматизирует рутину, следит за стабильностью систем.',
         'tools': ['Linux', 'Docker', 'Kubernetes', 'CI/CD'],
-        'cost': 2
+        'cost': 2,
+        'sphere': 'tech',
+        'mini_game': {
+            'type': 'pipeline_builder',
+            'title': 'Pipeline Builder',
+            'description': 'Построй CI/CD pipeline без ошибок',
+            'reward_coins': 400,
+            'reward_xp': 100
+        }
     },
     'data': {
         'name': 'DATA SCIENTIST',
@@ -50,7 +82,15 @@ PROFESSIONS_DATA = {
         'description': 'Анализ данных и машинное обучение',
         'guide': 'Data Scientist находит закономерности в данных, строит прогнозы и обучает нейросети. Это математика + программирование + бизнес-понимание.',
         'tools': ['Python', 'Pandas', 'ML', 'Statistics'],
-        'cost': 2
+        'cost': 2,
+        'sphere': 'analytics',
+        'mini_game': {
+            'type': 'pattern_match',
+            'title': 'Pattern Finder',
+            'description': 'Найди закономерности в данных',
+            'reward_coins': 400,
+            'reward_xp': 100
+        }
     },
     'security': {
         'name': 'SECURITY SPECIALIST',
@@ -58,7 +98,63 @@ PROFESSIONS_DATA = {
         'description': 'Кибербезопасность и защита',
         'guide': 'Специалист по безопасности ищет уязвимости до того, как их найдут злоумышленники. Он мыслит как хакер, чтобы защитить системы.',
         'tools': ['Penetration Testing', 'Cryptography', 'Networking', 'Linux'],
-        'cost': 2
+        'cost': 2,
+        'sphere': 'tech',
+        'mini_game': {
+            'type': 'hack_defense',
+            'title': 'Firewall Defense',
+            'description': 'Защити систему от атак',
+            'reward_coins': 500,
+            'reward_xp': 120
+        }
+    },
+    'design': {
+        'name': 'UI/UX DESIGNER',
+        'icon': '🎯',
+        'description': 'Дизайн интерфейсов и пользовательский опыт',
+        'guide': 'Дизайнер создаёт красивые и удобные интерфейсы. Он понимает психологию пользователя и умеет визуализировать идеи.',
+        'tools': ['Figma', 'Adobe XD', 'Prototyping', 'Color Theory'],
+        'cost': 1,
+        'sphere': 'creative',
+        'mini_game': {
+            'type': 'color_match',
+            'title': 'Color Harmony',
+            'description': 'Собери гармоничную цветовую палитру',
+            'reward_coins': 200,
+            'reward_xp': 50
+        }
+    },
+    'marketing': {
+        'name': 'DIGITAL MARKETING',
+        'icon': '📢',
+        'description': 'Цифровой маркетинг и продвижение',
+        'guide': 'Маркетолог находит клиентов и рассказывает им о продукте. Он анализирует данные, создаёт кампании и измеряет результаты.',
+        'tools': ['SEO', 'SMM', 'Analytics', 'Copywriting'],
+        'cost': 1,
+        'sphere': 'business',
+        'mini_game': {
+            'type': 'viral_spread',
+            'title': 'Viral Campaign',
+            'description': 'Запусти вирусную кампанию',
+            'reward_coins': 250,
+            'reward_xp': 60
+        }
+    },
+    'science': {
+        'name': 'RESEARCH SCIENTIST',
+        'icon': '🔬',
+        'description': 'Научные исследования и разработки',
+        'guide': 'Учёный проводит эксперименты, анализирует результаты и делает открытия. Он работает в лаборатории, университете или R&D отделе компании.',
+        'tools': ['Research Methods', 'Statistics', 'Lab Equipment', 'Academic Writing'],
+        'cost': 2,
+        'sphere': 'science',
+        'mini_game': {
+            'type': 'experiment',
+            'title': 'Lab Experiment',
+            'description': 'Проведи эксперимент и проанализируй результаты',
+            'reward_coins': 400,
+            'reward_xp': 100
+        }
     }
 }
 
@@ -104,7 +200,62 @@ TASKS_DATA = {
         {'id': 'sec_3', 'title': 'XSS атака', 'description': 'Продемонстрируй и защити от XSS-уязвимости.', 'difficulty': 3, 'reward_coins': 600, 'reward_xp': 120},
         {'id': 'sec_4', 'title': 'Reverse Engineering', 'description': 'Проанализируй бинарный файл и найди скрытую функцию.', 'difficulty': 4, 'reward_coins': 1200, 'reward_xp': 250},
         {'id': 'sec_5', 'title': 'Red Team', 'description': 'Проведи полноценный тест на проникновение системы.', 'difficulty': 5, 'reward_coins': 2500, 'reward_xp': 500}
+    ],
+    'design': [
+        {'id': 'des_1', 'title': 'Цветовой круг', 'description': 'Изучи основы цветовой теории и подбери гармоничные цвета.', 'difficulty': 1, 'reward_coins': 100, 'reward_xp': 20},
+        {'id': 'des_2', 'title': 'Типографика', 'description': 'Подбери шрифты для заголовков и основного текста.', 'difficulty': 2, 'reward_coins': 150, 'reward_xp': 30},
+        {'id': 'des_3', 'title': 'Композиция', 'description': 'Создай сбалансированный макет страницы.', 'difficulty': 3, 'reward_coins': 250, 'reward_xp': 50},
+        {'id': 'des_4', 'title': 'Прототип', 'description': 'Сделай интерактивный прототип в Figma.', 'difficulty': 4, 'reward_coins': 400, 'reward_xp': 80},
+        {'id': 'des_5', 'title': 'Дизайн-система', 'description': 'Создай полноценную дизайн-систему с компонентами.', 'difficulty': 5, 'reward_coins': 800, 'reward_xp': 150}
+    ],
+    'marketing': [
+        {'id': 'mkt_1', 'title': 'Целевая аудитория', 'description': 'Определи портрет целевого клиента.', 'difficulty': 1, 'reward_coins': 100, 'reward_xp': 20},
+        {'id': 'mkt_2', 'title': 'Контент-план', 'description': 'Составь план публикаций на неделю.', 'difficulty': 2, 'reward_coins': 150, 'reward_xp': 30},
+        {'id': 'mkt_3', 'title': 'Рекламная кампания', 'description': 'Настрой таргетированную рекламу.', 'difficulty': 3, 'reward_coins': 300, 'reward_xp': 60},
+        {'id': 'mkt_4', 'title': 'Email-рассылка', 'description': 'Создай цепочку писем для email-маркетинга.', 'difficulty': 4, 'reward_coins': 500, 'reward_xp': 100},
+        {'id': 'mkt_5', 'title': 'Аналитика', 'description': 'Проанализируй метрики и оптимизируй кампанию.', 'difficulty': 5, 'reward_coins': 1000, 'reward_xp': 200}
+    ],
+    'science': [
+        {'id': 'sci_1', 'title': 'Гипотеза', 'description': 'Сформулируй научную гипотезу.', 'difficulty': 1, 'reward_coins': 150, 'reward_xp': 30},
+        {'id': 'sci_2', 'title': 'Эксперимент', 'description': 'Спланируй и проведи простой эксперимент.', 'difficulty': 2, 'reward_coins': 250, 'reward_xp': 50},
+        {'id': 'sci_3', 'title': 'Сбор данных', 'description': 'Собери и структурируй экспериментальные данные.', 'difficulty': 3, 'reward_coins': 400, 'reward_xp': 80},
+        {'id': 'sci_4', 'title': 'Анализ', 'description': 'Проанализируй данные статистическими методами.', 'difficulty': 4, 'reward_coins': 700, 'reward_xp': 140},
+        {'id': 'sci_5', 'title': 'Публикация', 'description': 'Оформи результаты в научном стиле.', 'difficulty': 5, 'reward_coins': 1400, 'reward_xp': 280}
     ]
+}
+
+# Сферы профессий
+SPHERES_DATA = {
+    'tech': {
+        'name': 'ТЕХНОЛОГИИ',
+        'icon': '💻',
+        'color': '#00d4aa',
+        'description': 'Программирование, разработка, IT-инфраструктура'
+    },
+    'analytics': {
+        'name': 'АНАЛИТИКА',
+        'icon': '📊',
+        'color': '#9b59b6',
+        'description': 'Данные, статистика, машинное обучение'
+    },
+    'creative': {
+        'name': 'ТВОРЧЕСТВО',
+        'icon': '🎨',
+        'color': '#ff6b9d',
+        'description': 'Дизайн, искусство, контент'
+    },
+    'business': {
+        'name': 'БИЗНЕС',
+        'icon': '💼',
+        'color': '#f39c12',
+        'description': 'Маркетинг, продажи, управление'
+    },
+    'science': {
+        'name': 'НАУКА',
+        'icon': '🔬',
+        'color': '#3498db',
+        'description': 'Исследования, эксперименты, открытия'
+    }
 }
 
 # Хранилище сессий
@@ -119,7 +270,8 @@ def get_session(user_id):
                 'combo_taps': 0,
                 'current_multiplier': 1.0,
                 'last_energy_update': time.time(),
-                'was_full': True
+                'was_full': True,
+                'mini_game_progress': {}
             }
         return sessions[user_id]
 
@@ -312,6 +464,15 @@ async def create_character(request: Request):
     save_user(data['user_id'], 0, 100, 0, 1, 0, 0)
     return {'success': True}
 
+@app.get("/api/spheres")
+async def get_spheres():
+    return {'success': True, 'spheres': SPHERES_DATA}
+
+@app.get("/api/professions_by_sphere")
+async def get_professions_by_sphere(sphere: str):
+    profs = {k: v for k, v in PROFESSIONS_DATA.items() if v.get('sphere') == sphere}
+    return {'success': True, 'professions': profs}
+
 @app.get("/api/profession_data")
 async def get_profession_data(prof_key: str):
     if prof_key in PROFESSIONS_DATA:
@@ -432,6 +593,81 @@ async def api_complete_task(request: Request):
             'coins': task['reward_coins'],
             'xp': task['reward_xp']
         }
+    }
+
+@app.post("/api/complete_mini_game")
+async def complete_mini_game(request: Request):
+    data = await request.json()
+    user_id = data.get('user_id')
+    prof_key = data.get('prof_key')
+    score = data.get('score', 0)
+    
+    if prof_key not in PROFESSIONS_DATA:
+        return {'success': False, 'message': 'Profession not found'}
+    
+    prof_data = PROFESSIONS_DATA[prof_key]
+    mini_game = prof_data.get('mini_game', {})
+    
+    user = get_user(user_id)
+    session = get_session(user_id)
+    
+    # Проверяем, не проходил ли уже сегодня
+    today = time.strftime('%Y-%m-%d')
+    progress_key = f"{prof_key}_{today}"
+    
+    if progress_key in session.get('mini_game_progress', {}):
+        return {'success': False, 'message': 'Уже получена награда сегодня'}
+    
+    # Награда зависит от score (0-100)
+    max_coins = mini_game.get('reward_coins', 200)
+    max_xp = mini_game.get('reward_xp', 50)
+    
+    earned_coins = int((score / 100) * max_coins)
+    earned_xp = int((score / 100) * max_xp)
+    
+    # Минимум 10% за попытку
+    earned_coins = max(int(max_coins * 0.1), earned_coins)
+    earned_xp = max(int(max_xp * 0.1), earned_xp)
+    
+    user['coins'] += earned_coins
+    user['xp'] += earned_xp
+    
+    # Проверка уровня
+    def xp_for_level(lvl):
+        if lvl == 1:
+            return 0
+        elif lvl == 2:
+            return 50
+        else:
+            return 50 + (lvl - 2) * 100
+    
+    new_level = user['level']
+    tokens_gained = 0
+    while user['xp'] >= xp_for_level(new_level + 1):
+        new_level += 1
+        tokens_gained += 1
+    
+    user['level'] = new_level
+    user['tokens'] += tokens_gained
+    
+    save_user(user_id, user['coins'], user['energy'], user['xp'], user['level'], 
+             user['total_taps'], user['tokens'])
+    
+    # Сохраняем прогресс
+    if 'mini_game_progress' not in session:
+        session['mini_game_progress'] = {}
+    session['mini_game_progress'][progress_key] = score
+    
+    return {
+        'success': True,
+        'score': score,
+        'earned_coins': earned_coins,
+        'earned_xp': earned_xp,
+        'coins': user['coins'],
+        'xp': user['xp'],
+        'level': user['level'],
+        'tokens': user['tokens'],
+        'level_up': tokens_gained > 0
     }
 
 # === HTML Template ===
@@ -734,6 +970,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
         .hero-container {
             display: flex;
@@ -742,6 +979,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             gap: 15px;
             cursor: pointer;
             padding: 20px;
+            position: relative;
         }
         .hero-sprite {
             width: 80px;
@@ -754,17 +992,57 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             50% { transform: translateY(-6px); }
         }
         .floating-reward {
-            position: absolute;
+            position: fixed;
             font-size: 14px;
             color: var(--coin);
             text-shadow: 2px 2px 0px #000;
             pointer-events: none;
             animation: floatUp 0.8s forwards;
+            z-index: 9999;
         }
         @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-40px); }
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.2); }
         }
+        
+        /* Spheres Screen */
+        .spheres-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .sphere-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 5px solid;
+        }
+        .sphere-card:hover {
+            transform: translateX(5px);
+        }
+        .sphere-icon {
+            font-size: 40px;
+        }
+        .sphere-info {
+            flex: 1;
+        }
+        .sphere-name {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        .sphere-desc {
+            font-size: 7px;
+            color: #888;
+            line-height: 1.4;
+        }
+        
+        /* Professions Grid in Sphere */
         .professions-grid {
             flex: 1;
             display: grid;
@@ -804,6 +1082,163 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         .prof-icon { font-size: 32px; }
         .prof-name { font-size: 8px; text-align: center; }
         .prof-cost { font-size: 7px; color: var(--token); }
+        
+        /* Mini Game Styles */
+        .mini-game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+        }
+        .game-header {
+            text-align: center;
+            padding: 10px;
+        }
+        .game-title {
+            font-size: 12px;
+            color: var(--success);
+            margin-bottom: 5px;
+        }
+        .game-desc {
+            font-size: 8px;
+            color: #888;
+        }
+        .game-area {
+            flex: 1;
+            background: var(--panel-bg);
+            border: 3px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        .game-score {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+            color: var(--success);
+        }
+        .game-timer {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 14px;
+            color: var(--warning);
+        }
+        
+        /* Color Match Game */
+        .color-target {
+            width: 100%;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: background 0.3s;
+        }
+        .color-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 10px;
+        }
+        .color-option {
+            aspect-ratio: 1;
+            border: 3px solid #000;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .color-option:active {
+            transform: scale(0.95);
+        }
+        
+        /* Logic Gate Game */
+        .logic-circuit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .logic-gate {
+            width: 80px;
+            height: 60px;
+            background: var(--border-color);
+            border: 3px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        .logic-inputs {
+            display: flex;
+            gap: 20px;
+        }
+        .logic-switch {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            background: var(--danger);
+        }
+        .logic-switch.on {
+            background: var(--success);
+        }
+        
+        /* Pattern Match Game */
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            padding: 10px;
+            max-width: 250px;
+            margin: 0 auto;
+        }
+        .pattern-cell {
+            aspect-ratio: 1;
+            background: var(--border-color);
+            border: 2px solid #000;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pattern-cell.active {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+        .pattern-cell.selected {
+            background: var(--warning);
+        }
+        
+        /* Code Puzzle Game */
+        .code-blocks {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 10px;
+        }
+        .code-block {
+            padding: 10px;
+            background: var(--border-color);
+            border: 2px solid #000;
+            cursor: move;
+            font-size: 8px;
+            text-align: center;
+        }
+        .code-dropzone {
+            min-height: 200px;
+            border: 3px dashed var(--border-color);
+            margin: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
         .guide-modal {
             position: fixed;
             top: 0;
@@ -986,14 +1421,48 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             border: 3px solid #000;
             box-shadow: 4px 4px 0px #000;
             font-size: 8px;
-            z-index: 999;
+            z-index: 9999;
             transition: transform 0.3s;
         }
         .toast.show { transform: translateX(-50%) scale(1); }
+        
+        .play-game-btn {
+            background: var(--accent) !important;
+            margin-top: 10px;
+        }
+        .game-result {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .game-result.show { display: flex; }
+        .result-score {
+            font-size: 48px;
+            color: var(--success);
+        }
+        .result-reward {
+            font-size: 12px;
+            color: var(--coin);
+        }
     </style>
 </head>
 <body>
     <div class="toast" id="toast"></div>
+    
+    <div class="game-result" id="gameResult">
+        <div class="result-score" id="resultScore">0%</div>
+        <div class="result-reward" id="resultReward">+0 🪙 +0 XP</div>
+        <button class="modal-btn" onclick="closeGameResult()">ПРОДОЛЖИТЬ</button>
+    </div>
     
     <div class="modal-overlay" id="unlockModal">
         <div class="modal-content">
@@ -1023,7 +1492,18 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                 <p id="guideActivity">Активность...</p>
             </div>
             <button class="guide-btn" id="guideActionBtn" onclick="unlockOrStart()">ОТКРЫТЬ ЗА 1 ТОКЕН</button>
+            <button class="guide-btn play-game-btn" id="playGameBtn" onclick="startMiniGame()">▶ ИГРАТЬ ПРАКТИКУМ</button>
             <button class="guide-btn" onclick="closeGuide()" style="background: var(--panel-bg); color: var(--text); margin-top: 5px;">ЗАКРЫТЬ</button>
+        </div>
+    </div>
+
+    <!-- Mini Game Modal -->
+    <div class="guide-modal" id="miniGameModal">
+        <div class="guide-content" style="max-width: 380px; height: 90vh; display: flex; flex-direction: column;">
+            <div class="mini-game-container" id="miniGameContainer">
+                <!-- Game content injected here -->
+            </div>
+            <button class="guide-btn" onclick="closeMiniGame()" style="margin-top: auto;">ВЫЙТИ</button>
         </div>
     </div>
 
@@ -1155,6 +1635,34 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         </div>
     </div>
     
+    <!-- Spheres Screen -->
+    <div class="container screen" id="spheresScreen">
+        <div class="pixel-box" style="padding: 15px; text-align: center;">
+            <h2 style="font-size: 12px; color: var(--token);">◆ СФЕРЫ ПРОФЕССИЙ ◆</h2>
+            <div style="margin-top: 10px; font-size: 10px; color: var(--token);">
+                🔷 ТОКЕНОВ: <span id="spheresScreenTokens">0</span>
+            </div>
+        </div>
+        
+        <div class="spheres-grid" id="spheresGrid"></div>
+        
+        <button class="back-btn" onclick="backToGame()">◀ НАЗАД</button>
+    </div>
+    
+    <!-- Professions in Sphere Screen -->
+    <div class="container screen" id="sphereProfessionsScreen">
+        <div class="pixel-box" style="padding: 15px; text-align: center;">
+            <h2 style="font-size: 12px;" id="sphereTitle">◆ ТЕХНОЛОГИИ ◆</h2>
+            <div style="margin-top: 5px; font-size: 8px; color: #888;" id="sphereDesc">
+                Выбери профессию для изучения
+            </div>
+        </div>
+        
+        <div class="professions-grid" id="sphereProfessionsGrid"></div>
+        
+        <button class="back-btn" onclick="backToSpheres()">◀ К СФЕРАМ</button>
+    </div>
+    
     <div class="container screen" id="professionsScreen">
         <div class="pixel-box" style="padding: 15px; text-align: center;">
             <h2 style="font-size: 12px; color: var(--token);">◆ ИССЛЕДОВАНИЕ ПРОФЕССИЙ ◆</h2>
@@ -1194,16 +1702,23 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         let unlockedProfs = {};
         let completedTasks = [];
         let currentTaskProf = null;
+        let currentSphere = null;
+        let spheresData = {};
+        let currentMiniGame = null;
+        let miniGameScore = 0;
         
         const MAX = 20, MIN = 1;
         
         const professionsData = {
-            'frontend': {name: 'FRONTEND DEV', icon: '🎨', cost: 1},
-            'backend': {name: 'BACKEND DEV', icon: '⚙️', cost: 1},
-            'mobile': {name: 'MOBILE DEV', icon: '📱', cost: 1},
-            'devops': {name: 'DEVOPS', icon: '🚀', cost: 2},
-            'data': {name: 'DATA SCIENCE', icon: '📊', cost: 2},
-            'security': {name: 'SECURITY', icon: '🔒', cost: 2}
+            'frontend': {name: 'FRONTEND DEV', icon: '🎨', cost: 1, sphere: 'tech'},
+            'backend': {name: 'BACKEND DEV', icon: '⚙️', cost: 1, sphere: 'tech'},
+            'mobile': {name: 'MOBILE DEV', icon: '📱', cost: 1, sphere: 'tech'},
+            'devops': {name: 'DEVOPS', icon: '🚀', cost: 2, sphere: 'tech'},
+            'data': {name: 'DATA SCIENCE', icon: '📊', cost: 2, sphere: 'analytics'},
+            'security': {name: 'SECURITY', icon: '🔒', cost: 2, sphere: 'tech'},
+            'design': {name: 'UI/UX DESIGN', icon: '🎯', cost: 1, sphere: 'creative'},
+            'marketing': {name: 'MARKETING', icon: '📢', cost: 1, sphere: 'business'},
+            'science': {name: 'SCIENTIST', icon: '🔬', cost: 2, sphere: 'science'}
         };
         
         document.querySelectorAll('.hero-slot').forEach(el => {
@@ -1350,12 +1865,14 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             tapPattern.push(now);
             if (tapPattern.length > 10) tapPattern.shift();
             
+            // ИСПРАВЛЕНИЕ: позиционируем относительно viewport
             const floatEl = document.createElement('div');
             floatEl.className = 'floating-reward';
             floatEl.textContent = '+' + fingers;
-            floatEl.style.left = (x - heroContainer.getBoundingClientRect().left) + 'px';
-            floatEl.style.top = (y - heroContainer.getBoundingClientRect().top - 40) + 'px';
-            heroContainer.appendChild(floatEl);
+            floatEl.style.left = x + 'px';
+            floatEl.style.top = y + 'px';
+            floatEl.style.transform = 'translate(-50%, -50%)';
+            document.body.appendChild(floatEl);
             setTimeout(() => floatEl.remove(), 800);
             
             let r = await fetch('/api/tap', {
@@ -1394,13 +1911,60 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         }
         
         async function openProfessions() {
-            showScreen('professionsScreen');
-            document.getElementById('profScreenTokens').textContent = state.tokens || 0;
-            
-            const grid = document.getElementById('professionsGrid');
+            // Загружаем сферы
+            let r = await fetch('/api/spheres');
+            let d = await r.json();
+            if (d.success) {
+                spheresData = d.spheres;
+                renderSpheres();
+                showScreen('spheresScreen');
+                document.getElementById('spheresScreenTokens').textContent = state.tokens || 0;
+            }
+        }
+        
+        function renderSpheres() {
+            const grid = document.getElementById('spheresGrid');
             grid.innerHTML = '';
             
-            for (let [key, data] of Object.entries(professionsData)) {
+            for (let [key, data] of Object.entries(spheresData)) {
+                const card = document.createElement('div');
+                card.className = 'sphere-card pixel-box';
+                card.style.borderLeftColor = data.color;
+                card.innerHTML = `
+                    <div class="sphere-icon">${data.icon}</div>
+                    <div class="sphere-info">
+                        <div class="sphere-name" style="color: ${data.color}">${data.name}</div>
+                        <div class="sphere-desc">${data.description}</div>
+                    </div>
+                    <div style="font-size: 20px;">➤</div>
+                `;
+                card.onclick = () => openSphere(key);
+                grid.appendChild(card);
+            }
+        }
+        
+        async function openSphere(sphereKey) {
+            currentSphere = sphereKey;
+            const sphere = spheresData[sphereKey];
+            
+            document.getElementById('sphereTitle').textContent = `◆ ${sphere.name} ◆`;
+            document.getElementById('sphereTitle').style.color = sphere.color;
+            document.getElementById('sphereDesc').textContent = sphere.description;
+            
+            let r = await fetch(`/api/professions_by_sphere?sphere=${sphereKey}`);
+            let d = await r.json();
+            
+            if (d.success) {
+                renderSphereProfessions(d.professions);
+                showScreen('sphereProfessionsScreen');
+            }
+        }
+        
+        function renderSphereProfessions(professions) {
+            const grid = document.getElementById('sphereProfessionsGrid');
+            grid.innerHTML = '';
+            
+            for (let [key, data] of Object.entries(professions)) {
                 const isUnlocked = key in unlockedProfs;
                 const canAfford = (state.tokens || 0) >= data.cost;
                 
@@ -1418,6 +1982,10 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                 
                 grid.appendChild(card);
             }
+        }
+        
+        function backToSpheres() {
+            showScreen('spheresScreen');
         }
         
         async function openGuide(profKey) {
@@ -1444,15 +2012,19 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             });
             
             const btn = document.getElementById('guideActionBtn');
+            const playBtn = document.getElementById('playGameBtn');
+            
             if (isUnlocked) {
                 btn.textContent = '▶ К ЗАДАНИЯМ';
                 btn.onclick = () => {
                     closeGuide();
                     openProfessionTasks(profKey);
                 };
+                playBtn.style.display = 'block';
             } else {
                 btn.textContent = `ОТКРЫТЬ ЗА ${data.cost} ТОКЕНОВ`;
                 btn.onclick = unlockProfession;
+                playBtn.style.display = 'none';
             }
             
             document.getElementById('guideModal').classList.add('show');
@@ -1477,10 +2049,265 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                 unlockedProfs[currentGuideProf] = true;
                 showToast('✓ Профессия открыта!');
                 closeGuide();
-                openProfessions();
+                openSphere(currentSphere);
             } else {
                 showToast('✗ ' + d.message);
             }
+        }
+        
+        // Mini Games
+        function startMiniGame() {
+            if (!currentGuideProf) return;
+            
+            const profData = professionsData[currentGuideProf];
+            const gameType = profData.mini_game?.type || 'color_match';
+            
+            currentMiniGame = gameType;
+            miniGameScore = 0;
+            
+            const container = document.getElementById('miniGameContainer');
+            container.innerHTML = '';
+            
+            switch(gameType) {
+                case 'color_match':
+                    initColorMatchGame(container);
+                    break;
+                case 'logic_gate':
+                    initLogicGateGame(container);
+                    break;
+                case 'pattern_match':
+                    initPatternGame(container);
+                    break;
+                case 'code_puzzle':
+                    initCodePuzzleGame(container);
+                    break;
+                default:
+                    initColorMatchGame(container);
+            }
+            
+            document.getElementById('miniGameModal').classList.add('show');
+        }
+        
+        function closeMiniGame() {
+            document.getElementById('miniGameModal').classList.remove('show');
+        }
+        
+        function initColorMatchGame(container) {
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#9b59b6', '#ff6b9d', '#00d4aa'];
+            const targetColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            container.innerHTML = `
+                <div class="game-header">
+                    <div class="game-title">🎨 COLOR HARMONY</div>
+                    <div class="game-desc">Выбери цвет, который сочетается с образцом</div>
+                </div>
+                <div class="color-target" style="background: ${targetColor}; color: #000;">
+                    ОБРАЗЕЦ
+                </div>
+                <div class="color-options" id="colorOptions"></div>
+            `;
+            
+            const options = document.getElementById('colorOptions');
+            const shuffled = [...colors].sort(() => Math.random() - 0.5);
+            
+            shuffled.forEach(color => {
+                const btn = document.createElement('div');
+                btn.className = 'color-option';
+                btn.style.background = color;
+                btn.onclick = () => {
+                    const isCorrect = color === targetColor;
+                    miniGameScore = isCorrect ? 100 : 30;
+                    finishMiniGame();
+                };
+                options.appendChild(btn);
+            });
+        }
+        
+        function initLogicGateGame(container) {
+            container.innerHTML = `
+                <div class="game-header">
+                    <div class="game-title">⚙️ LOGIC GATES</div>
+                    <div class="game-desc">Нажми на переключатели, чтобы получить 1 на выходе</div>
+                </div>
+                <div class="logic-circuit">
+                    <div class="logic-inputs">
+                        <div class="logic-switch" id="switch1" onclick="toggleSwitch(1)">0</div>
+                        <div class="logic-switch" id="switch2" onclick="toggleSwitch(2)">0</div>
+                    </div>
+                    <div style="font-size: 10px;">AND GATE</div>
+                    <div class="logic-gate" id="gateOutput">0</div>
+                </div>
+            `;
+            
+            window.toggleSwitch = function(n) {
+                const sw = document.getElementById('switch' + n);
+                const isOn = sw.classList.contains('on');
+                if (isOn) {
+                    sw.classList.remove('on');
+                    sw.textContent = '0';
+                } else {
+                    sw.classList.add('on');
+                    sw.textContent = '1';
+                }
+                checkLogicGate();
+            };
+            
+            window.checkLogicGate = function() {
+                const s1 = document.getElementById('switch1').classList.contains('on');
+                const s2 = document.getElementById('switch2').classList.contains('on');
+                const output = s1 && s2 ? 1 : 0;
+                const outEl = document.getElementById('gateOutput');
+                outEl.textContent = output;
+                
+                if (output === 1) {
+                    setTimeout(() => {
+                        miniGameScore = 100;
+                        finishMiniGame();
+                    }, 500);
+                }
+            };
+        }
+        
+        function initPatternGame(container) {
+            container.innerHTML = `
+                <div class="game-header">
+                    <div class="game-title">📊 PATTERN FINDER</div>
+                    <div class="game-desc">Повтори последовательность</div>
+                </div>
+                <div class="pattern-grid" id="patternGrid"></div>
+            `;
+            
+            const grid = document.getElementById('patternGrid');
+            const pattern = [];
+            let playerPattern = [];
+            let round = 0;
+            
+            for (let i = 0; i < 16; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'pattern-cell';
+                cell.dataset.index = i;
+                cell.onclick = () => handlePatternClick(i);
+                grid.appendChild(cell);
+            }
+            
+            function handlePatternClick(index) {
+                playerPattern.push(index);
+                const cell = grid.children[index];
+                cell.classList.add('selected');
+                setTimeout(() => cell.classList.remove('selected'), 200);
+                
+                if (playerPattern[playerPattern.length - 1] !== pattern[playerPattern.length - 1]) {
+                    miniGameScore = Math.round((round / 5) * 100);
+                    finishMiniGame();
+                    return;
+                }
+                
+                if (playerPattern.length === pattern.length) {
+                    round++;
+                    if (round >= 5) {
+                        miniGameScore = 100;
+                        finishMiniGame();
+                    } else {
+                        playerPattern = [];
+                        setTimeout(() => showPattern(), 500);
+                    }
+                }
+            }
+            
+            function showPattern() {
+                pattern.push(Math.floor(Math.random() * 16));
+                let i = 0;
+                const interval = setInterval(() => {
+                    if (i >= pattern.length) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    const cell = grid.children[pattern[i]];
+                    cell.classList.add('active');
+                    setTimeout(() => cell.classList.remove('active'), 300);
+                    i++;
+                }, 600);
+            }
+            
+            setTimeout(() => showPattern(), 1000);
+        }
+        
+        function initCodePuzzleGame(container) {
+            const blocks = [
+                '<html>',
+                '<body>',
+                '<h1>Hello</h1>',
+                '</body>',
+                '</html>'
+            ];
+            
+            container.innerHTML = `
+                <div class="game-header">
+                    <div class="game-title">💻 HTML PUZZLE</div>
+                    <div class="game-desc">Собери правильную структуру HTML</div>
+                </div>
+                <div class="code-dropzone" id="dropzone"></div>
+                <div class="code-blocks" id="codeBlocks"></div>
+            `;
+            
+            const blocksContainer = document.getElementById('codeBlocks');
+            const dropzone = document.getElementById('dropzone');
+            const shuffled = [...blocks].sort(() => Math.random() - 0.5);
+            let placed = [];
+            
+            shuffled.forEach((block, idx) => {
+                const div = document.createElement('div');
+                div.className = 'code-block';
+                div.textContent = block;
+                div.onclick = () => {
+                    placed.push(block);
+                    div.remove();
+                    const placedDiv = document.createElement('div');
+                    placedDiv.className = 'code-block';
+                    placedDiv.style.background = 'var(--success)';
+                    placedDiv.textContent = block;
+                    dropzone.appendChild(placedDiv);
+                    
+                    if (placed.length === blocks.length) {
+                        const isCorrect = placed.every((b, i) => b === blocks[i]);
+                        miniGameScore = isCorrect ? 100 : 50;
+                        setTimeout(() => finishMiniGame(), 500);
+                    }
+                };
+                blocksContainer.appendChild(div);
+            });
+        }
+        
+        async function finishMiniGame() {
+            closeMiniGame();
+            
+            const r = await fetch('/api/complete_mini_game', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    user_id: uid,
+                    prof_key: currentGuideProf,
+                    score: miniGameScore
+                })
+            });
+            
+            const d = await r.json();
+            if (d.success) {
+                state.coins = d.coins;
+                state.xp = d.xp;
+                state.level = d.level;
+                state.tokens = d.tokens;
+                
+                document.getElementById('resultScore').textContent = miniGameScore + '%';
+                document.getElementById('resultReward').textContent = `+${d.earned_coins} 🪙 +${d.earned_xp} XP`;
+                document.getElementById('gameResult').classList.add('show');
+                
+                updateUI();
+            }
+        }
+        
+        function closeGameResult() {
+            document.getElementById('gameResult').classList.remove('show');
         }
         
         async function openTasks() {
