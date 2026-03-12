@@ -1653,16 +1653,10 @@ body{{
 <div id="screen-loading" class="screen active">
   <div class="loading-title">RE:ALITY</div>
   <div class="pixel-logo">⚔ ПРОФЕССИИ ⚔</div>
-  <div class="loading-sub" id="loading-sub-text">загружаем мир...</div>
+  <div class="loading-sub">загружаем мир...</div>
   <div class="loading-bar-wrap">
     <div class="loading-bar" id="loading-bar"></div>
   </div>
-  <button id="skip-btn" class="btn btn-dark"
-    onclick="goToNext('register')"
-    style="display:none;margin-top:20px;font-size:7px">
-    ПРОПУСТИТЬ →
-  </button>
-  <div style="font-size:6px;color:#444;margin-top:8px" id="loading-hint"></div>
 </div>
 
 <!-- Регистрация -->
@@ -1916,117 +1910,87 @@ let mgAnswered = false;
 // ──────────────────────────────────────────────────────────────────────
 // Безопасный fetch с таймаутом (мс)
 // Таймаут через Promise.race — надёжнее чем AbortController
-function timeoutPromise(ms) {{
-  return new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms));
+// ──────────────────────────────────────────────────────────────────────
+// ИНИЦИАЛИЗАЦИЯ — неблокирующая загрузка
+// Логика: показываем бар 2 сек → переходим → грузим данные в фоне
+// ──────────────────────────────────────────────────────────────────────
+
+function sleep(ms) {{
+  return new Promise(r => setTimeout(r, ms));
 }}
 
-async function fetchSafe(url, options={{}}, timeoutMs=4000) {{
+// Безопасный fetch — никогда не бросает исключение, возвращает null при ошибке
+async function fetchSafe(url, opts={{}}) {{
+  return new Promise(resolve => {{
+    const timer = setTimeout(() => resolve(null), 6000);
+    fetch(url, opts)
+      .then(r => {{ clearTimeout(timer); resolve(r); }})
+      .catch(() => {{ clearTimeout(timer); resolve(null); }});
+  }});
+}}
+
+window.addEventListener('DOMContentLoaded', () => {{
+  // Telegram ID
   try {{
-    const res = await Promise.race([
-      fetch(url, options),
-      timeoutPromise(timeoutMs)
-    ]);
-    return res;
-  }} catch(e) {{
-    return null; // Всегда возвращаем null при ошибке/таймауте
-  }}
-}}
+    if (window.Telegram?.WebApp) {{
+      const tg = window.Telegram.WebApp;
+      tg.ready(); tg.expand();
+      const uid = tg.initDataUnsafe?.user?.id;
+      if (uid) telegramId = String(uid);
+    }}
+  }} catch(e) {{}}
 
-// Глобальный флаг — уже перешли с загрузки?
-let _initDone = false;
-function goToNext(dest) {{
-  if (_initDone) return;
-  _initDone = true;
-  if (dest === 'game') {{
+  // Анимируем прогресс-бар за 2 секунды, потом переходим
+  const bar = document.getElementById('loading-bar');
+  let prog = 0;
+  const iv = setInterval(() => {{
+    prog += 2;
+    bar.style.width = Math.min(prog, 100) + '%';
+    if (prog >= 100) {{
+      clearInterval(iv);
+      setTimeout(_afterLoading, 200);
+    }}
+  }}, 40); // 100/2 * 40ms = 2 секунды
+}});
+
+async function _afterLoading() {{
+  // Сначала пробуем получить данные игрока (с коротким таймаутом)
+  // Если сервер не ответил — просто идём на регистрацию
+  const playerRes = await fetchSafe(`/api/player/${{telegramId}}`);
+
+  let playerData = null;
+  try {{
+    if (playerRes?.ok) {{
+      const d = await playerRes.json();
+      if (d.exists) playerData = d.player;
+    }}
+  }} catch(e) {{}}
+
+  // Загружаем словари в фоне (не блокируем переход)
+  _loadDictionaries();
+
+  if (playerData) {{
+    player = playerData;
     startGame();
   }} else {{
     showScreen('register');
   }}
 }}
 
-window.addEventListener('DOMContentLoaded', () => {{
-  // Telegram ID
+// Фоновая загрузка справочников — не блокирует UI
+async function _loadDictionaries() {{
   try {{
-    if (window.Telegram && window.Telegram.WebApp) {{
-      const tg = window.Telegram.WebApp;
-      tg.ready(); tg.expand();
-      if (tg.initDataUnsafe?.user) telegramId = String(tg.initDataUnsafe.user.id);
-    }}
-  }} catch(e) {{}}
-
-  // Показываем кнопку "ПРОПУСТИТЬ" через 3 секунды
-  setTimeout(() => {{
-    if (_initDone) return;
-    const skip = document.getElementById('skip-btn');
-    const hint = document.getElementById('loading-hint');
-    if (skip) skip.style.display = 'block';
-    if (hint) hint.textContent = 'сервер просыпается, подожди или нажми пропустить';
-  }}, 3000);
-  
-  // Обновляем статус
-  setTimeout(() => {{
-    if (_initDone) return;
-    const sub = document.getElementById('loading-sub-text');
-    if (sub) sub.textContent = 'подключаемся...';
-  }}, 1500);
-
-  // Жёсткий авто-переход через 12 секунд (на случай если JS завис)
-  setTimeout(() => goToNext('register'), 12000);
-
-  // Запускаем загрузку
-  doInit();
-}});
-
-async function doInit() {{
-  // Анимируем прогресс-бар (быстро, 1.5 сек)
-  const bar = document.getElementById('loading-bar');
-  let progress = 0;
-  const barInterval = setInterval(() => {{
-    progress = Math.min(progress + 3, 90);
-    bar.style.width = progress + '%';
-  }}, 50);
-
-  // Параллельно грузим все данные с таймаутом 5 сек
-  const [profRes, upgRes, playerRes] = await Promise.all([
-    fetchSafe('/api/professions', {{}}, 5000),
-    fetchSafe('/api/upgrades', {{}}, 5000),
-    fetchSafe(`/api/player/${{telegramId}}`, {{}}, 5000),
-  ]);
-
-  // Парсим то, что пришло
-  try {{
-    if (profRes && profRes.ok) {{
-      const d = await profRes.json();
+    const r = await fetchSafe('/api/professions');
+    if (r?.ok) {{
+      const d = await r.json();
       professionsData = d.professions;
       spheresData = d.spheres;
     }}
   }} catch(e) {{}}
-  try {{ if (upgRes && upgRes.ok) upgradesData = await upgRes.json(); }} catch(e) {{}}
-
-  // Заканчиваем бар
-  clearInterval(barInterval);
-  bar.style.width = '100%';
-  await sleep(300);
-
-  // Проверяем игрока
   try {{
-    if (playerRes && playerRes.ok) {{
-      const d = await playerRes.json();
-      if (d.exists) {{
-        player = d.player;
-        goToNext('game');
-        return;
-      }}
-    }}
+    const r = await fetchSafe('/api/upgrades');
+    if (r?.ok) upgradesData = await r.json();
   }} catch(e) {{}}
-
-  goToNext('register');
-}}
-
-async function animateLoading() {{ /* unused, kept for compat */ }}
-
-function sleep(ms) {{
-  return new Promise(r => setTimeout(r, ms));
 }}
 
 // ──────────────────────────────────────────────────────────────────────
