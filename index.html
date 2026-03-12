@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RE:ALITY: Профессии</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+/* ─── Сброс и база ──────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;touch-action:manipulation}
+body{font-family:'Press Start 2P',monospace;background:#0a0a1a;color:#e0e0e0;font-size:10px;line-height:1.6;display:flex;justify-content:center;align-items:center}
+
+/* ─── Контейнер приложения ──────────────────────────── */
+#app{width:100%;max-width:420px;height:100vh;height:100dvh;position:relative;overflow:hidden;background:linear-gradient(180deg,#0a0a2e 0%,#1a0a3e 50%,#0a0a2e 100%)}
+
+/* ─── Анимация звёзд на фоне ────────────────────────── */
+#app::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(2px 2px at 20px 30px,#fff,transparent),radial-gradient(2px 2px at 40px 70px,rgba(255,255,255,.8),transparent),radial-gradient(1px 1px at 90px 40px,#fff,transparent),radial-gradient(1px 1px at 130px 80px,rgba(255,255,255,.6),transparent),radial-gradient(2px 2px at 160px 30px,#fff,transparent),radial-gradient(1px 1px at 200px 90px,rgba(255,255,255,.7),transparent),radial-gradient(2px 2px at 250px 50px,#fff,transparent),radial-gradient(1px 1px at 300px 70px,rgba(255,255,255,.5),transparent),radial-gradient(2px 2px at 350px 20px,#fff,transparent),radial-gradient(1px 1px at 380px 60px,rgba(255,255,255,.8),transparent);background-size:400px 100px;animation:starScroll 60s linear infinite;pointer-events:none;opacity:.4;z-index:0}
+@keyframes starScroll{to{background-position:0 1000px}}
+
+/* ─── Экраны ────────────────────────────────────────── */
+.screen{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;z-index:1}
+.screen.active{display:flex}
+
+/* ─── Скроллируемый контент ─────────────────────────── */
+.scrollable{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:70px}
+.scrollable::-webkit-scrollbar{width:4px}
+.scrollable::-webkit-scrollbar-track{background:#1a1a3e}
+.scrollable::-webkit-scrollbar-thumb{background:#6c3baa;border-radius:2px}
+
+/* ─── Верхняя панель ────────────────────────────────── */
+.top-bar{background:linear-gradient(180deg,#1a0a3e,#0d0620);padding:10px 12px 8px;border-bottom:2px solid #2a1a4e;position:relative;z-index:10;flex-shrink:0}
+.top-bar .name-level{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.top-bar .name{font-size:11px;color:#ffcc00;text-shadow:0 0 8px rgba(255,204,0,.5)}
+.top-bar .level-badge{background:#6c3baa;padding:3px 8px;border-radius:2px;font-size:8px;border:1px solid #9b59b6}
+.xp-bar-wrap{background:#1a1a2e;height:10px;border-radius:2px;border:1px solid #2a2a4e;overflow:hidden}
+.xp-bar{height:100%;background:linear-gradient(90deg,#6c3baa,#9b59b6);transition:width .3s;border-radius:1px}
+.resources{display:flex;gap:10px;margin-top:6px;font-size:8px}
+.resource{display:flex;align-items:center;gap:4px;background:rgba(26,10,62,.6);padding:3px 6px;border-radius:2px;border:1px solid #2a1a4e}
+.resource span{color:#ffcc00}
+
+/* ─── Пиксельные аватары (CSS-арт) ─────────────────── */
+.pixel-avatar{image-rendering:pixelated;width:120px;height:120px;position:relative}
+.pixel-avatar canvas{width:100%;height:100%;image-rendering:pixelated}
+
+/* ─── Экран регистрации ─────────────────────────────── */
+#register{justify-content:center;align-items:center;padding:20px}
+.reg-title{font-size:14px;color:#ffcc00;text-align:center;margin-bottom:4px;text-shadow:0 0 10px rgba(255,204,0,.5)}
+.reg-subtitle{font-size:8px;color:#9b59b6;text-align:center;margin-bottom:20px}
+.avatar-select{display:flex;gap:16px;justify-content:center;margin-bottom:16px}
+.avatar-option{width:80px;height:80px;border:3px solid #2a1a4e;border-radius:4px;cursor:pointer;transition:.2s;background:#0d0620;display:flex;align-items:center;justify-content:center;position:relative}
+.avatar-option.selected{border-color:#ffcc00;box-shadow:0 0 12px rgba(255,204,0,.4)}
+.avatar-option:active{transform:scale(.95)}
+.avatar-option canvas{width:64px;height:64px;image-rendering:pixelated}
+
+.reg-input{width:100%;max-width:280px;background:#1a1a3e;border:2px solid #2a1a4e;color:#e0e0e0;padding:10px;font-family:'Press Start 2P',monospace;font-size:10px;border-radius:2px;text-align:center;margin-bottom:16px;outline:none}
+.reg-input:focus{border-color:#6c3baa;box-shadow:0 0 8px rgba(108,59,170,.4)}
+.reg-input::placeholder{color:#4a4a6e}
+
+/* ─── Характеристики ────────────────────────────────── */
+.stats-section{width:100%;max-width:300px;margin-bottom:16px}
+.stats-header{display:flex;justify-content:space-between;font-size:8px;margin-bottom:8px}
+.stats-header .points-left{color:#ffcc00}
+.stat-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.stat-label{font-size:8px;width:80px;color:#ccc}
+.stat-btn{width:24px;height:24px;background:#2a1a4e;border:1px solid #6c3baa;color:#e0e0e0;font-family:'Press Start 2P',monospace;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:2px}
+.stat-btn:active{background:#6c3baa}
+.stat-btn:disabled{opacity:.3;cursor:default}
+.stat-val{font-size:10px;color:#ffcc00;width:24px;text-align:center}
+.stat-bar{flex:1;height:8px;background:#1a1a2e;border-radius:1px;overflow:hidden;border:1px solid #2a2a4e}
+.stat-bar-fill{height:100%;transition:width .2s}
+.stat-str .stat-bar-fill{background:#e74c3c}
+.stat-int .stat-bar-fill{background:#3498db}
+.stat-chr .stat-bar-fill{background:#e67e22}
+.stat-lck .stat-bar-fill{background:#2ecc71}
+
+/* ─── Кнопки ────────────────────────────────────────── */
+.btn{font-family:'Press Start 2P',monospace;font-size:10px;padding:12px 24px;border:2px solid;border-radius:2px;cursor:pointer;transition:.15s;text-transform:uppercase;position:relative;overflow:hidden}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:#6c3baa;border-color:#9b59b6;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.btn-primary:hover{background:#7d4cc0}
+.btn-gold{background:linear-gradient(180deg,#f0c040,#d4a020);border-color:#ffcc00;color:#1a0a3e}
+.btn-gold:hover{background:linear-gradient(180deg,#ffd050,#e0b030)}
+.btn-sm{font-size:8px;padding:8px 14px}
+.btn-block{width:100%;max-width:280px}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+
+/* ─── Главный экран (тапалка) ───────────────────────── */
+#main .tap-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;user-select:none}
+.character-wrap{position:relative;width:140px;height:140px;margin-bottom:16px}
+.character-wrap canvas{width:100%;height:100%;image-rendering:pixelated}
+.tap-hint{font-size:7px;color:#6c3baa;text-align:center;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* Энергия */
+.energy-bar-wrap{width:80%;max-width:280px;margin:12px auto 0}
+.energy-label{display:flex;justify-content:space-between;font-size:7px;margin-bottom:3px;color:#aaa}
+.energy-bar-outer{height:12px;background:#1a1a2e;border:1px solid #2a2a4e;border-radius:2px;overflow:hidden}
+.energy-bar{height:100%;background:linear-gradient(90deg,#27ae60,#2ecc71);transition:width .15s}
+.energy-bar.low{background:linear-gradient(90deg,#e74c3c,#c0392b)}
+
+/* Комбо */
+.combo-display{position:absolute;top:10px;right:16px;font-size:16px;color:#ffcc00;text-shadow:0 0 10px rgba(255,204,0,.6);opacity:0;transition:opacity .2s}
+.combo-display.active{opacity:1}
+
+/* Награда за тап (всплывающие числа) */
+.tap-reward{position:absolute;font-size:12px;color:#ffcc00;text-shadow:0 0 6px rgba(255,204,0,.5);pointer-events:none;animation:floatUp .8s ease-out forwards;z-index:100}
+.tap-reward.crit{font-size:16px;color:#e74c3c;text-shadow:0 0 10px rgba(231,76,60,.6)}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-60px) scale(.6)}}
+
+/* ─── Нижняя навигация ──────────────────────────────── */
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;display:flex;background:linear-gradient(180deg,#0d0620,#1a0a3e);border-top:2px solid #2a1a4e;z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;padding:10px 4px;text-align:center;font-family:'Press Start 2P',monospace;font-size:7px;color:#6c6c8e;cursor:pointer;transition:.2s;border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:4px}
+.nav-btn .nav-icon{font-size:18px}
+.nav-btn.active{color:#ffcc00}
+.nav-btn:active{background:rgba(108,59,170,.2)}
+
+/* ─── Экран профессий ───────────────────────────────── */
+.prof-header{padding:12px;text-align:center;font-size:11px;color:#ffcc00;border-bottom:2px solid #2a1a4e;flex-shrink:0;background:linear-gradient(180deg,#1a0a3e,#0d0620)}
+.sphere-section{padding:8px 12px}
+.sphere-title{font-size:9px;color:#9b59b6;margin:8px 0;padding-bottom:4px;border-bottom:1px solid #2a1a4e}
+.prof-card{background:linear-gradient(135deg,#1a1a3e,#0d0d2e);border:2px solid #2a1a4e;border-radius:4px;padding:10px;margin-bottom:8px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:10px}
+.prof-card:active{transform:scale(.98);border-color:#6c3baa}
+.prof-card.unlocked{border-color:#27ae60}
+.prof-card .prof-icon{font-size:24px;width:40px;text-align:center}
+.prof-card .prof-info{flex:1}
+.prof-card .prof-name{font-size:8px;color:#e0e0e0;margin-bottom:4px}
+.prof-card .prof-desc{font-size:7px;color:#6c6c8e}
+.prof-card .prof-cost{font-size:7px;color:#ffcc00;white-space:nowrap}
+.prof-card .prof-progress{font-size:7px;color:#27ae60}
+
+/* ─── Детальный экран профессии ──────────────────────── */
+.prof-detail-header{padding:12px;border-bottom:2px solid #2a1a4e;flex-shrink:0;background:linear-gradient(180deg,#1a0a3e,#0d0620)}
+.prof-detail-header .back-btn{font-size:8px;color:#9b59b6;cursor:pointer;margin-bottom:8px;display:inline-block}
+.prof-detail-header .back-btn:active{color:#ffcc00}
+.prof-detail-title{display:flex;align-items:center;gap:10px}
+.prof-detail-title .icon{font-size:28px}
+.prof-detail-title .info h2{font-size:10px;color:#ffcc00;margin-bottom:4px}
+.prof-detail-title .info p{font-size:7px;color:#aaa}
+.prof-tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.prof-tool{font-size:7px;background:#2a1a4e;padding:3px 6px;border-radius:2px;color:#9b59b6}
+.task-list{padding:12px}
+.task-card{background:linear-gradient(135deg,#1a1a3e,#0d0d2e);border:2px solid #2a1a4e;border-radius:4px;padding:10px;margin-bottom:8px;cursor:pointer;transition:.2s}
+.task-card:active{transform:scale(.98)}
+.task-card.completed{border-color:#27ae60;opacity:.7}
+.task-card.locked{opacity:.4;cursor:default}
+.task-card h3{font-size:8px;color:#e0e0e0;margin-bottom:4px}
+.task-card p{font-size:7px;color:#6c6c8e}
+.task-card .task-reward{font-size:7px;color:#ffcc00;margin-top:4px}
+
+/* ─── Экран улучшений ───────────────────────────────── */
+.upgrades-header{padding:12px;text-align:center;font-size:11px;color:#ffcc00;border-bottom:2px solid #2a1a4e;flex-shrink:0;background:linear-gradient(180deg,#1a0a3e,#0d0620)}
+.upgrade-list{padding:12px}
+.upgrade-card{background:linear-gradient(135deg,#1a1a3e,#0d0d2e);border:2px solid #2a1a4e;border-radius:4px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.upgrade-card .up-icon{font-size:24px;width:40px;text-align:center}
+.upgrade-card .up-info{flex:1}
+.upgrade-card .up-name{font-size:8px;color:#e0e0e0;margin-bottom:3px}
+.upgrade-card .up-desc{font-size:7px;color:#6c6c8e;margin-bottom:3px}
+.upgrade-card .up-level{font-size:7px;color:#9b59b6}
+.upgrade-card .up-buy{flex-shrink:0}
+
+/* ─── Модальные окна ────────────────────────────────── */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:linear-gradient(180deg,#1a0a3e,#0d0620);border:2px solid #6c3baa;border-radius:4px;padding:20px;max-width:340px;width:100%;text-align:center;max-height:90vh;overflow-y:auto}
+.modal h2{font-size:11px;color:#ffcc00;margin-bottom:12px}
+.modal p{font-size:8px;color:#ccc;margin-bottom:12px;line-height:1.8}
+.modal .reward-display{font-size:10px;color:#ffcc00;margin:12px 0}
+
+/* ─── Экран заданий (мини-игры) ─────────────────────── */
+.task-screen{padding:12px}
+.task-screen .task-title{font-size:10px;color:#ffcc00;text-align:center;margin-bottom:4px}
+.task-screen .task-desc{font-size:7px;color:#aaa;text-align:center;margin-bottom:12px}
+.task-game{background:#0d0d2e;border:2px solid #2a1a4e;border-radius:4px;padding:12px;min-height:260px;position:relative}
+
+/* Мини-игры стили */
+.minigame-grid{display:grid;gap:6px;margin:8px 0}
+.minigame-item{background:#1a1a3e;border:2px solid #2a1a4e;border-radius:2px;padding:8px;font-size:7px;cursor:pointer;transition:.2s;text-align:center}
+.minigame-item:active{transform:scale(.95)}
+.minigame-item.selected{border-color:#ffcc00;background:#2a1a4e}
+.minigame-item.correct{border-color:#27ae60;background:rgba(39,174,96,.2)}
+.minigame-item.wrong{border-color:#e74c3c;background:rgba(231,76,60,.2)}
+
+.minigame-slider{width:100%;margin:8px 0}
+.minigame-slider input[type=range]{width:100%;accent-color:#6c3baa}
+.slider-labels{display:flex;justify-content:space-between;font-size:7px;color:#6c6c8e}
+.slider-value{text-align:center;font-size:10px;color:#ffcc00;margin:4px 0}
+
+.minigame-code{background:#0a0a1a;border:1px solid #2a2a4e;border-radius:2px;padding:8px;font-family:monospace;font-size:8px;color:#2ecc71;margin:8px 0;white-space:pre-wrap;line-height:1.6}
+.minigame-code .bug{color:#e74c3c;text-decoration:underline;cursor:pointer}
+
+.minigame-dropzone{min-height:40px;background:#0a0a1a;border:2px dashed #2a1a4e;border-radius:2px;padding:8px;margin:6px 0;display:flex;flex-wrap:wrap;gap:4px}
+.minigame-tag{display:inline-block;background:#6c3baa;padding:4px 8px;border-radius:2px;font-size:7px;cursor:grab;user-select:none;margin:2px}
+.minigame-tag:active{opacity:.7}
+
+.timer-bar{height:6px;background:#1a1a2e;border-radius:2px;margin:8px 0;overflow:hidden}
+.timer-bar-fill{height:100%;background:linear-gradient(90deg,#e74c3c,#f0c040,#27ae60);transition:width .1s linear}
+
+.game-feedback{font-size:8px;text-align:center;margin:8px 0;padding:6px;border-radius:2px}
+.game-feedback.good{color:#2ecc71;background:rgba(46,204,113,.1);border:1px solid #27ae60}
+.game-feedback.bad{color:#e74c3c;background:rgba(231,76,60,.1);border:1px solid #e74c3c}
+
+/* ─── Загрузочный экран ─────────────────────────────── */
+#loading{display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;background:#0a0a1a}
+#loading .logo{font-size:16px;color:#ffcc00;margin-bottom:8px;text-shadow:0 0 12px rgba(255,204,0,.5)}
+#loading .logo-sub{font-size:9px;color:#9b59b6;margin-bottom:24px}
+.loading-dots{display:flex;gap:8px}
+.loading-dots span{width:8px;height:8px;background:#6c3baa;animation:dotPulse 1.2s infinite}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+
+/* ─── Утилиты ───────────────────────────────────────── */
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mb-8{margin-bottom:8px}
+.text-center{text-align:center}
+.text-gold{color:#ffcc00}
+.text-purple{color:#9b59b6}
+.text-green{color:#27ae60}
+.text-red{color:#e74c3c}
+.text-sm{font-size:7px}
+.text-xs{font-size:6px}
+.gap-8{gap:8px}
+.flex-center{display:flex;align-items:center;justify-content:center}
+.w-full{width:100%}
+
+/* Анимации */
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@keyframes bounceIn{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes levelUp{0%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.2);filter:brightness(2) hue-rotate(30deg)}100%{transform:scale(1);filter:brightness(1)}}
+.shake{animation:shake .3s}
+.bounce-in{animation:bounceIn .4s}
+.level-up-anim{animation:levelUp .8s}
+</style>
+</head>
+<body>
+<div id="app">
+<!-- ═══ Загрузочный экран ═══ -->
+<div id="loading" class="screen active">
+  <div class="logo">RE:ALITY</div>
+  <div class="logo-sub">ПРОФЕССИИ</div>
+  <div class="loading-dots"><span></span><span></span><span></span></div>
+</div>
+
+<!-- ═══ Регистрация ═══ -->
+<div id="register" class="screen">
+  <div class="reg-title">RE:ALITY</div>
+  <div class="reg-subtitle">ПРОФЕССИИ · СОЗДАЙ ПЕРСОНАЖА</div>
+  
+  <div class="avatar-select" id="avatarSelect"></div>
+  
+  <input type="text" class="reg-input" id="nameInput" placeholder="Имя (макс 8)" maxlength="8" autocomplete="off">
+  
+  <div class="stats-section">
+    <div class="stats-header">
+      <span>ХАРАКТЕРИСТИКИ</span>
+      <span class="points-left">Осталось: <span id="pointsLeft">20</span></span>
+    </div>
+    <div class="stat-row stat-str">
+      <span class="stat-label">💪 СИЛА</span>
+      <button class="stat-btn" onclick="changeStat('strength',-1)">-</button>
+      <span class="stat-val" id="stat-strength">5</span>
+      <button class="stat-btn" onclick="changeStat('strength',1)">+</button>
+      <div class="stat-bar"><div class="stat-bar-fill" id="bar-strength" style="width:25%"></div></div>
+    </div>
+    <div class="stat-row stat-int">
+      <span class="stat-label">🧠 ИНТЕЛЛ</span>
+      <button class="stat-btn" onclick="changeStat('intellect',-1)">-</button>
+      <span class="stat-val" id="stat-intellect">5</span>
+      <button class="stat-btn" onclick="changeStat('intellect',1)">+</button>
+      <div class="stat-bar"><div class="stat-bar-fill" id="bar-intellect" style="width:25%"></div></div>
+    </div>
+    <div class="stat-row stat-chr">
+      <span class="stat-label">✨ ХАРИЗ</span>
+      <button class="stat-btn" onclick="changeStat('charisma',-1)">-</button>
+      <span class="stat-val" id="stat-charisma">5</span>
+      <button class="stat-btn" onclick="changeStat('charisma',1)">+</button>
+      <div class="stat-bar"><div class="stat-bar-fill" id="bar-charisma" style="width:25%"></div></div>
+    </div>
+    <div class="stat-row stat-lck">
+      <span class="stat-label">🍀 УДАЧА</span>
+      <button class="stat-btn" onclick="changeStat('luck',-1)">-</button>
+      <span class="stat-val" id="stat-luck">5</span>
+      <button class="stat-btn" onclick="changeStat('luck',1)">+</button>
+      <div class="stat-bar"><div class="stat-bar-fill" id="bar-luck" style="width:25%"></div></div>
+    </div>
+  </div>
+  
+  <button class="btn btn-gold btn-block" onclick="createCharacter()">НАЧАТЬ ПУТЬ</button>
+</div>
+
+<!-- ═══ Главный экран (тапалка) ═══ -->
+<div id="main" class="screen">
+  <div class="top-bar">
+    <div class="name-level">
+      <span class="name" id="playerName">---</span>
+      <span class="level-badge" id="playerLevel">Ур. 1</span>
+    </div>
+    <div class="xp-bar-wrap">
+      <div class="xp-bar" id="xpBar" style="width:0%"></div>
+    </div>
+    <div class="resources">
+      <div class="resource">🪙 <span id="coinCount">0</span></div>
+      <div class="resource">🎟️ <span id="tokenCount">0</span></div>
+      <div class="resource">⚡ <span id="energyCount">100</span></div>
+    </div>
+  </div>
+  
+  <div class="tap-area" id="tapArea">
+    <div class="combo-display" id="comboDisplay">x1</div>
+    <div class="character-wrap" id="characterWrap">
+      <canvas id="mainChar" width="32" height="32"></canvas>
+    </div>
+    <div class="tap-hint">TAP!</div>
+    <div class="energy-bar-wrap">
+      <div class="energy-label">
+        <span>ЭНЕРГИЯ</span>
+        <span id="energyText">100/100</span>
+      </div>
+      <div class="energy-bar-outer">
+        <div class="energy-bar" id="energyBar" style="width:100%"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bottom-nav">
+    <div class="nav-btn" onclick="showScreen('professions')"><span class="nav-icon">📋</span>ПРОФЕССИИ</div>
+    <div class="nav-btn active" onclick="showScreen('main')"><span class="nav-icon">🏠</span>ГЛАВНАЯ</div>
+    <div class="nav-btn" onclick="showScreen('upgrades')"><span class="nav-icon">⬆️</span>УЛУЧШЕНИЯ</div>
+  </div>
+</div>
+
+<!-- ═══ Экран профессий ═══ -->
+<div id="professions" class="screen">
+  <div class="prof-header">📋 ПРОФЕССИИ</div>
+  <div class="scrollable" id="professionsList"></div>
+  <div class="bottom-nav">
+    <div class="nav-btn active" onclick="showScreen('professions')"><span class="nav-icon">📋</span>ПРОФЕССИИ</div>
+    <div class="nav-btn" onclick="showScreen('main')"><span class="nav-icon">🏠</span>ГЛАВНАЯ</div>
+    <div class="nav-btn" onclick="showScreen('upgrades')"><span class="nav-icon">⬆️</span>УЛУЧШЕНИЯ</div>
+  </div>
+</div>
+
+<!-- ═══ Детальный экран профессии ═══ -->
+<div id="profDetail" class="screen">
+  <div class="prof-detail-header">
+    <div class="back-btn" onclick="showScreen('professions')">← НАЗАД</div>
+    <div class="prof-detail-title">
+      <span class="icon" id="pdIcon"></span>
+      <div class="info">
+        <h2 id="pdName"></h2>
+        <p id="pdDesc"></p>
+      </div>
+    </div>
+    <div class="prof-tools" id="pdTools"></div>
+  </div>
+  <div class="scrollable" id="pdTasks"></div>
+  <div class="bottom-nav">
+    <div class="nav-btn" onclick="showScreen('professions')"><span class="nav-icon">📋</span>ПРОФЕССИИ</div>
+    <div class="nav-btn" onclick="showScreen('main')"><span class="nav-icon">🏠</span>ГЛАВНАЯ</div>
+    <div class="nav-btn" onclick="showScreen('upgrades')"><span class="nav-icon">⬆️</span>УЛУЧШЕНИЯ</div>
+  </div>
+</div>
+
+<!-- ═══ Экран задания ═══ -->
+<div id="taskScreen" class="screen">
+  <div class="task-screen scrollable">
+    <div class="back-btn text-purple" onclick="backFromTask()" style="padding:12px;cursor:pointer;font-size:8px">← НАЗАД</div>
+    <div class="task-title" id="tsTitle"></div>
+    <div class="task-desc" id="tsDesc"></div>
+    <div class="task-game" id="tsGame"></div>
+  </div>
+</div>
+
+<!-- ═══ Экран улучшений ═══ -->
+<div id="upgrades" class="screen">
+  <div class="upgrades-header">⬆️ УЛУЧШЕНИЯ</div>
+  <div class="scrollable">
+    <div class="upgrade-list" id="upgradeList"></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-btn" onclick="showScreen('professions')"><span class="nav-icon">📋</span>ПРОФЕССИИ</div>
+    <div class="nav-btn" onclick="showScreen('main')"><span class="nav-icon">🏠</span>ГЛАВНАЯ</div>
+    <div class="nav-btn active" onclick="showScreen('upgrades')"><span class="nav-icon">⬆️</span>УЛУЧШЕНИЯ</div>
+  </div>
+</div>
+
+<!-- ═══ Модальное окно ═══ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   RE:ALITY: Профессии — Frontend Logic
+   ═══════════════════════════════════════════════════════════ */
+
+// ─── Глобальное состояние ──────────────────────────────────
+const STATE = {
+  telegramId: null,
+  user: null,
+  professions: {},
+  userProfessions: {},
+  currentProfession: null,
+  currentTask: null,
+  selectedAvatar: 1,
+  stats: { strength: 5, intellect: 5, charisma: 5, luck: 5 },
+  combo: 1,
+  lastTapTime: 0,
+  energyInterval: null,
+  breathAnim: null,
+};
+
+const COMBO_DECAY_MS = 800;
+const MAX_COMBO = 5;
+const API = '';  // Базовый URL API (пустой = текущий хост)
+
+// ─── Пиксельные аватары (рисуем на canvas) ─────────────────
+const AVATARS = {
+  1: { // Воин
+    body: '#4a90d9', hair: '#f0c040', skin: '#fdbcb4',
+    pixels: [
+      '....ffff....',
+      '...ffffff...',
+      '..fsssssf..',
+      '..fsessef..',
+      '..fsssssef.',
+      '..fssmssf..',
+      '...ssssss..',
+      '....bbbb...',
+      '...bbbbbb..',
+      '..bbbbbbb..',
+      '..bb.bb.bb.',
+      '..b..bb..b.',
+      '.....ll.....',
+      '....llll....',
+      '...ll..ll...',
+      '..ll....ll..',
+    ]
+  },
+  2: { // Маг
+    body: '#9b59b6', hair: '#e74c3c', skin: '#fdbcb4',
+    pixels: [
+      '...hhhhhh..',
+      '..hhhhhhhh.',
+      '..hssssssh.',
+      '..hsessesh.',
+      '..hssssssh.',
+      '..hssmsssh.',
+      '...ssssss..',
+      '....bbbb...',
+      '...bbbbbb..',
+      '..bbbbbbbb.',
+      '..bb.bb.bb.',
+      '..b..bb..b.',
+      '.....ll.....',
+      '....llll....',
+      '...ll..ll...',
+      '..ll....ll..',
+    ]
+  },
+  3: { // Разведчик
+    body: '#27ae60', hair: '#2c3e50', skin: '#fdbcb4',
+    pixels: [
+      '..hhhhhhhh.',
+      '..hhhhhhhh.',
+      '..hssssssh.',
+      '..hsessesh.',
+      '..hssssssh.',
+      '..hssmsssh.',
+      '...ssssss..',
+      '....bbbb...',
+      '...bbbbbb..',
+      '..bbbbbbb..',
+      '..bb.bb.bb.',
+      '..b..bb..b.',
+      '.....ll.....',
+      '....llll....',
+      '...ll..ll...',
+      '..ll....ll..',
+    ]
+  }
+};
+
+function drawAvatar(canvas, avatarId, size = 32) {
+  const ctx = canvas.getContext('2d');
+  const a = AVATARS[avatarId];
+  canvas.width = 12;
+  canvas.height = 16;
+  ctx.clearRect(0, 0, 12, 16);
+  
+  const colorMap = {
+    'f': a.hair, 'h': a.hair, 's': a.skin, 'e': '#2c3e50',
+    'b': a.body, 'l': '#8B4513', 'm': '#e74c3c', '.': null
+  };
+  
+  for (let y = 0; y < a.pixels.length && y < 16; y++) {
+    for (let x = 0; x < a.pixels[y].length && x < 12; x++) {
+      const c = colorMap[a.pixels[y][x]];
+      if (c) {
+        ctx.fillStyle = c;
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
+  }
+}
+
+// ─── API вызовы ────────────────────────────────────────────
+async function api(url, method = 'GET', body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const res = await fetch(API + url, opts);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Ошибка');
+    return data;
+  } catch (e) {
+    console.error('API error:', e);
+    throw e;
+  }
+}
+
+// ─── Инициализация Telegram ────────────────────────────────
+function initTelegram() {
+  if (window.Telegram?.WebApp) {
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.ready();
+    STATE.telegramId = tg.initDataUnsafe?.user?.id || null;
+  }
+  // Для тестирования без Telegram
+  if (!STATE.telegramId) {
+    STATE.telegramId = Math.floor(Math.random() * 1000000) + 100000;
+    // Пробуем из localStorage для консистентности
+    const saved = localStorage.getItem('reality_test_id');
+    if (saved) STATE.telegramId = parseInt(saved);
+    else localStorage.setItem('reality_test_id', STATE.telegramId);
+  }
+}
+
+// ─── Загрузка приложения ───────────────────────────────────
+async function loadApp() {
+  initTelegram();
+  
+  try {
+    const userData = await api(`/api/user/${STATE.telegramId}`);
+    STATE.professions = await api('/api/professions');
+    
+    if (userData.exists) {
+      STATE.user = userData;
+      STATE.userProfessions = await api(`/api/professions/${STATE.telegramId}`);
+      showScreen('main');
+      updateUI();
+      startEnergyRegen();
+      startBreathAnimation();
+    } else {
+      showScreen('register');
+      initRegister();
+    }
+  } catch (e) {
+    console.error('Load error:', e);
+    // Показываем регистрацию при ошибке
+    showScreen('register');
+    initRegister();
+  }
+}
+
+// ─── Управление экранами ───────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+  
+  // Обновляем навигацию
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll(`#${id} .nav-btn, .nav-btn`).forEach(b => {
+    const target = b.getAttribute('onclick')?.match(/showScreen\('(\w+)'\)/)?.[1];
+    if (target === id) b.classList.add('active');
+  });
+  
+  // Обновляем контент экрана
+  if (id === 'professions') renderProfessions();
+  if (id === 'upgrades') renderUpgrades();
+  if (id === 'main') updateUI();
+}
+
+// ─── Регистрация ───────────────────────────────────────────
+function initRegister() {
+  const container = document.getElementById('avatarSelect');
+  container.innerHTML = '';
+  
+  [1, 2, 3].forEach(id => {
+    const div = document.createElement('div');
+    div.className = `avatar-option${id === 1 ? ' selected' : ''}`;
+    div.onclick = () => selectAvatar(id);
+    const cvs = document.createElement('canvas');
+    drawAvatar(cvs, id);
+    div.appendChild(cvs);
+    
+    const label = document.createElement('div');
+    label.style.cssText = 'font-size:6px;text-align:center;margin-top:4px;color:#9b59b6';
+    label.textContent = ['', 'ВОИН', 'МАГ', 'РАЗВЕДЧИК'][id];
+    div.appendChild(label);
+    
+    container.appendChild(div);
+  });
+}
+
+function selectAvatar(id) {
+  STATE.selectedAvatar = id;
+  document.querySelectorAll('.avatar-option').forEach((el, i) => {
+    el.classList.toggle('selected', i + 1 === id);
+  });
+}
+
+function changeStat(stat, delta) {
+  const current = STATE.stats[stat];
+  const total = Object.values(STATE.stats).reduce((a, b) => a + b, 0);
+  
+  if (delta > 0 && total >= 20) return;
+  if (delta < 0 && current <= 0) return;
+  
+  STATE.stats[stat] = current + delta;
+  
+  document.getElementById(`stat-${stat}`).textContent = STATE.stats[stat];
+  document.getElementById(`bar-${stat}`).style.width = `${(STATE.stats[stat] / 20) * 100}%`;
+  
+  const newTotal = Object.values(STATE.stats).reduce((a, b) => a + b, 0);
+  document.getElementById('pointsLeft').textContent = 20 - newTotal;
+}
+
+async function createCharacter() {
+  const name = document.getElementById('nameInput').value.trim();
+  if (!name) return showModal('Ошибка', 'Введи имя персонажа!');
+  if (name.length > 8) return showModal('Ошибка', 'Имя до 8 символов!');
+  
+  const total = Object.values(STATE.stats).reduce((a, b) => a + b, 0);
+  if (total !== 20) return showModal('Ошибка', 'Распредели все 20 очков!');
+  
+  try {
+    await api('/api/create', 'POST', {
+      telegram_id: STATE.telegramId,
+      name,
+      avatar: STATE.selectedAvatar,
+      ...STATE.stats,
+    });
+    
+    STATE.user = await api(`/api/user/${STATE.telegramId}`);
+    STATE.userProfessions = await api(`/api/professions/${STATE.telegramId}`);
+    showScreen('main');
+    updateUI();
+    startEnergyRegen();
+    startBreathAnimation();
+    
+    showModal('Добро пожаловать!', `${name}, твоё приключение начинается! Тапай персонажа чтобы зарабатывать монеты. Копи токены профессий для изучения новых специальностей!`, 'ВПЕРЁД!');
+  } catch (e) {
+    showModal('Ошибка', e.message);
+  }
+}
+
+// ─── Обновление интерфейса ─────────────────────────────────
+function updateUI() {
+  if (!STATE.user) return;
+  const u = STATE.user;
+  
+  document.getElementById('playerName').textContent = u.name;
+  document.getElementById('playerLevel').textContent = `Ур. ${u.level}`;
+  document.getElementById('coinCount').textContent = formatNum(u.coins);
+  document.getElementById('tokenCount').textContent = u.tokens;
+  
+  const xpPct = (u.xp / u.xp_needed) * 100;
+  document.getElementById('xpBar').style.width = `${Math.min(xpPct, 100)}%`;
+  
+  updateEnergyUI();
+  
+  // Рисуем персонажа
+  drawAvatar(document.getElementById('mainChar'), u.avatar);
+}
+
+function updateEnergyUI() {
+  if (!STATE.user) return;
+  const e = Math.floor(STATE.user.energy);
+  const max = STATE.user.max_energy;
+  const pct = (e / max) * 100;
+  
+  document.getElementById('energyCount').textContent = e;
+  document.getElementById('energyText').textContent = `${e}/${max}`;
+  
+  const bar = document.getElementById('energyBar');
+  bar.style.width = `${pct}%`;
+  bar.classList.toggle('low', pct < 20);
+}
+
+function formatNum(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n;
+}
+
+// ─── Тапалка ───────────────────────────────────────────────
+function initTapper() {
+  const tapArea = document.getElementById('tapArea');
+  
+  tapArea.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.energy-bar-wrap') || e.target.closest('.bottom-nav')) return;
+    handleTap(e);
+  });
+  
+  // Мультитач
+  tapArea.addEventListener('touchstart', (e) => {
+    if (e.target.closest('.energy-bar-wrap') || e.target.closest('.bottom-nav')) return;
+    e.preventDefault();
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      handleTap(e.changedTouches[i]);
+    }
+  }, { passive: false });
+}
+
+async function handleTap(e) {
+  if (!STATE.user || STATE.user.energy < 1) return;
+  
+  const now = Date.now();
+  
+  // Обновляем комбо
+  if (now - STATE.lastTapTime < COMBO_DECAY_MS) {
+    STATE.combo = Math.min(STATE.combo + 1, MAX_COMBO);
+  } else {
+    STATE.combo = 1;
+  }
+  STATE.lastTapTime = now;
+  
+  // Обновляем отображение комбо
+  const comboEl = document.getElementById('comboDisplay');
+  comboEl.textContent = `x${STATE.combo}`;
+  comboEl.classList.toggle('active', STATE.combo > 1);
+  
+  // Анимация персонажа
+  const charWrap = document.getElementById('characterWrap');
+  charWrap.classList.remove('shake');
+  void charWrap.offsetWidth;
+  charWrap.classList.add('shake');
+  
+  try {
+    const result = await api('/api/tap', 'POST', {
+      telegram_id: STATE.telegramId,
+      taps: 1,
+      timestamp: now / 1000,
+      combo: STATE.combo,
+    });
+    
+    if (result.success) {
+      // Обновляем состояние
+      STATE.user.coins = result.total_coins;
+      STATE.user.xp = result.total_xp;
+      STATE.user.energy = result.energy;
+      STATE.user.level = result.level;
+      STATE.user.tokens = result.tokens;
+      STATE.user.xp_needed = result.xp_needed;
+      
+      // Всплывающее число
+      showTapReward(e, result.coins_earned, result.crit);
+      
+      updateUI();
+      
+      // Повышение уровня
+      if (result.leveled_up) {
+        charWrap.classList.add('level-up-anim');
+        setTimeout(() => charWrap.classList.remove('level-up-anim'), 800);
+        
+        if (result.level === 2) {
+          setTimeout(() => {
+            showModal('Уровень 2!', 'Поздравляем! Теперь ты можешь открывать профессии за токены! Зайди в раздел ПРОФЕССИИ и выбери первую специальность.', 'КРУТО!');
+          }, 500);
+        } else {
+          setTimeout(() => {
+            showModal('Новый уровень!', `Уровень ${result.level}! Ты получил +1 токен профессии.`, 'ОТЛИЧНО!');
+          }, 500);
+        }
+      }
+    }
+  } catch (e) {
+    // Тихая ошибка при тапе
+  }
+}
+
+function showTapReward(e, amount, crit) {
+  const el = document.createElement('div');
+  el.className = `tap-reward${crit ? ' crit' : ''}`;
+  el.textContent = `+${amount}${crit ? ' КРИТ!' : ''}`;
+  
+  const rect = document.getElementById('tapArea').getBoundingClientRect();
+  const x = (e.clientX || e.pageX || rect.left + rect.width/2) - rect.left;
+  const y = (e.clientY || e.pageY || rect.top + rect.height/2) - rect.top;
+  
+  el.style.left = `${x - 20}px`;
+  el.style.top = `${y - 20}px`;
+  
+  document.getElementById('tapArea').appendChild(el);
+  setTimeout(() => el.remove(), 800);
+}
+
+// ─── Регенерация энергии ───────────────────────────────────
+function startEnergyRegen() {
+  if (STATE.energyInterval) clearInterval(STATE.energyInterval);
+  STATE.energyInterval = setInterval(() => {
+    if (!STATE.user) return;
+    const regen = STATE.user.energy_regen || 2;
+    STATE.user.energy = Math.min(STATE.user.max_energy, STATE.user.energy + regen * 0.5);
+    updateEnergyUI();
+  }, 500);
+}
+
+// ─── Анимация дыхания ──────────────────────────────────────
+function startBreathAnimation() {
+  const char = document.getElementById('characterWrap');
+  let scale = 1;
+  let growing = true;
+  
+  if (STATE.breathAnim) cancelAnimationFrame(STATE.breathAnim);
+  
+  function animate() {
+    if (growing) {
+      scale += 0.001;
+      if (scale >= 1.03) growing = false;
+    } else {
+      scale -= 0.001;
+      if (scale <= 1.0) growing = true;
+    }
+    char.style.transform = `scale(${scale})`;
+    STATE.breathAnim = requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+// ─── Профессии ─────────────────────────────────────────────
+async function renderProfessions() {
+  try {
+    STATE.userProfessions = await api(`/api/professions/${STATE.telegramId}`);
+  } catch(e) {}
+  
+  const container = document.getElementById('professionsList');
+  const spheres = {};
+  
+  for (const [id, prof] of Object.entries(STATE.professions)) {
+    if (!spheres[prof.sphere]) spheres[prof.sphere] = [];
+    spheres[prof.sphere].push({ id, ...prof });
+  }
+  
+  let html = '';
+  for (const [sphere, profs] of Object.entries(spheres)) {
+    html += `<div class="sphere-section"><div class="sphere-title">${sphere}</div>`;
+    for (const p of profs) {
+      const up = STATE.userProfessions[p.id];
+      const unlocked = up?.unlocked;
+      const completed = up?.tasks_completed || [];
+      const total = p.tasks.length;
+      
+      html += `<div class="prof-card${unlocked ? ' unlocked' : ''}" onclick="openProfession('${p.id}')">
+        <div class="prof-icon">${p.icon}</div>
+        <div class="prof-info">
+          <div class="prof-name">${p.name}</div>
+          <div class="prof-desc">${p.description}</div>
+          ${unlocked ? `<div class="prof-progress">✓ ${completed.length}/${total} заданий</div>` : ''}
+        </div>
+        ${!unlocked ? `<div class="prof-cost">🎟️${p.cost}</div>` : ''}
+      </div>`;
+    }
+    html += '</div>';
+  }
+  
+  container.innerHTML = html;
+}
+
+async function openProfession(id) {
+  const prof = STATE.professions[id];
+  if (!prof) return;
+  
+  STATE.currentProfession = id;
+  const up = STATE.userProfessions[id];
+  const unlocked = up?.unlocked;
+  
+  document.getElementById('pdIcon').textContent = prof.icon;
+  document.getElementById('pdName').textContent = prof.name;
+  document.getElementById('pdDesc').textContent = prof.description;
+  
+  let toolsHtml = '';
+  for (const t of prof.tools) {
+    toolsHtml += `<span class="prof-tool">${t}</span>`;
+  }
+  document.getElementById('pdTools').innerHTML = toolsHtml;
+  
+  const tasksEl = document.getElementById('pdTasks');
+  
+  if (!unlocked) {
+    tasksEl.innerHTML = `
+      <div style="padding:40px 20px;text-align:center">
+        <div style="font-size:28px;margin-bottom:12px">🔒</div>
+        <p style="font-size:8px;color:#aaa;margin-bottom:16px">Открой профессию за ${prof.cost} токен(ов) чтобы получить доступ к заданиям</p>
+        <button class="btn btn-gold" onclick="unlockProfession('${id}')">ОТКРЫТЬ ЗА 🎟️${prof.cost}</button>
+      </div>`;
+  } else {
+    const completed = up?.tasks_completed || [];
+    let html = '<div class="task-list">';
+    prof.tasks.forEach((task, i) => {
+      const done = completed.includes(i);
+      const locked = i > 0 && !completed.includes(i - 1);
+      html += `<div class="task-card${done ? ' completed' : ''}${locked ? ' locked' : ''}" 
+                    onclick="${locked ? '' : (done ? '' : `startTask('${id}',${i})`)}">
+        <h3>${done ? '✅' : locked ? '🔒' : '📝'} ${task.title}</h3>
+        <p>${task.description}</p>
+        <div class="task-reward">${done ? 'Выполнено' : `🪙${task.coins} · ⭐${task.xp}XP`}</div>
+      </div>`;
+    });
+    html += '</div>';
+    tasksEl.innerHTML = html;
+  }
+  
+  showScreen('profDetail');
+}
+
+async function unlockProfession(id) {
+  try {
+    const result = await api('/api/professions/unlock', 'POST', {
+      telegram_id: STATE.telegramId,
+      profession_id: id,
+    });
+    
+    if (result.success) {
+      STATE.user.tokens = result.tokens;
+      STATE.userProfessions[id] = { unlocked: true, tasks_completed: [] };
+      updateUI();
+      openProfession(id);
+      showModal('Открыто!', `Профессия разблокирована! Выполняй задания чтобы узнать больше.`, 'НАЧАТЬ');
+    }
+  } catch (e) {
+    showModal('Ошибка', e.message);
+  }
+}
+
+// ─── Мини-игры заданий ─────────────────────────────────────
+function startTask(profId, taskIndex) {
+  const prof = STATE.professions[profId];
+  const task = prof.tasks[taskIndex];
+  STATE.currentProfession = profId;
+  STATE.currentTask = taskIndex;
+  
+  document.getElementById('tsTitle').textContent = task.title;
+  document.getElementById('tsDesc').textContent = task.description;
+  
+  const gameEl = document.getElementById('tsGame');
+  generateMiniGame(gameEl, task, profId, taskIndex);
+  
+  showScreen('taskScreen');
+}
+
+function backFromTask() {
+  if (STATE.currentProfession) {
+    openProfession(STATE.currentProfession);
+  } else {
+    showScreen('professions');
+  }
+}
+
+function generateMiniGame(container, task, profId, taskIndex) {
+  // Генерация мини-игры на основе типа задания
+  const type = task.type;
+  
+  // Набор универсальных генераторов мини-игр
+  const games = {
+    // ═══ IT: Frontend ═══
+    css_builder: () => buildCSSGame(container, profId, taskIndex),
+    color_match: () => buildColorMatchGame(container, profId, taskIndex),
+    layout_puzzle: () => buildLayoutGame(container, profId, taskIndex),
+    responsive: () => buildChoiceGame(container, profId, taskIndex,
+      'Клиент просит адаптировать сайт. Какой подход выбрать для мобильной версии?',
+      [
+        { text: 'Скрыть всё ненужное через display:none', correct: false, feedback: 'Это плохая практика — контент всё равно загружается' },
+        { text: 'Mobile-first: media queries от min-width', correct: true, feedback: 'Верно! Mobile-first — стандарт индустрии' },
+        { text: 'Сделать отдельный сайт m.site.ru', correct: false, feedback: 'Устаревший подход, дублирование кода' },
+        { text: 'Фиксированная ширина 375px для всех', correct: false, feedback: 'Не работает для планшетов и десктопов' },
+      ]),
+    animation_builder: () => buildSliderGame(container, profId, taskIndex,
+      'Настрой параметры CSS-анимации для плавного появления карточки товара:',
+      [
+        { name: 'duration (мс)', min: 100, max: 2000, correct: [300, 600], unit: 'мс' },
+        { name: 'delay (мс)', min: 0, max: 1000, correct: [0, 200], unit: 'мс' },
+        { name: 'translateY (px)', min: -50, max: 50, correct: [10, 30], unit: 'px' },
+      ]),
+    
+    // ═══ IT: Backend ═══
+    sql_builder: () => buildChoiceGame(container, profId, taskIndex,
+      'Нужно выбрать всех пользователей старше 18 лет, зарегистрированных в 2025 году, отсортированных по дате. Какой запрос верный?',
+      [
+        { text: 'SELECT * FROM users WHERE age > 18 AND year(created_at) = 2025 ORDER BY created_at', correct: true, feedback: 'Верно! Правильный SQL-запрос' },
+        { text: 'GET users WHERE age > 18 AND created_at = 2025', correct: false, feedback: 'GET — не SQL-команда' },
+        { text: 'SELECT * FROM users WHERE age > 18 OR year = 2025', correct: false, feedback: 'OR вместо AND даст неправильную выборку' },
+        { text: 'SELECT users FROM * WHERE age > 18', correct: false, feedback: 'Неправильный синтаксис SELECT' },
+      ]),
+    api_design: () => buildSortGame(container, profId, taskIndex,
+      'Расположи REST endpoints интернет-магазина в правильном порядке (от получения до удаления):',
+      ['GET /products', 'GET /products/{id}', 'POST /products', 'PUT /products/{id}', 'DELETE /products/{id}']),
+    debug_code: () => buildDebugGame(container, profId, taskIndex),
+    optimize: () => buildChoiceGame(container, profId, taskIndex,
+      'Запрос к БД выполняется 5 секунд. Таблица users содержит 1 млн записей. Запрос: SELECT * FROM users WHERE email LIKE "%@gmail.com". Что сделать?',
+      [
+        { text: 'Добавить индекс на поле email', correct: false, feedback: 'LIKE с % в начале не использует индекс' },
+        { text: 'Добавить полнотекстовый поиск или колонку domain', correct: true, feedback: 'Верно! Выделение домена в отдельную колонку с индексом решит проблему' },
+        { text: 'Увеличить оперативную память сервера', correct: false, feedback: 'Это не решит проблему с паттерном запроса' },
+        { text: 'Перезапустить базу данных', correct: false, feedback: 'Это не оптимизация запроса' },
+      ]),
+    architecture: () => buildSortGame(container, profId, taskIndex,
+      'Расположи этапы проектирования микросервисной архитектуры в правильном порядке:',
+      ['Определить бизнес-домены', 'Выделить bounded contexts', 'Определить API контракты', 'Настроить коммуникацию между сервисами', 'Организовать мониторинг и логирование']),
+    
+    // ═══ IT: Data Science ═══
+    data_analysis: () => buildChoiceGame(container, profId, taskIndex,
+      'В датасете продаж 10,000 записей. Среднее — 5000₽, медиана — 2000₽. Что это значит?',
+      [
+        { text: 'Данные распределены нормально', correct: false, feedback: 'При нормальном распределении среднее ≈ медиана' },
+        { text: 'Есть выбросы с очень высокими значениями (правый хвост)', correct: true, feedback: 'Верно! Среднее >> медиана = правосторонний перекос из-за выбросов' },
+        { text: 'Данные содержат ошибки', correct: false, feedback: 'Такое распределение может быть нормальным для продаж' },
+        { text: 'Нужно удалить половину данных', correct: false, feedback: 'Нельзя удалять данные без анализа' },
+      ]),
+    data_viz: () => buildChoiceGame(container, profId, taskIndex,
+      'Нужно показать изменение температуры по месяцам за 3 года. Какой тип графика выбрать?',
+      [
+        { text: 'Круговая диаграмма (pie chart)', correct: false, feedback: 'Pie chart для долей целого, не для временных рядов' },
+        { text: 'Линейный график (line chart)', correct: true, feedback: 'Верно! Line chart идеален для временных рядов' },
+        { text: 'Гистограмма (histogram)', correct: false, feedback: 'Гистограмма для распределения, не для временных рядов' },
+        { text: 'Точечная диаграмма (scatter plot)', correct: false, feedback: 'Scatter plot для корреляции двух переменных' },
+      ]),
+    data_clean: () => buildSliderGame(container, profId, taskIndex,
+      'Настрой параметры очистки датасета с аномалиями (1000 записей, 15% пропусков):',
+      [
+        { name: 'Порог пропусков для удаления строки (%)', min: 10, max: 90, correct: [40, 60], unit: '%' },
+        { name: 'Порог Z-score для выбросов', min: 1, max: 5, correct: [2, 3], unit: 'σ' },
+        { name: 'Размер окна скользящего среднего', min: 3, max: 30, correct: [5, 15], unit: 'шаг' },
+      ]),
+    ml_model: () => buildChoiceGame(container, profId, taskIndex,
+      'Нужно предсказать цену квартиры по 15 признакам (площадь, район, этаж...). 50,000 записей. Какую модель выбрать для начала?',
+      [
+        { text: 'Линейная регрессия', correct: false, feedback: 'Слишком простая для нелинейных зависимостей в ценах' },
+        { text: 'Gradient Boosting (XGBoost)', correct: true, feedback: 'Верно! XGBoost отлично работает с табличными данными и нелинейными зависимостями' },
+        { text: 'Нейронная сеть (100 слоёв)', correct: false, feedback: 'Избыточно для 50K записей, требует много данных' },
+        { text: 'Метод k-ближайших соседей', correct: false, feedback: 'Плохо масштабируется на 15 признаков (проклятие размерности)' },
+      ]),
+    ab_test: () => buildSliderGame(container, profId, taskIndex,
+      'A/B тест: вариант A (конверсия 3.2%, 5000 визитов), вариант B (конверсия 3.8%, 5000 визитов). Настрой параметры теста:',
+      [
+        { name: 'Уровень значимости (%)', min: 1, max: 20, correct: [3, 7], unit: '%' },
+        { name: 'Минимальный эффект для принятия решения (%)', min: 0.5, max: 5, correct: [0.5, 1.5], unit: '%' },
+      ]),
+    
+    // ═══ IT: Кибербезопасность ═══
+    password_check: () => buildPasswordGame(container, profId, taskIndex),
+    phishing: () => buildPhishingGame(container, profId, taskIndex),
+    traffic_analysis: () => buildChoiceGame(container, profId, taskIndex,
+      'В логах сети обнаружены запросы: 10,000 GET-запросов за 1 минуту с одного IP к /api/login. Что происходит?',
+      [
+        { text: 'Обычный трафик от активного пользователя', correct: false, feedback: '10K запросов в минуту — явно не человек' },
+        { text: 'Brute-force атака на подбор пароля', correct: true, feedback: 'Верно! Массовые запросы к /login = брутфорс' },
+        { text: 'DDoS атака', correct: false, feedback: 'DDoS обычно с множества IP, не с одного' },
+        { text: 'Сбой в мониторинге', correct: false, feedback: 'Сбой мониторинга не создаёт реальных запросов' },
+      ]),
+    vulnerability: () => buildChoiceGame(container, profId, taskIndex,
+      'На странице авторизации есть поле ввода email. Пользователь вводит: admin@test.com\' OR \'1\'=\'1. Что это за уязвимость?',
+      [
+        { text: 'XSS (Cross-Site Scripting)', correct: false, feedback: 'XSS использует JS-инъекции, не SQL' },
+        { text: 'SQL Injection', correct: true, feedback: 'Верно! Классическая SQL-инъекция через модификацию запроса' },
+        { text: 'CSRF (Cross-Site Request Forgery)', correct: false, feedback: 'CSRF — подделка запросов, не инъекция' },
+        { text: 'Брутфорс', correct: false, feedback: 'Брутфорс — перебор паролей, не инъекция кода' },
+      ]),
+    incident: () => buildSortGame(container, profId, taskIndex,
+      'В компании обнаружена утечка данных. Расположи шаги реагирования в правильном порядке:',
+      ['Изолировать затронутые системы', 'Оценить масштаб утечки', 'Уведомить руководство и юристов', 'Устранить уязвимость', 'Уведомить пострадавших пользователей']),
+    
+    // ═══ Инженерия ═══
+    robot_schema: () => buildSortGame(container, profId, taskIndex,
+      'Расположи элементы цепи робота в правильном порядке (от питания к мотору):',
+      ['Батарея 12V', 'Предохранитель', 'Контроллер (Arduino)', 'Драйвер мотора (L298N)', 'DC-мотор']),
+    robot_move: () => buildRobotMazeGame(container, profId, taskIndex),
+    sensors: () => buildChoiceGame(container, profId, taskIndex,
+      'Робот должен объезжать препятствия в тёмном помещении. Какой набор датчиков оптимален?',
+      [
+        { text: 'Только камера', correct: false, feedback: 'Камера плохо работает в темноте' },
+        { text: 'Ультразвуковой + ИК-датчик', correct: true, feedback: 'Верно! УЗ даёт дистанцию, ИК — ближний обзор. Работают в темноте' },
+        { text: 'Только GPS', correct: false, feedback: 'GPS не определяет ближайшие препятствия' },
+        { text: 'Микрофон + гироскоп', correct: false, feedback: 'Они не определяют препятствия' },
+      ]),
+    gripper: () => buildSliderGame(container, profId, taskIndex,
+      'Откалибруй манипулятор для захвата хрупкого стеклянного стакана (100г):',
+      [
+        { name: 'Сила захвата (Н)', min: 0.5, max: 20, correct: [2, 5], unit: 'Н' },
+        { name: 'Скорость сжатия (%)', min: 5, max: 100, correct: [10, 30], unit: '%' },
+        { name: 'Угол раскрытия (°)', min: 30, max: 180, correct: [80, 120], unit: '°' },
+      ]),
+    auto_nav: () => buildChoiceGame(container, profId, taskIndex,
+      'Какой алгоритм навигации выбрать для робота-доставщика в офисном здании?',
+      [
+        { text: 'A* (A-star) по карте здания', correct: true, feedback: 'Верно! A* оптимален для навигации по известной карте' },
+        { text: 'Случайное блуждание', correct: false, feedback: 'Неэффективно и непредсказуемо' },
+        { text: 'Всегда ехать прямо', correct: false, feedback: 'Без обхода препятствий робот застрянет' },
+        { text: 'Навигация по GPS', correct: false, feedback: 'GPS не работает внутри здания' },
+      ]),
+    
+    // ═══ Энергетика ═══
+    load_calc: () => buildSliderGame(container, profId, taskIndex,
+      'Рассчитай параметры электросети для дома (площадь 100м²):',
+      [
+        { name: 'Автомат (А)', min: 10, max: 63, correct: [25, 40], unit: 'А' },
+        { name: 'Сечение кабеля (мм²)', min: 1.5, max: 10, correct: [4, 6], unit: 'мм²' },
+        { name: 'Число групп (шт)', min: 2, max: 12, correct: [4, 8], unit: 'шт' },
+      ]),
+    solar: () => buildChoiceGame(container, profId, taskIndex,
+      'Дом потребляет 300 кВт·ч/мес. Панель 400Вт даёт ~40 кВт·ч/мес в средней полосе. Сколько нужно панелей?',
+      [
+        { text: '4 панели', correct: false, feedback: '4×40=160 кВт·ч — мало' },
+        { text: '8 панелей', correct: true, feedback: 'Верно! 8×40=320 кВт·ч с небольшим запасом' },
+        { text: '15 панелей', correct: false, feedback: 'Избыточно и дорого' },
+        { text: '2 панели', correct: false, feedback: '2×40=80 кВт·ч — совсем мало' },
+      ]),
+    fault_find: () => buildChoiceGame(container, profId, taskIndex,
+      'На линии 10кВ произошло КЗ. Защита отключила секцию между подстанциями А и Б. Как найти точку аварии?',
+      [
+        { text: 'Отключить всю линию и ждать', correct: false, feedback: 'Пассивный подход затянет аварию' },
+        { text: 'Метод деления пополам: отключать секции поочерёдно', correct: true, feedback: 'Верно! Бинарный поиск — стандартный метод' },
+        { text: 'Прочитать показания счётчиков', correct: false, feedback: 'Счётчики не показывают место КЗ' },
+        { text: 'Заменить все провода', correct: false, feedback: 'Нереально и дорого' },
+      ]),
+    efficiency: () => buildSliderGame(container, profId, taskIndex,
+      'Оптимизируй потребление энергии офисного здания (текущее: 50000 кВт·ч/мес):',
+      [
+        { name: 'Температура кондиционирования (°C)', min: 18, max: 28, correct: [22, 24], unit: '°C' },
+        { name: 'Время выключения освещения (час)', min: 18, max: 23, correct: [19, 21], unit: 'ч' },
+      ]),
+    substation: () => buildSortGame(container, profId, taskIndex,
+      'Расположи этапы проектирования трансформаторной подстанции:',
+      ['Расчёт нагрузки потребителей', 'Выбор мощности трансформатора', 'Проект заземления', 'Выбор защитной аппаратуры', 'Согласование с сетевой компанией']),
+    
+    // ═══ Медицина ═══
+    anatomy: () => buildChoiceGame(container, profId, taskIndex,
+      'На КТ-снимке пациента обнаружено образование в правом верхнем квадранте живота. Какой орган здесь расположен?',
+      [
+        { text: 'Селезёнка', correct: false, feedback: 'Селезёнка — в левом верхнем квадранте' },
+        { text: 'Печень', correct: true, feedback: 'Верно! Печень занимает правый верхний квадрант' },
+        { text: 'Желудок', correct: false, feedback: 'Желудок — в левом верхнем/центральном квадранте' },
+        { text: 'Аппендикс', correct: false, feedback: 'Аппендикс — в правом нижнем квадранте' },
+      ]),
+    stitching: () => buildSortGame(container, profId, taskIndex,
+      'Расположи этапы наложения хирургического шва в правильном порядке:',
+      ['Обработка антисептиком', 'Местная анестезия', 'Вкол иглы перпендикулярно коже', 'Проведение нити через оба края раны', 'Завязывание хирургического узла']),
+    diagnosis: () => buildChoiceGame(container, profId, taskIndex,
+      'Пациент: боль в правой нижней части живота, тошнота, температура 37.8°C, боль при пальпации в точке Мак-Бёрни. Диагноз?',
+      [
+        { text: 'Гастрит', correct: false, feedback: 'Гастрит — боль в верхней части живота' },
+        { text: 'Острый аппендицит', correct: true, feedback: 'Верно! Классические симптомы аппендицита' },
+        { text: 'Пневмония', correct: false, feedback: 'Пневмония — заболевание лёгких' },
+        { text: 'Мигрень', correct: false, feedback: 'Мигрень — головная боль' },
+      ]),
+    surgery_plan: () => buildSortGame(container, profId, taskIndex,
+      'Расположи этапы лапароскопической аппендэктомии в правильном порядке:',
+      ['Общий наркоз', 'Создание пневмоперитонеума', 'Введение троакаров', 'Мобилизация аппендикса', 'Удаление и ушивание']),
+    emergency: () => buildChoiceGame(container, profId, taskIndex,
+      'В приёмный покой доставлен пациент без сознания. Дыхание есть, пульс 40 уд/мин, АД 80/50. Первое действие?',
+      [
+        { text: 'Сделать МРТ головного мозга', correct: false, feedback: 'МРТ — не первоочередное действие при нестабильном состоянии' },
+        { text: 'Обеспечить венозный доступ и инфузию', correct: true, feedback: 'Верно! Стабилизация гемодинамики — приоритет №1' },
+        { text: 'Дать обезболивающее', correct: false, feedback: 'Пациент без сознания, пероральный приём невозможен' },
+        { text: 'Выписать рецепт', correct: false, feedback: 'Пациент в критическом состоянии!' },
+      ]),
+    
+    // ═══ Биотехнологии ═══
+    dna_analysis: () => buildChoiceGame(container, profId, taskIndex,
+      'В последовательности ДНК найден стоп-кодон TAA в позиции 150 из 900. Что делать?',
+      [
+        { text: 'Проигнорировать, это нормально', correct: false, feedback: 'Преждевременный стоп-кодон может быть мутацией' },
+        { text: 'Проверить рамку считывания и сравнить с референсом', correct: true, feedback: 'Верно! Нужно верифицировать мутацию' },
+        { text: 'Удалить этот участок', correct: false, feedback: 'Нельзя произвольно редактировать данные' },
+        { text: 'Начать секвенирование заново', correct: false, feedback: 'Сначала проверь данные, потом решай' },
+      ]),
+    cell_culture: () => buildSliderGame(container, profId, taskIndex,
+      'Подбери условия для культивирования клеток HeLa:',
+      [
+        { name: 'Температура (°C)', min: 30, max: 42, correct: [36, 38], unit: '°C' },
+        { name: 'CO₂ (%)', min: 0, max: 15, correct: [4, 6], unit: '%' },
+        { name: 'Сыворотка в среде (%)', min: 0, max: 30, correct: [8, 12], unit: '%' },
+      ]),
+    vaccine: () => buildChoiceGame(container, profId, taskIndex,
+      'Для нового вируса нужна вакцина максимально быстро. Какая технология?',
+      [
+        { text: 'Живая аттенуированная вакцина', correct: false, feedback: 'Разработка занимает годы' },
+        { text: 'мРНК-вакцина', correct: true, feedback: 'Верно! мРНК-технология позволяет разработать вакцину за недели' },
+        { text: 'Инактивированная вакцина', correct: false, feedback: 'Требует выращивания большого количества вируса' },
+        { text: 'Гомеопатическое средство', correct: false, feedback: 'Гомеопатия не имеет доказательной базы' },
+      ]),
+    pcr: () => buildSliderGame(container, profId, taskIndex,
+      'Настрой параметры ПЦР-теста для выявления вирусной РНК:',
+      [
+        { name: 'Температура денатурации (°C)', min: 85, max: 99, correct: [94, 96], unit: '°C' },
+        { name: 'Температура отжига праймеров (°C)', min: 45, max: 70, correct: [55, 65], unit: '°C' },
+        { name: 'Число циклов', min: 15, max: 50, correct: [30, 40], unit: 'шт' },
+      ]),
+    bioethics: () => buildChoiceGame(container, profId, taskIndex,
+      'Компания предлагает генетическое редактирование эмбрионов для устранения наследственного заболевания. Какова этическая позиция?',
+      [
+        { text: 'Разрешить без ограничений', correct: false, feedback: 'Без контроля возможны злоупотребления' },
+        { text: 'Разрешить при тяжёлых заболеваниях с этическим комитетом', correct: true, feedback: 'Верно! Баланс между пользой и контролем' },
+        { text: 'Запретить полностью', correct: false, feedback: 'Полный запрет лишает людей лечения' },
+        { text: 'Решать должны только родители', correct: false, feedback: 'Нужен экспертный контроль' },
+      ]),
+    
+    // ═══ Творчество: Геймдев ═══
+    balance: () => buildSliderGame(container, profId, taskIndex,
+      'Сбалансируй персонажа-танка для PvP (суммарный рейтинг должен быть ~50):',
+      [
+        { name: 'Здоровье', min: 1, max: 20, correct: [14, 18], unit: '' },
+        { name: 'Урон', min: 1, max: 20, correct: [5, 9], unit: '' },
+        { name: 'Скорость', min: 1, max: 20, correct: [3, 7], unit: '' },
+        { name: 'Защита', min: 1, max: 20, correct: [14, 18], unit: '' },
+      ]),
+    level_design: () => buildChoiceGame(container, profId, taskIndex,
+      'Проектируешь первый уровень платформера. Какой принцип самый важный?',
+      [
+        { text: 'Максимальная сложность сразу', correct: false, feedback: 'Игрок уйдёт, не разобравшись' },
+        { text: 'Обучение через геймплей: постепенное введение механик', correct: true, feedback: 'Верно! Принцип Nintendo: teach through play' },
+        { text: 'Много текста с инструкциями', correct: false, feedback: 'Игроки не читают длинные тексты' },
+        { text: 'Копирование уровня из другой игры', correct: false, feedback: 'Плагиат и не подходит под твои механики' },
+      ]),
+    game_economy: () => buildSliderGame(container, profId, taskIndex,
+      'Настрой экономику мобильной RPG (баланс между фаном и монетизацией):',
+      [
+        { name: 'Золото за квест', min: 10, max: 500, correct: [50, 150], unit: '' },
+        { name: 'Цена лечебного зелья', min: 5, max: 200, correct: [20, 50], unit: '' },
+        { name: 'Цена легендарного меча', min: 100, max: 10000, correct: [800, 2000], unit: '' },
+      ]),
+    narrative: () => buildChoiceGame(container, profId, taskIndex,
+      'NPC-кузнец просит героя добыть руду. Игрок отказывается. Лучшая реакция NPC?',
+      [
+        { text: 'NPC замолкает и больше не говорит', correct: false, feedback: 'Убивает контент, блокирует прогресс' },
+        { text: 'NPC предлагает альтернативу: купить руду на рынке', correct: true, feedback: 'Верно! Ветвление даёт свободу и удерживает в сюжете' },
+        { text: 'Принудительно начать квест', correct: false, feedback: 'Нарушает свободу игрока' },
+        { text: 'Game over', correct: false, feedback: 'Слишком наказывающе' },
+      ]),
+    mechanic_proto: () => buildChoiceGame(container, profId, taskIndex,
+      'Прототипируешь механику "перемотка времени". Какой минимальный прототип сделать в первую очередь?',
+      [
+        { text: 'Полная 3D-сцена с эффектами', correct: false, feedback: 'Слишком долго для прототипа' },
+        { text: 'Документ на 50 страниц с описанием', correct: false, feedback: 'Документ не покажет ощущения от механики' },
+        { text: 'Простая 2D-сцена: объект двигается, кнопка перемотки', correct: true, feedback: 'Верно! Greybox-прототип — проверяем core loop' },
+        { text: 'Нарисовать концепт-арт', correct: false, feedback: 'Арт не проверяет механику' },
+      ]),
+    
+    // ═══ Творчество: Дизайн ═══
+    color_theory: () => buildColorMatchGame(container, profId, taskIndex),
+    typography: () => buildChoiceGame(container, profId, taskIndex,
+      'Для приложения банка нужно выбрать основной шрифт. Какой подходит лучше?',
+      [
+        { text: 'Comic Sans', correct: false, feedback: 'Несерьёзный, не подходит для финансов' },
+        { text: 'Inter или SF Pro — нейтральный sans-serif', correct: true, feedback: 'Верно! Чистый, читаемый, профессиональный' },
+        { text: 'Lobster — декоративный курсив', correct: false, feedback: 'Декоративные шрифты плохо читаются в интерфейсе' },
+        { text: 'Impact — жирный заголовочный', correct: false, feedback: 'Слишком агрессивный для банковского приложения' },
+      ]),
+    wireframe: () => buildSortGame(container, profId, taskIndex,
+      'Расположи элементы экрана мобильного приложения доставки еды сверху вниз:',
+      ['Строка поиска', 'Категории (горизонтальный скролл)', 'Баннер акции', 'Список ресторанов', 'Навигация (таб-бар)']),
+    usability: () => buildChoiceGame(container, profId, taskIndex,
+      'На экране оформления заказа кнопка "Оплатить" серого цвета на сером фоне. Что не так?',
+      [
+        { text: 'Ничего, серый — модный цвет', correct: false, feedback: 'Контраст важнее моды' },
+        { text: 'Недостаточный контраст: CTA-кнопка должна выделяться', correct: true, feedback: 'Верно! Главное действие должно быть ярким и заметным' },
+        { text: 'Нужно добавить больше текста', correct: false, feedback: 'Проблема в визуальном контрасте, не в тексте' },
+        { text: 'Кнопка слишком большая', correct: false, feedback: 'Размер не упоминался как проблема' },
+      ]),
+    design_system: () => buildSortGame(container, profId, taskIndex,
+      'Расположи этапы создания дизайн-системы в правильном порядке:',
+      ['Аудит существующих компонентов', 'Определить токены (цвета, типографика, отступы)', 'Создать атомарные компоненты', 'Собрать составные компоненты', 'Документация и гайдлайны']),
+    
+    // ═══ Бизнес ═══
+    target_audience: () => buildChoiceGame(container, profId, taskIndex,
+      'Запускаем подписку на органические снеки. Какая ЦА первичная?',
+      [
+        { text: 'Все люди от 0 до 100 лет', correct: false, feedback: 'Слишком широко, нет фокуса' },
+        { text: 'Женщины 25-40, средний+ доход, ЗОЖ', correct: true, feedback: 'Верно! Узкий сегмент для MVP, потом расширяем' },
+        { text: 'Пенсионеры', correct: false, feedback: 'Не основная аудитория подписочных сервисов' },
+        { text: 'Только веганы', correct: false, feedback: 'Слишком узко для органических снеков' },
+      ]),
+    ad_copy: () => buildChoiceGame(container, profId, taskIndex,
+      'Какой заголовок рекламы курсов английского языка сработает лучше?',
+      [
+        { text: 'Курсы английского. Записывайтесь.', correct: false, feedback: 'Скучно, нет мотивации' },
+        { text: 'Заговори по-английски за 30 дней — или вернём деньги', correct: true, feedback: 'Верно! Конкретный результат + гарантия = доверие' },
+        { text: 'Мы лучшие учителя', correct: false, feedback: 'Нет конкретики, самохвальство' },
+        { text: 'Английский язык очень важен', correct: false, feedback: 'Банальность, нет призыва к действию' },
+      ]),
+    analytics: () => buildSliderGame(container, profId, taskIndex,
+      'Рекламная кампания: бюджет 100,000₽, 50,000 кликов, 500 покупок. Оцени метрики:',
+      [
+        { name: 'CPC (цена клика) ₽', min: 0.5, max: 10, correct: [1.5, 2.5], unit: '₽' },
+        { name: 'Конверсия (%)', min: 0.1, max: 5, correct: [0.8, 1.2], unit: '%' },
+      ]),
+    strategy: () => buildSortGame(container, profId, taskIndex,
+      'Расположи этапы маркетинговой стратегии для нового продукта:',
+      ['Анализ рынка и конкурентов', 'Определение целевой аудитории', 'Позиционирование продукта', 'Выбор каналов продвижения', 'Запуск и A/B тестирование']),
+    crisis_pr: () => buildChoiceGame(container, profId, taskIndex,
+      'В соцсетях распространяется видео: клиент нашёл насекомое в вашем продукте. 10,000 репостов за час. Что делать?',
+      [
+        { text: 'Игнорировать, само утихнет', correct: false, feedback: 'Молчание воспринимается как признание вины' },
+        { text: 'Быстрый официальный ответ: извинение, расследование, компенсация', correct: true, feedback: 'Верно! Скорость + прозрачность + действия = контроль ситуации' },
+        { text: 'Удалить все упоминания', correct: false, feedback: 'Эффект Стрейзанд — станет только хуже' },
+        { text: 'Подать в суд на автора видео', correct: false, feedback: 'Усилит негатив и воспринимается как давление' },
+      ]),
+    
+    // ═══ Финансы ═══
+    budget: () => buildSliderGame(container, profId, taskIndex,
+      'Бюджет стартапа на месяц: 500,000₽. Распредели расходы (% от бюджета):',
+      [
+        { name: 'Зарплаты (%)', min: 20, max: 80, correct: [50, 65], unit: '%' },
+        { name: 'Маркетинг (%)', min: 5, max: 40, correct: [15, 25], unit: '%' },
+        { name: 'Инфраструктура (%)', min: 5, max: 30, correct: [10, 20], unit: '%' },
+      ]),
+    fin_report: () => buildChoiceGame(container, profId, taskIndex,
+      'Выручка компании выросла на 30%, а чистая прибыль упала на 10%. Что вероятнее всего?',
+      [
+        { text: 'Компания работает отлично', correct: false, feedback: 'Падение прибыли при росте выручки — тревожный сигнал' },
+        { text: 'Резко выросли расходы (маркетинг, персонал)', correct: true, feedback: 'Верно! Рост расходов опережает рост выручки' },
+        { text: 'Ошибка в отчёте', correct: false, feedback: 'Такая ситуация вполне реальна' },
+        { text: 'Нужно уволить всех', correct: false, feedback: 'Нужен анализ, а не импульсивные решения' },
+      ]),
+    portfolio: () => buildChoiceGame(container, profId, taskIndex,
+      'Клиенту 25 лет, горизонт инвестиций 20+ лет, средний риск. Какой портфель?',
+      [
+        { text: '100% банковский депозит', correct: false, feedback: 'Слишком консервативно для долгосрочного горизонта' },
+        { text: '70% акции, 20% облигации, 10% золото', correct: true, feedback: 'Верно! Классическая диверсификация для молодого инвестора' },
+        { text: '100% криптовалюта', correct: false, feedback: 'Слишком рисковано, нет диверсификации' },
+        { text: '100% облигации', correct: false, feedback: 'Слишком консервативно, упущенная доходность' },
+      ]),
+    risk: () => buildSliderGame(container, profId, taskIndex,
+      'Оцени риски IT-стартапа (1-10, где 10 = максимальный риск):',
+      [
+        { name: 'Рыночный риск', min: 1, max: 10, correct: [6, 8], unit: '' },
+        { name: 'Технический риск', min: 1, max: 10, correct: [4, 6], unit: '' },
+        { name: 'Финансовый риск', min: 1, max: 10, correct: [7, 9], unit: '' },
+      ]),
+    business_plan: () => buildSortGame(container, profId, taskIndex,
+      'Расположи разделы бизнес-плана в правильном порядке:',
+      ['Резюме проекта', 'Анализ рынка', 'Бизнес-модель', 'Финансовый план', 'Оценка рисков']),
+    
+    // ═══ Наука: Химия ═══
+    reaction_eq: () => buildChoiceGame(container, profId, taskIndex,
+      'Уравняй реакцию: Fe + O₂ → Fe₂O₃. Какие коэффициенты верные?',
+      [
+        { text: '4Fe + 3O₂ → 2Fe₂O₃', correct: true, feedback: 'Верно! 4 атома Fe и 6 атомов O с каждой стороны' },
+        { text: '2Fe + 3O₂ → Fe₂O₃', correct: false, feedback: 'Не сбалансировано: 6 O слева, 3 O справа? Нет, 3 справа тоже, но Fe не балансирует' },
+        { text: 'Fe + O₂ → Fe₂O₃', correct: false, feedback: 'Не сбалансировано' },
+        { text: '3Fe + 2O₂ → Fe₃O₄', correct: false, feedback: 'Это другой оксид железа' },
+      ]),
+    identify_substance: () => buildChoiceGame(container, profId, taskIndex,
+      'Вещество: бесцветный газ, тяжелее воздуха, тушит горение, при растворении в воде pH < 7. Что это?',
+      [
+        { text: 'Кислород (O₂)', correct: false, feedback: 'Кислород поддерживает горение' },
+        { text: 'Углекислый газ (CO₂)', correct: true, feedback: 'Верно! Все признаки совпадают' },
+        { text: 'Водород (H₂)', correct: false, feedback: 'Водород легче воздуха и горит' },
+        { text: 'Азот (N₂)', correct: false, feedback: 'Азот не даёт кислую реакцию с водой' },
+      ]),
+    lab_work: () => buildSortGame(container, profId, taskIndex,
+      'Расположи этапы лабораторного эксперимента по титрованию:',
+      ['Приготовить стандартный раствор', 'Заполнить бюретку титрантом', 'Отмерить аликвоту аналита', 'Добавить индикатор', 'Титровать до изменения цвета']),
+    molecular: () => buildChoiceGame(container, profId, taskIndex,
+      'Молекула воды H₂O. Какова её геометрия?',
+      [
+        { text: 'Линейная (180°)', correct: false, feedback: 'Линейная — это CO₂' },
+        { text: 'Угловая (~104.5°)', correct: true, feedback: 'Верно! Из-за двух неподелённых пар электронов' },
+        { text: 'Тетраэдрическая', correct: false, feedback: 'Тетраэдр — это CH₄' },
+        { text: 'Плоская', correct: false, feedback: 'Вода — не плоская молекула' },
+      ]),
+    synthesis: () => buildSortGame(container, profId, taskIndex,
+      'Расположи этапы синтеза аспирина (ацетилсалициловой кислоты):',
+      ['Навеска салициловой кислоты', 'Добавление уксусного ангидрида', 'Нагревание на водяной бане', 'Кристаллизация из воды', 'Фильтрация и сушка']),
+    
+    // ═══ Наука: Физика ═══
+    trajectory: () => buildSliderGame(container, profId, taskIndex,
+      'Мяч брошен под углом 45° с начальной скоростью V₀. Рассчитай параметры (g=10 м/с²):',
+      [
+        { name: 'Скорость (м/с)', min: 5, max: 50, correct: [15, 25], unit: 'м/с' },
+        { name: 'Макс. высота (м)', min: 1, max: 50, correct: [5, 15], unit: 'м' },
+      ]),
+    circuit: () => buildChoiceGame(container, profId, taskIndex,
+      'Два резистора R1=100 Ом и R2=100 Ом соединены параллельно. Чему равно общее сопротивление?',
+      [
+        { text: '200 Ом', correct: false, feedback: '200 Ом — для последовательного соединения' },
+        { text: '50 Ом', correct: true, feedback: 'Верно! Для параллельного: R=R1×R2/(R1+R2)=50 Ом' },
+        { text: '100 Ом', correct: false, feedback: 'Параллельное соединение уменьшает сопротивление' },
+        { text: '10 Ом', correct: false, feedback: 'Неверный расчёт' },
+      ]),
+    optics: () => buildChoiceGame(container, profId, taskIndex,
+      'Луч света переходит из воздуха (n=1) в стекло (n=1.5). Угол падения 45°. Что произойдёт?',
+      [
+        { text: 'Луч не изменит направления', correct: false, feedback: 'При переходе между средами с разным n луч преломляется' },
+        { text: 'Луч преломится к нормали (угол преломления < 45°)', correct: true, feedback: 'Верно! Закон Снеллиуса: n₁sinθ₁ = n₂sinθ₂' },
+        { text: 'Полное внутреннее отражение', correct: false, feedback: 'ПВО — только из оптически более плотной среды' },
+        { text: 'Луч отразится назад', correct: false, feedback: 'Часть отразится, но основная часть пройдёт' },
+      ]),
+    thermo: () => buildSliderGame(container, profId, taskIndex,
+      '1 кг воды при 20°C нагревают. Рассчитай параметры (удельная теплоёмкость воды = 4200 Дж/(кг·°C)):',
+      [
+        { name: 'Энергия для нагрева до 100°C (кДж)', min: 100, max: 600, correct: [320, 340], unit: 'кДж' },
+        { name: 'Время нагрева чайником 2кВт (сек)', min: 50, max: 300, correct: [160, 170], unit: 'сек' },
+      ]),
+    quantum: () => buildChoiceGame(container, profId, taskIndex,
+      'В квантовом компьютере кубит может быть в состоянии |0⟩, |1⟩ или суперпозиции. Что произойдёт при измерении кубита в суперпозиции |ψ⟩ = (|0⟩ + |1⟩)/√2?',
+      [
+        { text: 'Всегда получим |0⟩', correct: false, feedback: 'Суперпозиция даёт вероятностный результат' },
+        { text: 'Получим |0⟩ или |1⟩ с равной вероятностью 50%', correct: true, feedback: 'Верно! Коэффициенты равны → равные вероятности' },
+        { text: 'Получим оба значения одновременно', correct: false, feedback: 'При измерении суперпозиция коллапсирует' },
+        { text: 'Ничего не произойдёт', correct: false, feedback: 'Измерение всегда даёт результат' },
+      ]),
+  };
+  
+  // Выбираем генератор игры или дефолтный
+  const gameGen = games[type];
+  if (gameGen) {
+    gameGen();
+  } else {
+    // Дефолтная игра-викторина
+    buildDefaultQuiz(container, profId, taskIndex, task);
+  }
+}
+
+// ═══ Генераторы мини-игр ═══════════════════════════════════
+
+// ─── Игра: Выбор ответа ────────────────────────────────────
+function buildChoiceGame(container, profId, taskIndex, question, options) {
+  let answered = false;
+  let html = `<p style="font-size:8px;color:#e0e0e0;margin-bottom:12px;line-height:1.8">${question}</p>`;
+  html += '<div class="minigame-grid" style="grid-template-columns:1fr">';
+  options.forEach((opt, i) => {
+    html += `<div class="minigame-item" id="choice-${i}" style="text-align:left;line-height:1.6">${opt.text}</div>`;
+  });
+  html += '</div><div id="choiceFeedback"></div>';
+  container.innerHTML = html;
+  
+  options.forEach((opt, i) => {
+    document.getElementById(`choice-${i}`).onclick = () => {
+      if (answered) return;
+      answered = true;
+      
+      options.forEach((o, j) => {
+        const el = document.getElementById(`choice-${j}`);
+        if (j === i) el.classList.add(o.correct ? 'correct' : 'wrong');
+        if (o.correct) el.classList.add('correct');
+      });
+      
+      const fb = document.getElementById('choiceFeedback');
+      fb.className = `game-feedback ${opt.correct ? 'good' : 'bad'}`;
+      fb.textContent = opt.feedback;
+      
+      const score = opt.correct ? 100 : 25;
+      setTimeout(() => completeCurrentTask(score), 1500);
+    };
+  });
+}
+
+// ─── Игра: Сортировка ──────────────────────────────────────
+function buildSortGame(container, profId, taskIndex, question, correctOrder) {
+  const shuffled = [...correctOrder].sort(() => Math.random() - 0.5);
+  let items = [...shuffled];
+  
+  function render() {
+    let html = `<p style="font-size:8px;color:#e0e0e0;margin-bottom:12px;line-height:1.8">${question}</p>`;
+    html += '<div id="sortItems">';
+    items.forEach((item, i) => {
+      html += `<div class="minigame-item" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;cursor:pointer" data-idx="${i}">
+        <span style="color:#ffcc00;min-width:16px">${i + 1}.</span>
+        <span style="flex:1;text-align:left;line-height:1.6">${item}</span>
+        <span style="color:#6c6c8e">↕</span>
+      </div>`;
+    });
+    html += '</div>';
+    html += '<button class="btn btn-primary btn-sm btn-block mt-12" id="checkSortBtn" style="margin:12px auto;display:block">ПРОВЕРИТЬ</button>';
+    html += '<div id="sortFeedback"></div>';
+    container.innerHTML = html;
+    
+    // Клик по элементу — перемещаем вверх (упрощённая сортировка)
+    document.querySelectorAll('#sortItems .minigame-item').forEach(el => {
+      el.onclick = () => {
+        const idx = parseInt(el.dataset.idx);
+        if (idx > 0) {
+          [items[idx], items[idx - 1]] = [items[idx - 1], items[idx]];
+          render();
+        }
+      };
+    });
+    
+    document.getElementById('checkSortBtn').onclick = () => {
+      let correct = 0;
+      items.forEach((item, i) => {
+        if (item === correctOrder[i]) correct++;
+      });
+      
+      const score = Math.round((correct / correctOrder.length) * 100);
+      const fb = document.getElementById('sortFeedback');
+      
+      if (score === 100) {
+        fb.className = 'game-feedback good';
+        fb.textContent = 'Идеально! Все элементы на своих местах!';
+      } else {
+        fb.className = 'game-feedback bad';
+        fb.textContent = `${correct}/${correctOrder.length} правильно. Кликай на элемент чтобы переместить его вверх.`;
+        if (score >= 60) {
+          setTimeout(() => completeCurrentTask(score), 1500);
+          return;
+        }
+        return;
+      }
+      
+      setTimeout(() => completeCurrentTask(score), 1500);
+    };
+  }
+  
+  render();
+}
+
+// ─── Игра: Слайдеры ───────────────────────────────────────
+function buildSliderGame(container, profId, taskIndex, question, sliders) {
+  let values = sliders.map(s => Math.round((s.min + s.max) / 2));
+  
+  let html = `<p style="font-size:8px;color:#e0e0e0;margin-bottom:12px;line-height:1.8">${question}</p>`;
+  
+  sliders.forEach((s, i) => {
+    const step = (s.max - s.min) > 100 ? 10 : (s.max - s.min) > 10 ? 1 : 0.5;
+    html += `<div class="minigame-slider">
+      <div style="font-size:7px;color:#aaa;margin-bottom:2px">${s.name}</div>
+      <input type="range" min="${s.min}" max="${s.max}" value="${values[i]}" step="${step}" id="slider-${i}" 
+             oninput="document.getElementById('sliderVal-${i}').textContent=this.value+' ${s.unit}'">
+      <div class="slider-labels">
+        <span>${s.min}${s.unit}</span>
+        <span class="slider-value" id="sliderVal-${i}">${values[i]} ${s.unit}</span>
+        <span>${s.max}${s.unit}</span>
+      </div>
+    </div>`;
+  });
+  
+  html += '<button class="btn btn-primary btn-sm btn-block mt-12" id="checkSliderBtn" style="margin:12px auto;display:block">ПРОВЕРИТЬ</button>';
+  html += '<div id="sliderFeedback"></div>';
+  container.innerHTML = html;
+  
+  document.getElementById('checkSliderBtn').onclick = () => {
+    let totalScore = 0;
+    let feedback = '';
+    
+    sliders.forEach((s, i) => {
+      const val = parseFloat(document.getElementById(`slider-${i}`).value);
+      const [min, max] = s.correct;
+      
+      if (val >= min && val <= max) {
+        totalScore += 100 / sliders.length;
+        feedback += `✅ ${s.name}: ${val}${s.unit} — отлично!\n`;
+      } else {
+        const dist = Math.min(Math.abs(val - min), Math.abs(val - max));
+        const range = s.max - s.min;
+        const closeness = Math.max(0, 1 - (dist / (range * 0.3)));
+        totalScore += (closeness * 100) / sliders.length;
+        feedback += `${closeness > 0.5 ? '🟡' : '❌'} ${s.name}: ${val}${s.unit} (рекомендуемо: ${min}-${max}${s.unit})\n`;
+      }
+    });
+    
+    const score = Math.round(totalScore);
+    const fb = document.getElementById('sliderFeedback');
+    fb.className = `game-feedback ${score >= 60 ? 'good' : 'bad'}`;
+    fb.innerHTML = feedback.replace(/\n/g, '<br>') + `<br><br>Результат: ${score}%`;
+    
+    setTimeout(() => completeCurrentTask(score), 2000);
+  };
+}
+
+// ─── Игра: CSS Builder ─────────────────────────────────────
+function buildCSSGame(container, profId, taskIndex) {
+  const target = { bg: '#3498db', color: '#ffffff', radius: '8', padding: '12', fontSize: '14' };
+  
+  let html = `<p style="font-size:8px;color:#e0e0e0;margin-bottom:8px">Создай кнопку максимально похожую на образец:</p>`;
+  html += `<div style="text-align:center;margin:8px 0;padding:12px;background:#0a0a1a;border-radius:4px">
+    <div style="display:inline-block;background:${target.bg};color:${target.color};border-radius:${target.radius}px;padding:${target.padding}px 24px;font-size:${target.fontSize}px;font-family:sans-serif">ОБРАЗЕЦ</div>
+  </div>`;
+  html += `<div style="text-align:center;margin:8px 0;padding:12px;background:#0a0a1a;border-radius:4px">
+    <div id="previewBtn" style="display:inline-block;background:#888;color:#000;border-radius:0px;padding:8px 24px;font-size:12px;font-family:sans-serif">ТВОЯ КНОПКА</div>
+  </div>`;
+  
+  const controls = [
+    { name: 'Фон', prop: 'background', type: 'color', options: ['#e74c3c','#3498db','#27ae60','#f39c12','#9b59b6','#888888'], correct: '#3498db' },
+    { name: 'Текст', prop: 'color', type: 'color', options: ['#ffffff','#000000','#333333','#ffcc00'], correct: '#ffffff' },
+    { name: 'Скругление', prop: 'borderRadius', type: 'range', min: 0, max: 20, correct: [6, 10], unit: 'px' },
+    { name: 'Отступ', prop: 'padding', type: 'range', min: 4, max: 24, correct: [10, 14], unit: 'px' },
+    { name: 'Размер шрифта', prop: 'fontSize', type: 'range', min: 10, max: 20, correct: [13, 15], unit: 'px' },
+  ];
+  
+  controls.forEach((c, i) => {
+    if (c.type === 'color') {
+      html += `<div style="margin:6px 0"><span style="font-size:7px;color:#aaa">${c.name}:</span><div style="display:flex;gap:4px;margin-top:4px">`;
+      c.options.forEach(clr => {
+        html += `<div class="css-color-opt" data-prop="${c.prop}" data-value="${clr}" style="width:24px;height:24px;background:${clr};border:2px solid #2a1a4e;border-radius:2px;cursor:pointer" onclick="selectCSSColor(this,'${c.prop}','${clr}')"></div>`;
+      });
+      html += `</div></div>`;
+    } else {
+      html += `<div class="minigame-slider"><div style="font-size:7px;color:#aaa">${c.name}</div>
+        <input type="range" min="${c.min}" max="${c.max}" value="${Math.round((c.min+c.max)/2)}" id="css-${c.prop}" 
+               oninput="updateCSSPreview('${c.prop}',this.value,'${c.unit}')">
+      </div>`;
+    }
+  });
+  
+  html += '<button class="btn btn-primary btn-sm btn-block mt-12" onclick="checkCSSGame()" style="margin:12px auto;display:block">ПРОВЕРИТЬ</button>';
+  html += '<div id="cssFeedback"></div>';
+  container.innerHTML = html;
+  
+  // Глобальные функции для CSS-игры
+  window.selectCSSColor = (el, prop, value) => {
+    document.querySelectorAll(`[data-prop="${prop}"]`).forEach(e => e.style.borderColor = '#2a1a4e');
+    el.style.borderColor = '#ffcc00';
+    document.getElementById('previewBtn').style[prop] = value;
+  };
+  
+  window.updateCSSPreview = (prop, value, unit) => {
+    document.getElementById('previewBtn').style[prop] = value + unit;
+  };
+  
+  window.checkCSSGame = () => {
+    let score = 0;
+    const btn = document.getElementById('previewBtn');
+    const style = btn.style;
+    
+    controls.forEach(c => {
+      if (c.type === 'color') {
+        const selected = document.querySelector(`[data-prop="${c.prop}"][style*="border-color: rgb(255, 204, 0)"]`) ||
+                         document.querySelector(`[data-prop="${c.prop}"].selected`);
+        if (selected && selected.dataset.value === c.correct) score += 20;
+      } else {
+        const val = parseFloat(document.getElementById(`css-${c.prop}`).value);
+        if (val >= c.correct[0] && val <= c.correct[1]) score += 20;
+        else if (Math.abs(val - (c.correct[0]+c.correct[1])/2) < 5) score += 10;
+      }
+    });
+    
+    const fb = document.getElementById('cssFeedback');
+    fb.className = `game-feedback ${score >= 60 ? 'good' : 'bad'}`;
+    fb.textContent = score >= 80 ? 'Отлично! Кнопка почти идеальна!' : score >= 60 ? 'Хорошо! Почти попал.' : 'Попробуй подобрать ближе к образцу.';
+    
+    completeCurrentTask(score);
+  };
+}
+
+// ─── Игра: Подбор цвета ───────────────────────────────────
+function buildColorMatchGame(container, profId, taskIndex) {
+  const palettes = [
+    { theme: 'Спокойный медицинский сайт', correct: ['#2196F3','#E3F2FD','#1565C0','#FFFFFF'], wrong: [['#FF0000','#00FF00','#0000FF','#FFFF00'],['#000000','#FF00FF','#FF6600','#00FFFF']] },
+    { theme: 'Энергичный фитнес-приложение', correct: ['#FF5722','#FF9800','#212121','#FFFFFF'], wrong: [['#E8D5B7','#C9B99A','#A09077','#7B6B55'],['#2196F3','#90CAF9','#E3F2FD','#BBDEFB']] },
+    { theme: 'Экологичный бренд', correct: ['#4CAF50','#8BC34A','#F5F5DC','#2E7D32'], wrong: [['#E91E63','#F44336','#9C27B0','#FF5722'],['#607D8B','#455A64','#37474F','#263238']] },
+  ];
+  
+  const p = palettes[Math.floor(Math.random() * palettes.length)];
+  const options = [p.correct, ...p.wrong].sort(() => Math.random() - 0.5);
+  let answered = false;
+  
+  let html = `<p style="font-size:8px;color:#e0e0e0;margin-bottom:12px;line-height:1.8">Тема: "${p.theme}". Какая палитра подходит лучше?</p>`;
+  
+  options.forEach((palette, i) => {
+    html += `<div class="minigame-item" id="palette-${i}" style="display:flex;gap:4px;padding:10px;justify-content:center">`;
+    palette.forEach(c => {
+      html += `<div style="width:40px;height:40px;background:${c};border-radius:2px;border:1px solid #2a2a4e"></div>`;
+    });
+    html += '</div>';
+  });
+  
+  html += '<div id="colorFeedback"></div>';
+  container.innerHTML = html;
+  
+  options.forEach((palette, i) => {
+    document.getElementById(`palette-${i}`).onclick = () => {
+      if (answered) return;
+      answered = true;
+      
+      const isCorrect = palette === p.correct;
+      options.forEach((_, j) => {
+        const el = document.getElementById(`palette-${j}`);
+        if (options[j] === p.correct) el.classList.add('correct');
+        else if (j === i && !isCorrect) el.classList.add('wrong');
+      });
+      
+      const fb = document.getElementById('colorFeedback');
+      fb.className = `game-feedback ${isCorrect ? 'good' : 'bad'}`;
+      fb.textContent = isCorrect ? 'Отлично! Идеальное сочетание для темы!' : 'Эта палитра не передаёт нужное настроение.';
+      
+      completeCurrentTask(isCorrect ? 100 : 30);
+    };
+  });
+}
+
+// ─── Игра: Layout Puzzle ───────────────────────────────────
+function buildLayoutGame(container, profId, taskIndex) {
+  buildChoiceGame(container, profId, taskIndex,
+    'Нужно расположить 3 карточки в ряд с равными отступами. Какое CSS-свойство контейнера использовать?',
+    [
+      { text: 'display: flex; justify-content: space-between', correct: true, feedback: 'Верно! Flexbox с space-between идеально распределит карточки' },
+      { text: 'float: left для каждой карточки', correct: false, feedback: 'Float — устаревший подход, создаёт проблемы' },
+      { text: 'position: absolute для каждой', correct: false, feedback: 'Absolute позиционирование сложно и не адаптивно' },
+      { text: 'margin: auto для каждой', correct: false, feedback: 'Не создаст ряд из 3 элементов' },
+    ]);
+}
+
+// ─── Игра: Отладка кода ───────────────────────────────────
+function buildDebugGame(container, profId, taskIndex) {
+  const bugs = [
+    { code: 'def get_users():\n  users = db.query("SELECT * FROM users")\n  return users\n\ndef get_user(id):\n  user = db.query(f"SELECT * FROM users WHERE id={id}")\n  return user',
+      bugLine: 'f"SELECT * FROM users WHERE id={id}"',
+      fix: 'SQL-инъекция! Нужно использовать параметризованный запрос',
+      options: ['SQL-инъекция в get_user', 'Ошибка синтаксиса в get_users', 'Не закрыто соединение с БД', 'Не импортирован модуль db'],
+      correctIdx: 0 },
+  ];
+  
+  const bug = bugs[0];
+  let html = `<p style="font-size:8px;color:#e0e0e0;margin-bottom:8px">Найди критический баг в этом коде:</p>`;
+  html += `<div class="minigame-code">${bug.code.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>`;
+  html += '<p style="font-size:7px;color:#aaa;margin-bottom:8px">Что здесь не так?</p>';
+  
+  let answered = false;
+  html += '<div class="minigame-grid" style="grid-template-columns:1fr">';
+  bug.options.forEach((opt, i) => {
+    html += `<div class="minigame-item" id="debug-${i}" style="text-align:left;line-height:1.6">${opt}</div>`;
+  });
+  html += '</div><div id="debugFeedback"></div>';
+  container.innerHTML = html;
+  
+  bug.options.forEach((_, i) => {
+    document.getElementById(`debug-${i}`).onclick = () => {
+      if (answered) return;
+      answered = true;
+      
+      const correct = i === bug.correctIdx;
+      document.getElementById(`debug-${i}`).classList.add(correct ? 'correct' : 'wrong');
+      document.getElementById(`debug-${bug.correctIdx}`).classList.add('correct');
+      
+      const fb = document.getElementById('debugFeedback');
+      fb.className = `game-feedback ${correct ? 'good' : 'bad'}`;
+      fb.textContent = correct ? `Верно! ${bug.fix}` : `Неверно. Правильный ответ: ${bug.fix}`;
+      
+      completeCurrentTask(correct ? 100 : 20);
+    };
+  });
+}
+
+// ─── Игра: Проверка паролей ────────────────────────────────
+function buildPasswordGame(container, profId, taskIndex) {
+  const passwords = [
+    { pass: 'admin123', strength: 'weak', reason: 'Словарное слово + простая последовательность' },
+    { pass: 'P@ssw0rd!', strength: 'medium', reason: 'Популярная замена символов, легко подбирается' },
+    { pass: 'jK8#mNp2$qLx', strength: 'strong', reason: 'Случайная комбинация, хорошая длина и разнообразие' },
+    { pass: 'qwerty', strength: 'weak', reason: 'Клавиатурная последовательность, топ-10 паролей в мире' },
+    { pass: 'CorrectHorseBatteryStaple', strength: 'strong', reason: 'Длинная парольная фраза из случайных слов' },
+  ];
+  
+  let currentIdx = 0;
+  let totalScore = 0;
+  
+  function renderPassword() {
+    if (currentIdx >= passwords.length) {
+      const score = Math.round((totalScore / passwords.length) * 100);
+      container.innerHTML = `<div class="game-feedback good">Результат: ${totalScore}/${passwords.length} правильно (${score}%)</div>`;
+      completeCurrentTask(score);
+      return;
+    }
+    
+    const p = passwords[currentIdx];
+    let html = `<p style="font-size:8px;color:#e0e0e0;margin-bottom:8px">Пароль ${currentIdx + 1}/${passwords.length}:</p>`;
+    html += `<div style="text-align:center;font-size:12px;color:#ffcc00;margin:12px 0;word-break:break-all;font-family:monospace">${p.pass}</div>`;
+    html += '<p style="font-size:7px;color:#aaa;margin-bottom:8px">Оцени надёжность:</p>';
+    html += '<div class="minigame-grid" style="grid-template-columns:1fr 1fr 1fr">';
+    ['weak', 'medium', 'strong'].forEach(s => {
+      const labels = { weak: '🔴 Слабый', medium: '🟡 Средний', strong: '🟢 Сильный' };
+      html += `<div class="minigame-item" id="pw-${s}">${labels[s]}</div>`;
+    });
+    html += '</div><div id="pwFeedback"></div>';
+    container.innerHTML = html;
+    
+    ['weak', 'medium', 'strong'].forEach(s => {
+      document.getElementById(`pw-${s}`).onclick = () => {
+        const correct = s === p.strength;
+        if (correct) totalScore++;
+        
+        document.getElementById(`pw-${s}`).classList.add(correct ? 'correct' : 'wrong');
+        document.getElementById(`pw-${p.strength}`).classList.add('correct');
+        
+        const fb = document.getElementById('pwFeedback');
+        fb.className = `game-feedback ${correct ? 'good' : 'bad'}`;
+        fb.textContent = p.reason;
+        
+        setTimeout(() => { currentIdx++; renderPassword(); }, 1200);
+      };
+    });
+  }
+  
+  renderPassword();
+}
+
+// ─── Игра: Фишинг-детектор ────────────────────────────────
+function buildPhishingGame(container, profId, taskIndex) {
+  const emails = [
+    { from: 'support@sberbank.ru', subject: 'Подтверждение транзакции', phishing: false, hint: 'Официальный домен банка' },
+    { from: 'sberbank-support@mail.ru', subject: 'СРОЧНО! Ваш счёт заблокирован!!!', phishing: true, hint: 'Фейковый адрес на mail.ru + давление срочностью' },
+    { from: 'no-reply@gosuslugi.ru', subject: 'Налоговое уведомление', phishing: false, hint: 'Официальный домен Госуслуг' },
+    { from: 'g0suslugi-online@yandex.ru', subject: 'Выплата 10 000₽, подтвердите данные', phishing: true, hint: 'Подменён символ "о" на "0", левый домен, обещание денег' },
+  ];
+  
+  let currentIdx = 0;
+  let totalScore = 0;
+  
+  function renderEmail() {
+    if (currentIdx >= emails.length) {
+      const score = Math.round((totalScore / emails.length) * 100);
+      container.innerHTML = `<div class="game-feedback good">Результат: ${totalScore}/${emails.length} правильно (${score}%)</div>`;
+      completeCurrentTask(score);
+      return;
+    }
+    
+    const e = emails[currentIdx];
+    let html = `<p style="font-size:8px;color:#e0e0e0;margin-bottom:8px">Письмо ${currentIdx + 1}/${emails.length}:</p>`;
+    html += `<div style="background:#0a0a1a;border:1px solid #2a2a4e;border-radius:4px;padding:10px;margin:8px 0">
+      <div style="font-size:7px;color:#6c6c8e">От: <span style="color:#e0e0e0">${e.from}</span></div>
+      <div style="font-size:8px;color:#ffcc00;margin-top:4px">${e.subject}</div>
+    </div>`;
+    html += '<div class="minigame-grid" style="grid-template-columns:1fr 1fr">';
+    html += `<div class="minigame-item" id="ph-legit" style="color:#27ae60">✓ Настоящее</div>`;
+    html += `<div class="minigame-item" id="ph-phish" style="color:#e74c3c">⚠ Фишинг</div>`;
+    html += '</div><div id="phFeedback"></div>';
+    container.innerHTML = html;
+    
+    ['legit', 'phish'].forEach(choice => {
+      document.getElementById(`ph-${choice}`).onclick = () => {
+        const correct = (choice === 'phish') === e.phishing;
+        if (correct) totalScore++;
+        
+        document.getElementById(`ph-${choice}`).classList.add(correct ? 'correct' : 'wrong');
+        
+        const fb = document.getElementById('phFeedback');
+        fb.className = `game-feedback ${correct ? 'good' : 'bad'}`;
+        fb.textContent = e.hint;
+        
+        setTimeout(() => { currentIdx++; renderEmail(); }, 1200);
+      };
+    });
+  }
+  
+  renderEmail();
+}
+
+// ─── Игра: Робот-лабиринт ─────────────────────────────────
+function buildRobotMazeGame(container, profId, taskIndex) {
+  const maze = [
+    [0,0,1,0,0],
+    [1,0,1,0,1],
+    [0,0,0,0,0],
+    [0,1,1,1,0],
+    [0,0,0,0,0],
+  ];
+  const start = { x: 0, y: 0 };
+  const end = { x: 4, y: 4 };
+  let pos = { ...start };
+  let commands = [];
+  let maxCommands = 10;
+  
+  function render() {
+    let html = `<p style="font-size:8px;color:#e0e0e0;margin-bottom:8px">Запрограммируй путь робота (🤖→🏁). Стены: ⬛</p>`;
+    html += '<div style="display:grid;grid-template-columns:repeat(5,36px);gap:2px;justify-content:center;margin:8px 0">';
+    
+    for (let y = 0; y < 5; y++) {
+      for (let x = 0; x < 5; x++) {
+        let cell = '';
+        let bg = '#1a1a3e';
+        if (maze[y][x] === 1) { bg = '#2a2a4e'; cell = '⬛'; }
+        if (x === pos.x && y === pos.y) { cell = '🤖'; bg = '#1a3a2e'; }
+        if (x === end.x && y === end.y && !(x === pos.x && y === pos.y)) { cell = '🏁'; }
+        html += `<div style="width:36px;height:36px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:16px;border-radius:2px">${cell}</div>`;
+      }
+    }
+    html += '</div>';
+    
+    html += `<div style="font-size:7px;color:#aaa;text-align:center;margin:4px 0">Команды: ${commands.length}/${maxCommands}</div>`;
+    html += `<div style="display:flex;gap:4px;justify-content:center;margin:8px 0;flex-wrap:wrap">`;
+    commands.forEach((c, i) => {
+      const arrows = { up: '⬆', down: '⬇', left: '⬅', right: '➡' };
+      html += `<span style="font-size:14px">${arrows[c]}</span>`;
+    });
+    html += '</div>';
+    
+    html += '<div style="display:grid;grid-template-columns:repeat(3,40px);gap:4px;justify-content:center;margin:8px 0">';
+    html += '<div></div><div class="minigame-item" style="font-size:14px;padding:6px" id="cmd-up">⬆</div><div></div>';
+    html += '<div class="minigame-item" style="font-size:14px;padding:6px" id="cmd-left">⬅</div>';
+    html += '<div class="minigame-item" style="font-size:14px;padding:6px" id="cmd-run">▶</div>';
+    html += '<div class="minigame-item" style="font-size:14px;padding:6px" id="cmd-right">➡</div>';
+    html += '<div></div><div class="minigame-item" style="font-size:14px;padding:6px" id="cmd-down">⬇</div><div></div>';
+    html += '</div>';
+    html += '<button class="btn btn-sm" style="margin:4px auto;display:block;font-size:7px" id="cmd-clear">ОЧИСТИТЬ</button>';
+    html += '<div id="mazeFeedback"></div>';
+    container.innerHTML = html;
+    
+    ['up','down','left','right'].forEach(dir => {
+      document.getElementById(`cmd-${dir}`).onclick = () => {
+        if (commands.length < maxCommands) { commands.push(dir); render(); }
+      };
+    });
+    
+    document.getElementById('cmd-clear').onclick = () => { commands = []; pos = { ...start }; render(); };
+    document.getElementById('cmd-run').onclick = executeCommands;
+  }
+  
+  function executeCommands() {
+    pos = { ...start };
+    let step = 0;
+    let success = false;
+    
+    const interval = setInterval(() => {
+      if (step >= commands.length) {
+        clearInterval(interval);
+        success = pos.x === end.x && pos.y === end.y;
+        const score = success ? Math.max(100 - (commands.length - 8) * 10, 60) : 20;
+        
+        const fb = document.getElementById('mazeFeedback');
+        fb.className = `game-feedback ${success ? 'good' : 'bad'}`;
+        fb.textContent = success ? `Робот дошёл за ${commands.length} шагов!` : 'Робот не дошёл до цели. Попробуй ещё!';
+        
+        if (success) setTimeout(() => completeCurrentTask(score), 1500);
+        return;
+      }
+      
+      const dir = commands[step];
+      const moves = { up: {x:0,y:-1}, down: {x:0,y:1}, left: {x:-1,y:0}, right: {x:1,y:0} };
+      const nx = pos.x + moves[dir].x;
+      const ny = pos.y + moves[dir].y;
+      
+      if (nx >= 0 && nx < 5 && ny >= 0 && ny < 5 && maze[ny][nx] !== 1) {
+        pos = { x: nx, y: ny };
+      }
+      
+      step++;
+      render();
+    }, 300);
+  }
+  
+  render();
+}
+
+// ─── Дефолтная викторина ───────────────────────────────────
+function buildDefaultQuiz(container, profId, taskIndex, task) {
+  buildChoiceGame(container, profId, taskIndex,
+    `Задание по профессии: ${task.description}. Какой подход правильный?`,
+    [
+      { text: 'Изучить теорию и практику, затем применить', correct: true, feedback: 'Верно! Системный подход — основа любой профессии' },
+      { text: 'Делать наугад', correct: false, feedback: 'Без знаний результат непредсказуем' },
+      { text: 'Попросить кого-то сделать за тебя', correct: false, feedback: 'Так ты ничему не научишься' },
+      { text: 'Отложить на потом', correct: false, feedback: 'Прокрастинация — враг развития' },
+    ]);
+}
+
+// ─── Завершение задания ────────────────────────────────────
+async function completeCurrentTask(score) {
+  if (!STATE.currentProfession || STATE.currentTask === null) return;
+  
+  try {
+    const result = await api('/api/professions/complete-task', 'POST', {
+      telegram_id: STATE.telegramId,
+      profession_id: STATE.currentProfession,
+      task_index: STATE.currentTask,
+      score: Math.min(100, Math.max(0, score)),
+    });
+    
+    if (result.success) {
+      STATE.userProfessions[STATE.currentProfession] = {
+        unlocked: true,
+        tasks_completed: result.tasks_completed,
+      };
+      
+      STATE.user.level = result.level;
+      
+      const prof = STATE.professions[STATE.currentProfession];
+      const task = prof.tasks[STATE.currentTask];
+      const scoreMultiplier = score / 100;
+      
+      showModal('Задание выполнено!',
+        `${task.title}<br><br>` +
+        `Оценка: ${score}%<br>` +
+        `🪙 +${result.coins_earned} монет<br>` +
+        `⭐ +${result.xp_earned} XP` +
+        (result.leveled_up ? `<br><br>🎉 Новый уровень: ${result.level}!` : ''),
+        'ОТЛИЧНО!',
+        () => openProfession(STATE.currentProfession)
+      );
+      
+      // Обновляем данные пользователя
+      STATE.user = await api(`/api/user/${STATE.telegramId}`);
+    }
+  } catch (e) {
+    // Задание уже выполнено или другая ошибка
+    showModal('Информация', e.message || 'Ошибка при сохранении', 'ОК', () => openProfession(STATE.currentProfession));
+  }
+}
+
+// ─── Улучшения ─────────────────────────────────────────────
+async function renderUpgrades() {
+  try {
+    const upgrades = await api(`/api/upgrades/${STATE.telegramId}`);
+    const list = document.getElementById('upgradeList');
+    let html = `<div style="text-align:center;font-size:8px;color:#aaa;margin-bottom:12px">Монеты: 🪙 ${formatNum(STATE.user?.coins || 0)}</div>`;
+    
+    for (const [id, up] of Object.entries(upgrades)) {
+      const canAfford = STATE.user && STATE.user.coins >= up.cost;
+      const maxed = !up.can_upgrade;
+      
+      html += `<div class="upgrade-card">
+        <div class="up-icon">${up.icon}</div>
+        <div class="up-info">
+          <div class="up-name">${up.name}</div>
+          <div class="up-desc">${up.description}</div>
+          <div class="up-level">Ур. ${up.current_level}/${up.max_level}</div>
+        </div>
+        <div class="up-buy">
+          ${maxed 
+            ? '<span style="font-size:7px;color:#27ae60">МАКС</span>' 
+            : `<button class="btn btn-sm ${canAfford ? 'btn-gold' : 'btn-primary'}" 
+                       ${!canAfford ? 'disabled' : ''} 
+                       onclick="buyUpgrade('${id}')">🪙${formatNum(up.cost)}</button>`}
+        </div>
+      </div>`;
+    }
+    
+    list.innerHTML = html;
+  } catch (e) {
+    console.error('Upgrades error:', e);
+  }
+}
+
+async function buyUpgrade(id) {
+  try {
+    const result = await api('/api/upgrades/buy', 'POST', {
+      telegram_id: STATE.telegramId,
+      upgrade_id: id,
+    });
+    
+    if (result.success) {
+      STATE.user = await api(`/api/user/${STATE.telegramId}`);
+      updateUI();
+      renderUpgrades();
+      
+      showModal('Улучшено!', `Уровень: ${result.new_level}`, 'КРУТО!');
+    }
+  } catch (e) {
+    showModal('Ошибка', e.message);
+  }
+}
+
+// ─── Модальные окна ────────────────────────────────────────
+function showModal(title, text, btnText = 'ОК', callback = null) {
+  const overlay = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  
+  content.innerHTML = `
+    <h2>${title}</h2>
+    <p>${text}</p>
+    <button class="btn btn-gold btn-sm" id="modalBtn">${btnText}</button>
+  `;
+  
+  overlay.classList.add('active');
+  
+  document.getElementById('modalBtn').onclick = () => {
+    overlay.classList.remove('active');
+    if (callback) callback();
+  };
+  
+  overlay.onclick = (e) => {
+    if (e.target === overlay) {
+      overlay.classList.remove('active');
+      if (callback) callback();
+    }
+  };
+}
+
+// ─── Запуск приложения ─────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initTapper();
+  
+  // Загружаем с задержкой для анимации
+  setTimeout(() => loadApp(), 800);
+});
+</script>
+</body>
+</html>
