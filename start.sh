@@ -1,6 +1,3 @@
 #!/bin/bash
-# Запускаем Telegram бота в фоне
-python bot.py &
-
-# Запускаем FastAPI сервер (основной процесс)
+# Запускаем только FastAPI сервер
 python main.py
