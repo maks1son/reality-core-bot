@@ -2,1697 +2,1576 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>RE:ALITY — Профессии</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-/* ============ ОБЩИЕ СТИЛИ ============ */
-* { margin:0; padding:0; box-sizing:border-box; }
-:root {
-  --bg: #0a0a1a;
-  --bg2: #12122a;
-  --bg3: #1a1a3a;
-  --primary: #ffcc00;
-  --secondary: #00ccff;
-  --accent: #ff6699;
-  --green: #33ff66;
-  --red: #ff4444;
-  --text: #e0e0ff;
-  --text2: #8888aa;
-  --pixel-border: 3px solid var(--primary);
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0b0b1e;--bg2:#131336;--bg3:#1b1b4a;--bg4:#252560;
+  --pri:#ffd700;--sec:#00e5ff;--acc:#ff4d9a;--grn:#00ff87;--red:#ff3b3b;
+  --txt:#d8d8ff;--txt2:#6a6a99;
+  --glow:0 0 10px rgba(255,215,0,0.3);
 }
-body {
-  font-family: 'Press Start 2P', monospace;
-  background: var(--bg);
-  color: var(--text);
-  max-width: 420px;
-  margin: 0 auto;
-  min-height: 100vh;
-  overflow-x: hidden;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
+body{
+  font-family:'Press Start 2P',monospace;background:var(--bg);color:var(--txt);
+  max-width:420px;margin:0 auto;min-height:100vh;overflow-x:hidden;
+  user-select:none;-webkit-tap-highlight-color:transparent;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px,rgba(255,255,255,0.15),transparent),
+    radial-gradient(1px 1px at 40px 70px,rgba(255,255,255,0.1),transparent),
+    radial-gradient(1px 1px at 50px 160px,rgba(255,255,255,0.12),transparent),
+    radial-gradient(1px 1px at 90px 40px,rgba(255,255,255,0.08),transparent),
+    radial-gradient(1.5px 1.5px at 130px 80px,rgba(0,229,255,0.15),transparent),
+    radial-gradient(1px 1px at 160px 120px,rgba(255,255,255,0.1),transparent),
+    radial-gradient(1px 1px at 200px 50px,rgba(255,215,0,0.1),transparent),
+    radial-gradient(1px 1px at 280px 90px,rgba(255,255,255,0.08),transparent),
+    radial-gradient(1.5px 1.5px at 320px 150px,rgba(255,77,154,0.12),transparent),
+    radial-gradient(1px 1px at 370px 30px,rgba(255,255,255,0.1),transparent);
+  background-size:400px 200px;
+  animation:starScroll 60s linear infinite;
 }
-/* Отключаем все нежелательные мобильные поведения */
-input { font-family: 'Press Start 2P', monospace; }
+@keyframes starScroll{0%{background-position:0 0}100%{background-position:0 600px}}
+input,textarea,select{font-family:'Press Start 2P',monospace}
 
-/* Пиксельная рамка */
-.pixel-box {
-  background: var(--bg2);
-  border: 3px solid var(--primary);
-  box-shadow: 6px 6px 0 rgba(0,0,0,0.5), inset 0 0 20px rgba(255,204,0,0.05);
-  padding: 12px;
-  margin: 8px;
-  image-rendering: pixelated;
-}
-.pixel-btn {
-  font-family: 'Press Start 2P', monospace;
-  background: var(--bg3);
-  color: var(--primary);
-  border: 3px solid var(--primary);
-  padding: 10px 16px;
-  font-size: 10px;
-  cursor: pointer;
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
-  transition: all 0.1s;
-  text-transform: uppercase;
-  width: 100%;
-  text-align: center;
-}
-.pixel-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-}
-.pixel-btn:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-.pixel-btn.accent { border-color: var(--accent); color: var(--accent); }
-.pixel-btn.green { border-color: var(--green); color: var(--green); }
-.pixel-btn.secondary { border-color: var(--secondary); color: var(--secondary); }
+.pixel-box{background:var(--bg2);border:2px solid var(--bg4);border-radius:4px;padding:10px;margin:6px 8px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.03)}
+.btn{font-family:'Press Start 2P',monospace;background:var(--bg3);color:var(--pri);
+  border:2px solid var(--pri);padding:10px 14px;font-size:9px;cursor:pointer;
+  border-radius:3px;transition:all .15s;text-align:center;width:100%;
+  box-shadow:0 2px 0 rgba(0,0,0,0.5)}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.acc{border-color:var(--acc);color:var(--acc)}
+.btn.grn{border-color:var(--grn);color:var(--grn)}
+.btn.sec{border-color:var(--sec);color:var(--sec)}
+.btn.filled{background:var(--pri);color:var(--bg);border-color:var(--pri)}
+.btn.filled:active{background:#ccac00}
 
-/* Прогресс-бар */
-.progress-bar {
-  width: 100%;
-  height: 14px;
-  background: var(--bg);
-  border: 2px solid var(--text2);
-  position: relative;
-  overflow: hidden;
-}
-.progress-bar .fill {
-  height: 100%;
-  transition: width 0.3s;
-}
-.progress-bar .fill.xp { background: var(--secondary); }
-.progress-bar .fill.energy { background: var(--green); }
+.bar{width:100%;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;border:1px solid var(--bg4)}
+.bar .fill{height:100%;border-radius:3px;transition:width .3s}
+.bar .fill.xp{background:linear-gradient(90deg,#0066ff,var(--sec))}
+.bar .fill.en{background:linear-gradient(90deg,#00aa44,var(--grn))}
+.bar .fill.prog{background:linear-gradient(90deg,var(--pri),#ffaa00)}
 
-/* Скрытие экранов */
-.screen { display: none; flex-direction: column; min-height: 100vh; padding-bottom: 70px; }
-.screen.active { display: flex; }
+.screen{display:none;flex-direction:column;min-height:100vh;padding-bottom:62px}
+.screen.active{display:flex}
 
-/* Нижняя навигация */
-#navbar {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 420px;
-  display: flex;
-  background: var(--bg2);
-  border-top: 3px solid var(--primary);
-  z-index: 100;
-}
-#navbar .nav-btn {
-  flex: 1;
-  padding: 8px 4px;
-  text-align: center;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: var(--text2);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-#navbar .nav-btn.active { color: var(--primary); background: var(--bg3); }
-#navbar .nav-btn span { display: block; font-size: 16px; margin-bottom: 2px; }
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;
+  display:flex;background:var(--bg2);border-top:2px solid var(--bg4);z-index:100;
+  box-shadow:0 -4px 20px rgba(0,0,0,0.5)}
+#nav .nb{flex:1;padding:7px 2px;text-align:center;font-family:'Press Start 2P',monospace;
+  font-size:6px;color:var(--txt2);background:none;border:none;cursor:pointer;transition:.2s}
+#nav .nb.on{color:var(--pri);background:var(--bg3)}
+#nav .nb i{display:block;font-size:14px;margin-bottom:1px;font-style:normal}
 
-/* ============ ЭКРАН РЕГИСТРАЦИИ ============ */
-#register-screen {
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-}
-#register-screen h1 {
-  font-size: 16px;
-  color: var(--primary);
-  text-align: center;
-  margin-bottom: 4px;
-  text-shadow: 2px 2px 0 #664400;
-}
-#register-screen .subtitle {
-  font-size: 8px;
-  color: var(--secondary);
-  text-align: center;
-  margin-bottom: 16px;
-}
-.avatar-select {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin: 12px 0;
-}
-.avatar-option {
-  width: 80px;
-  height: 80px;
-  border: 3px solid var(--text2);
-  cursor: pointer;
-  image-rendering: pixelated;
-  transition: all 0.2s;
-  background: var(--bg3);
-  padding: 4px;
-}
-.avatar-option.selected {
-  border-color: var(--primary);
-  box-shadow: 0 0 12px rgba(255,204,0,0.5);
-  transform: scale(1.1);
-}
-.avatar-option img { width: 100%; height: 100%; image-rendering: pixelated; object-fit: contain; }
-.name-input {
-  width: 100%;
-  background: var(--bg);
-  border: 3px solid var(--secondary);
-  color: var(--text);
-  padding: 10px;
-  font-size: 12px;
-  text-align: center;
-  outline: none;
-}
-.name-input:focus { border-color: var(--primary); }
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin: 12px 0;
-}
-.stat-item {
-  background: var(--bg3);
-  border: 2px solid var(--text2);
-  padding: 8px;
-  text-align: center;
-}
-.stat-item .stat-name { font-size: 7px; color: var(--secondary); margin-bottom: 6px; display: block; }
-.stat-item .stat-controls { display: flex; align-items: center; justify-content: center; gap: 8px; }
-.stat-item .stat-val { font-size: 14px; color: var(--primary); min-width: 24px; }
-.stat-item button {
-  font-family: 'Press Start 2P', monospace;
-  width: 28px;
-  height: 28px;
-  background: var(--bg);
-  color: var(--primary);
-  border: 2px solid var(--primary);
-  cursor: pointer;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.stat-item button:disabled { opacity: 0.3; }
-.points-left { font-size: 9px; color: var(--accent); text-align: center; margin: 6px 0; }
+/* Регистрация */
+#reg-screen{justify-content:center;align-items:center;padding:14px}
+#reg-screen h1{font-size:18px;color:var(--pri);text-align:center;text-shadow:0 0 20px rgba(255,215,0,0.4)}
+.reg-sub{font-size:7px;color:var(--sec);text-align:center;margin:4px 0 14px;letter-spacing:2px}
+.av-sel{display:flex;gap:10px;justify-content:center;margin:10px 0}
+.av-opt{width:72px;height:72px;border:2px solid var(--bg4);cursor:pointer;border-radius:4px;
+  background:var(--bg3);padding:4px;transition:.2s;image-rendering:pixelated}
+.av-opt.sel{border-color:var(--pri);box-shadow:var(--glow);transform:scale(1.08)}
+.av-opt img{width:100%;height:100%;image-rendering:pixelated;object-fit:contain}
+.nm-inp{width:100%;background:var(--bg);border:2px solid var(--bg4);color:var(--txt);
+  padding:10px;font-size:11px;text-align:center;border-radius:3px;outline:none}
+.nm-inp:focus{border-color:var(--sec)}
+.st-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.st-item{background:var(--bg3);border:1px solid var(--bg4);padding:8px;text-align:center;border-radius:3px}
+.st-item .sn{font-size:6px;color:var(--sec);margin-bottom:5px;display:block}
+.st-item .sc{display:flex;align-items:center;justify-content:center;gap:6px}
+.st-item .sv{font-size:14px;color:var(--pri);min-width:20px}
+.st-item button{width:26px;height:26px;background:var(--bg);color:var(--pri);
+  border:1px solid var(--pri);cursor:pointer;font-size:12px;border-radius:2px;
+  display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace}
+.st-item button:disabled{opacity:.25}
+.pts{font-size:8px;color:var(--acc);text-align:center;margin:4px 0}
 
-/* ============ ГЛАВНЫЙ ЭКРАН (ТАПАЛКА) ============ */
-#main-screen { padding: 8px; }
-.top-panel {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-}
-.top-panel .user-info { flex: 1; }
-.top-panel .user-name { font-size: 10px; color: var(--primary); }
-.top-panel .user-level { font-size: 7px; color: var(--secondary); margin-top: 2px; }
-.top-panel .user-avatar {
-  width: 40px;
-  height: 40px;
-  image-rendering: pixelated;
-  border: 2px solid var(--primary);
-}
+/* Главная */
+#main-screen{padding:6px}
+.top-bar{display:flex;align-items:center;gap:6px;padding:4px 8px}
+.top-bar img{width:36px;height:36px;image-rendering:pixelated;border:2px solid var(--pri);border-radius:3px}
+.top-bar .info{flex:1}
+.top-bar .uname{font-size:9px;color:var(--pri)}
+.top-bar .ulvl{font-size:6px;color:var(--sec);margin-top:1px}
 
-.resources-bar {
-  display: flex;
-  gap: 6px;
-  padding: 6px 8px;
-  flex-wrap: wrap;
-}
-.resource {
-  background: var(--bg3);
-  border: 2px solid var(--text2);
-  padding: 5px 8px;
-  font-size: 7px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex: 1;
-  min-width: 80px;
-}
-.resource .r-icon { font-size: 12px; }
-.resource .r-val { color: var(--primary); }
+.en-bar-wrap{padding:2px 8px;display:flex;align-items:center;gap:6px}
+.en-bar-wrap .bar{flex:1;height:6px}
+.en-bar-wrap span{font-size:5px;color:var(--txt2);min-width:45px;text-align:right}
 
-.xp-section { padding: 4px 8px; }
-.xp-label { font-size: 7px; color: var(--text2); margin-bottom: 3px; }
+.xp-wrap{padding:2px 8px;display:flex;align-items:center;gap:6px}
+.xp-wrap .bar{flex:1}
+.xp-wrap span{font-size:5px;color:var(--txt2);min-width:50px;text-align:right}
 
-.tap-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  min-height: 300px;
-  position: relative;
-}
-.tap-character {
-  width: 140px;
-  height: 140px;
-  image-rendering: pixelated;
-  cursor: pointer;
-  animation: breathe 2s ease-in-out infinite;
-  transition: transform 0.08s;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-.tap-character:active { transform: scale(0.92); }
-@keyframes breathe {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.03); }
-}
+.res-bar{display:flex;gap:4px;padding:4px 8px}
+.res{background:var(--bg3);border:1px solid var(--bg4);padding:5px 8px;font-size:6px;
+  display:flex;align-items:center;gap:3px;flex:1;border-radius:3px}
+.res .rv{color:var(--pri)}
 
-.energy-section { padding: 4px 16px; width: 100%; }
-.energy-label { font-size: 7px; color: var(--text2); margin-bottom: 3px; display: flex; justify-content: space-between; }
+.tap-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:10px;min-height:280px;position:relative;touch-action:manipulation}
+.tap-char{width:130px;height:130px;image-rendering:pixelated;cursor:pointer;
+  animation:breathe 2.5s ease-in-out infinite;filter:drop-shadow(0 0 15px rgba(255,215,0,0.2))}
+.tap-char:active{animation:none;transform:scale(.92)}
+@keyframes breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.025)}}
 
-.combo-display {
-  font-size: 10px;
-  color: var(--accent);
-  text-align: center;
-  margin-top: 8px;
-  min-height: 16px;
-}
+.mult-display{font-size:18px;color:var(--pri);text-align:center;margin-top:6px;min-height:24px;
+  text-shadow:0 0 10px rgba(255,215,0,0.5);transition:all .15s}
+.mult-display.hot{color:var(--acc);text-shadow:0 0 15px rgba(255,77,154,0.6)}
+.mult-display.fire{color:var(--red);text-shadow:0 0 20px rgba(255,59,59,0.7);animation:pulse .3s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
 
-/* Анимация получения монет */
-.coin-popup {
-  position: absolute;
-  font-size: 12px;
-  color: var(--primary);
-  pointer-events: none;
-  animation: coinFloat 0.8s ease-out forwards;
-  text-shadow: 1px 1px 0 #000;
-  z-index: 50;
-}
-@keyframes coinFloat {
-  0% { opacity: 1; transform: translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
-}
+.coin-pop{position:absolute;font-size:11px;color:var(--pri);pointer-events:none;
+  animation:coinUp .7s ease-out forwards;text-shadow:1px 1px 0 #000;z-index:50;font-family:'Press Start 2P',monospace}
+@keyframes coinUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-50px) scale(1.2)}}
 
-/* ============ ЭКРАН ПРОФЕССИЙ ============ */
-#professions-screen { padding: 8px; }
-#professions-screen h2 {
-  font-size: 12px;
-  color: var(--primary);
-  text-align: center;
-  margin: 8px;
-}
-.spheres-list { display: flex; flex-direction: column; gap: 8px; padding: 4px; }
-.sphere-card {
-  background: var(--bg2);
-  border: 3px solid var(--text2);
-  padding: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.sphere-card:active { border-color: var(--primary); transform: scale(0.98); }
-.sphere-card .s-icon { font-size: 28px; }
-.sphere-card .s-name { font-size: 9px; color: var(--text); }
-.sphere-card .s-count { font-size: 7px; color: var(--text2); margin-top: 3px; }
+/* Профессии */
+#prof-screen{padding:6px}
+.scr-title{font-size:11px;color:var(--pri);text-align:center;margin:8px;text-shadow:0 0 10px rgba(255,215,0,0.3)}
+.sph-list{display:flex;flex-direction:column;gap:6px;padding:2px 4px}
+.sph-card{background:var(--bg2);border:2px solid var(--bg4);padding:10px;cursor:pointer;
+  display:flex;align-items:center;gap:10px;border-radius:4px;transition:.2s}
+.sph-card:active{border-color:var(--pri);transform:scale(.98)}
+.sph-card .si{font-size:24px}.sph-card .sn{font-size:8px;color:var(--txt)}
+.sph-card .sc{font-size:6px;color:var(--txt2);margin-top:2px}
 
-/* Список профессий в сфере */
-.prof-list { display: flex; flex-direction: column; gap: 6px; padding: 4px; }
-.prof-card {
-  background: var(--bg3);
-  border: 2px solid var(--text2);
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.prof-card.unlocked { border-color: var(--green); }
-.prof-card .p-icon { font-size: 22px; }
-.prof-card .p-info { flex: 1; }
-.prof-card .p-name { font-size: 8px; color: var(--text); }
-.prof-card .p-status { font-size: 6px; margin-top: 3px; }
-.prof-card .p-status.locked { color: var(--accent); }
-.prof-card .p-status.open { color: var(--green); }
+.prof-list{display:flex;flex-direction:column;gap:5px;padding:2px}
+.prof-card{background:var(--bg3);border:1px solid var(--bg4);padding:10px;
+  display:flex;align-items:center;gap:8px;cursor:pointer;border-radius:3px;transition:.2s}
+.prof-card.open{border-color:var(--grn)}
+.prof-card .pi{font-size:20px}.prof-card .pn{font-size:7px}
+.prof-card .ps{font-size:5px;margin-top:2px}
+.prof-card .ps.lk{color:var(--acc)}.prof-card .ps.op{color:var(--grn)}
 
-/* Детальный экран профессии */
-.prof-detail { padding: 4px; }
-.prof-detail .pd-header { text-align: center; margin: 8px 0; }
-.prof-detail .pd-icon { font-size: 40px; }
-.prof-detail .pd-name { font-size: 11px; color: var(--primary); margin: 6px 0; }
-.prof-detail .pd-desc { font-size: 7px; color: var(--text2); line-height: 1.6; }
-.pd-tools { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 0; }
-.pd-tools .tool-tag {
-  background: var(--bg);
-  border: 1px solid var(--secondary);
-  color: var(--secondary);
-  font-size: 6px;
-  padding: 4px 8px;
-}
-.task-list { display: flex; flex-direction: column; gap: 6px; }
-.task-card {
-  background: var(--bg3);
-  border: 2px solid var(--text2);
-  padding: 10px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.task-card.completed { border-color: var(--green); opacity: 0.7; }
-.task-card.locked { opacity: 0.4; cursor: default; }
-.task-card .t-num {
-  width: 28px;
-  height: 28px;
-  border: 2px solid var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  color: var(--primary);
-  flex-shrink: 0;
-}
-.task-card.completed .t-num { border-color: var(--green); color: var(--green); }
-.task-card .t-info { flex: 1; }
-.task-card .t-title { font-size: 8px; color: var(--text); }
-.task-card .t-desc { font-size: 6px; color: var(--text2); margin-top: 3px; }
+.back-b{background:none;border:none;color:var(--sec);font-family:'Press Start 2P',monospace;
+  font-size:7px;cursor:pointer;padding:6px;display:flex;align-items:center;gap:3px}
 
-.back-btn {
-  background: none;
-  border: none;
-  color: var(--secondary);
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+.pd-hdr{text-align:center;margin:6px 0}
+.pd-hdr .pdi{font-size:36px}.pd-hdr .pdn{font-size:10px;color:var(--pri);margin:5px 0}
+.pd-hdr .pdd{font-size:6px;color:var(--txt2);line-height:1.6}
+.pd-tools{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin:8px 0}
+.pd-tools span{background:var(--bg);border:1px solid var(--sec);color:var(--sec);
+  font-size:5px;padding:3px 6px;border-radius:2px}
 
-/* ============ ЭКРАН УЛУЧШЕНИЙ ============ */
-#upgrades-screen { padding: 8px; }
-#upgrades-screen h2 { font-size: 12px; color: var(--primary); text-align: center; margin: 8px; }
-.upgrade-list { display: flex; flex-direction: column; gap: 8px; padding: 4px; }
-.upgrade-card {
-  background: var(--bg2);
-  border: 3px solid var(--text2);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.upgrade-card .u-header { display: flex; align-items: center; gap: 8px; }
-.upgrade-card .u-icon { font-size: 24px; }
-.upgrade-card .u-name { font-size: 9px; color: var(--text); }
-.upgrade-card .u-level { font-size: 7px; color: var(--secondary); margin-top: 2px; }
-.upgrade-card .u-desc { font-size: 7px; color: var(--text2); line-height: 1.4; }
-.upgrade-card .u-cost { font-size: 8px; color: var(--primary); }
+.prog-section{padding:4px 8px;margin:4px 0}
+.prog-label{font-size:6px;color:var(--txt2);margin-bottom:3px;display:flex;justify-content:space-between}
 
-/* ============ ЭКРАН ЗАДАНИЯ (МИНИ-ИГРА) ============ */
-#task-screen { padding: 8px; }
-.task-game { padding: 8px; }
-.task-game h3 { font-size: 10px; color: var(--primary); text-align: center; margin: 8px 0; }
-.task-game .task-desc { font-size: 7px; color: var(--text2); text-align: center; margin-bottom: 12px; line-height: 1.6; }
-.task-game .task-content { min-height: 200px; }
+.task-list{display:flex;flex-direction:column;gap:5px}
+.task-card{background:var(--bg3);border:1px solid var(--bg4);padding:9px;cursor:pointer;
+  display:flex;align-items:center;gap:7px;border-radius:3px;transition:.2s}
+.task-card.done{border-color:var(--grn);opacity:.65}
+.task-card.locked{opacity:.35;cursor:default}
+.task-card .tn{width:24px;height:24px;border:2px solid var(--pri);display:flex;
+  align-items:center;justify-content:center;font-size:9px;color:var(--pri);
+  flex-shrink:0;border-radius:2px}
+.task-card.done .tn{border-color:var(--grn);color:var(--grn)}
+.task-card .tt{font-size:7px}.task-card .td{font-size:5px;color:var(--txt2);margin-top:2px}
+.task-card .tprog{font-size:5px;color:var(--sec);margin-top:2px}
 
-/* Quiz задание */
-.quiz-question { font-size: 8px; color: var(--text); line-height: 1.6; margin-bottom: 12px; }
-.quiz-options { display: flex; flex-direction: column; gap: 8px; }
-.quiz-opt {
-  font-family: 'Press Start 2P', monospace;
-  background: var(--bg3);
-  border: 2px solid var(--text2);
-  color: var(--text);
-  padding: 10px;
-  font-size: 7px;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s;
-  line-height: 1.5;
-}
-.quiz-opt:active { border-color: var(--primary); }
-.quiz-opt.correct { border-color: var(--green); color: var(--green); background: rgba(51,255,102,0.1); }
-.quiz-opt.wrong { border-color: var(--red); color: var(--red); background: rgba(255,68,68,0.1); }
+/* Улучшения */
+#upg-screen{padding:6px}
+.upg-list{display:flex;flex-direction:column;gap:6px;padding:2px 4px}
+.upg-card{background:var(--bg2);border:2px solid var(--bg4);padding:10px;border-radius:4px;
+  display:flex;flex-direction:column;gap:6px}
+.upg-card .uh{display:flex;align-items:center;gap:8px}
+.upg-card .ui{font-size:20px}.upg-card .un{font-size:8px}
+.upg-card .ul{font-size:6px;color:var(--sec);margin-top:1px}
+.upg-card .ud{font-size:6px;color:var(--txt2);line-height:1.4}
 
-/* Find Bug задание */
-.code-block {
-  background: var(--bg);
-  border: 2px solid var(--text2);
-  padding: 10px;
-  font-size: 7px;
-  line-height: 1.8;
-  overflow-x: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-.code-line {
-  padding: 3px 6px;
-  cursor: pointer;
-  transition: background 0.2s;
-  display: block;
-}
-.code-line:hover { background: rgba(255,204,0,0.1); }
-.code-line.selected { background: rgba(255,204,0,0.2); border-left: 3px solid var(--primary); }
-.code-line.bug-found { background: rgba(51,255,102,0.2); border-left: 3px solid var(--green); }
-.code-line.bug-wrong { background: rgba(255,68,68,0.2); border-left: 3px solid var(--red); }
+/* Задание */
+#task-screen{padding:6px}
+.tg-area{padding:4px}
+.tg-area h3{font-size:9px;color:var(--pri);text-align:center;margin:6px 0}
+.tg-area .tg-desc{font-size:6px;color:var(--txt2);text-align:center;margin-bottom:10px;line-height:1.6}
+.tg-content{min-height:200px}
 
-/* Drag & Arrange задание */
-.drag-container { display: flex; flex-direction: column; gap: 6px; }
-.drag-item {
-  background: var(--bg3);
-  border: 2px solid var(--secondary);
-  padding: 10px;
-  font-size: 7px;
-  cursor: grab;
-  touch-action: none;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  line-height: 1.4;
-}
-.drag-item:active { cursor: grabbing; border-color: var(--primary); }
-.drag-item .drag-handle { color: var(--text2); font-size: 10px; }
-.drag-item.dragging { opacity: 0.5; border-color: var(--primary); }
+/* Общие элементы заданий */
+.info-panel{background:var(--bg);border:1px solid var(--sec);border-radius:3px;padding:8px;
+  font-size:6px;line-height:1.7;margin:6px 0;color:var(--txt)}
+.info-panel b{color:var(--sec)}
+.info-panel .hint{color:var(--pri);font-style:italic}
 
-/* Color Pick задание */
-.color-palette { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
-.color-swatch {
-  width: 100%;
-  aspect-ratio: 1;
-  border: 3px solid var(--text2);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.color-swatch.selected { border-color: var(--primary); transform: scale(1.1); box-shadow: 0 0 10px rgba(255,204,0,0.5); }
-.color-swatch.correct { border-color: var(--green); }
-.color-swatch.wrong { border-color: var(--red); opacity: 0.5; }
+.step-indicator{display:flex;gap:3px;justify-content:center;margin:8px 0}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--bg4);border:1px solid var(--txt2)}
+.step-dot.active{background:var(--pri);border-color:var(--pri);box-shadow:0 0 6px rgba(255,215,0,0.5)}
+.step-dot.done{background:var(--grn);border-color:var(--grn)}
 
-/* Code Match задание */
-.code-slots { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; }
-.code-slot {
-  background: var(--bg);
-  border: 2px dashed var(--text2);
-  padding: 8px;
-  font-size: 7px;
-  min-height: 30px;
-  display: flex;
-  align-items: center;
-  color: var(--text2);
-}
-.code-slot.filled { border-style: solid; border-color: var(--secondary); color: var(--text); }
-.code-pieces { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
-.code-piece {
-  background: var(--bg3);
-  border: 2px solid var(--secondary);
-  padding: 6px 10px;
-  font-size: 7px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.code-piece.used { opacity: 0.3; cursor: default; }
-.code-piece:active { border-color: var(--primary); }
+.choice-list{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.choice-btn{font-family:'Press Start 2P',monospace;background:var(--bg3);border:1px solid var(--bg4);
+  color:var(--txt);padding:10px;font-size:6px;text-align:left;cursor:pointer;
+  border-radius:3px;transition:.2s;line-height:1.5}
+.choice-btn:active{border-color:var(--pri)}
+.choice-btn.correct{border-color:var(--grn);color:var(--grn);background:rgba(0,255,135,.08)}
+.choice-btn.wrong{border-color:var(--red);color:var(--red);background:rgba(255,59,59,.08)}
+.choice-btn.selected{border-color:var(--sec);background:rgba(0,229,255,.08)}
 
-/* Результат задания */
-.task-result {
-  text-align: center;
-  padding: 20px;
-}
-.task-result .result-icon { font-size: 40px; margin-bottom: 12px; }
-.task-result .result-title { font-size: 12px; color: var(--primary); margin-bottom: 8px; }
-.task-result .result-score { font-size: 9px; color: var(--secondary); margin-bottom: 6px; }
-.task-result .result-rewards { font-size: 8px; color: var(--green); margin-bottom: 16px; }
+/* Site Builder */
+.sb-workspace{display:flex;flex-direction:column;gap:4px;background:var(--bg);
+  border:2px solid var(--bg4);border-radius:3px;padding:6px;min-height:200px;position:relative}
+.sb-block{background:var(--bg3);border:1px solid var(--sec);border-radius:2px;
+  padding:8px;font-size:6px;text-align:center;cursor:grab;touch-action:none;transition:.2s}
+.sb-block.dragging{opacity:.5;border-color:var(--pri)}
+.sb-block .sb-label{color:var(--sec);margin-bottom:2px;font-size:5px}
+.sb-palette{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.sb-piece{background:var(--bg3);border:1px solid var(--bg4);border-radius:2px;
+  padding:6px 8px;font-size:5px;cursor:pointer;transition:.2s;color:var(--txt)}
+.sb-piece:active{border-color:var(--pri)}
+.sb-piece.used{opacity:.3;cursor:default}
+.sb-preview{background:#fff;border-radius:3px;padding:6px;min-height:120px;color:#333;font-size:5px}
 
-/* Модальное окно */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.8);
-  z-index: 200;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-}
-.modal-overlay.active { display: flex; }
-.modal-box {
-  background: var(--bg2);
-  border: 3px solid var(--primary);
-  padding: 20px;
-  max-width: 340px;
-  width: 100%;
-  text-align: center;
-  box-shadow: 8px 8px 0 rgba(0,0,0,0.5);
-}
-.modal-box h3 { font-size: 10px; color: var(--primary); margin-bottom: 10px; }
-.modal-box p { font-size: 7px; color: var(--text2); line-height: 1.6; margin-bottom: 14px; }
+/* Drag items */
+.drag-list{display:flex;flex-direction:column;gap:4px}
+.drag-item{background:var(--bg3);border:1px solid var(--sec);border-radius:2px;
+  padding:8px;font-size:6px;cursor:grab;touch-action:none;display:flex;align-items:center;
+  gap:6px;line-height:1.4;transition:.2s}
+.drag-item:active{border-color:var(--pri)}.drag-item.dragging{opacity:.4}
+.drag-item .dh{color:var(--txt2);font-size:8px}
 
-/* Загрузка */
-#loading {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-#loading h1 { font-size: 16px; color: var(--primary); margin-bottom: 8px; text-shadow: 2px 2px 0 #664400; }
-#loading p { font-size: 8px; color: var(--secondary); animation: blink 1s infinite; }
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+/* Input fields */
+.game-input{width:100%;background:var(--bg);border:1px solid var(--bg4);color:var(--txt);
+  padding:8px;font-size:8px;border-radius:3px;outline:none;margin:4px 0}
+.game-input:focus{border-color:var(--sec)}
 
-/* Скроллбар */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--primary); }
+/* Grid/Canvas for builders */
+.grid-canvas{display:grid;gap:2px;margin:6px 0;background:var(--bg);border:1px solid var(--bg4);
+  border-radius:3px;padding:4px}
+.grid-cell{aspect-ratio:1;border:1px solid var(--bg4);border-radius:1px;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;justify-content:center;font-size:8px}
+.grid-cell:active{transform:scale(.9)}
+.grid-cell.filled{border-color:var(--sec)}
+
+/* Scenario result */
+.task-result{text-align:center;padding:16px}
+.task-result .ri{font-size:36px;margin-bottom:10px}
+.task-result .rt{font-size:11px;color:var(--pri);margin-bottom:6px}
+.task-result .rs{font-size:8px;color:var(--sec);margin-bottom:4px}
+.task-result .rr{font-size:7px;color:var(--grn);margin-bottom:14px}
+
+/* Модалка */
+.modal-ov{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);
+  z-index:200;justify-content:center;align-items:center;padding:14px}
+.modal-ov.on{display:flex}
+.modal-box{background:var(--bg2);border:2px solid var(--pri);padding:16px;max-width:320px;
+  width:100%;text-align:center;border-radius:5px;box-shadow:0 0 30px rgba(255,215,0,0.15)}
+.modal-box h3{font-size:9px;color:var(--pri);margin-bottom:8px}
+.modal-box p{font-size:6px;color:var(--txt2);line-height:1.7;margin-bottom:12px}
+
+/* Лоадер */
+#loading{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999}
+#loading h1{font-size:18px;color:var(--pri);text-shadow:0 0 20px rgba(255,215,0,0.4)}
+#loading p{font-size:7px;color:var(--sec);animation:blink 1s infinite;margin-top:6px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
 </style>
 </head>
 <body>
+<div id="loading"><h1>RE:ALITY</h1><p>Загрузка...</p></div>
+<div class="modal-ov" id="modal"><div class="modal-box" id="mcont"></div></div>
 
-<!-- Загрузка -->
-<div id="loading">
-  <h1>RE:ALITY</h1>
-  <p>Загрузка...</p>
-</div>
-
-<!-- Модальное окно -->
-<div class="modal-overlay" id="modal">
-  <div class="modal-box" id="modal-content"></div>
-</div>
-
-<!-- ========== ЭКРАН РЕГИСТРАЦИИ ========== -->
-<div class="screen" id="register-screen">
-  <h1>RE:ALITY</h1>
-  <div class="subtitle">ПРОФЕССИИ</div>
-
+<!-- РЕГИСТРАЦИЯ -->
+<div class="screen" id="reg-screen">
+  <h1>RE:ALITY</h1><div class="reg-sub">ПРОФЕССИИ</div>
   <div class="pixel-box">
-    <div style="font-size:8px;color:var(--secondary);text-align:center;margin-bottom:10px;">ВЫБЕРИ АВАТАР</div>
-    <div class="avatar-select">
-      <div class="avatar-option selected" data-avatar="1" onclick="selectAvatar(1)"><img src="/hero1.png" alt="Hero 1"></div>
-      <div class="avatar-option" data-avatar="2" onclick="selectAvatar(2)"><img src="/hero2.png" alt="Hero 2"></div>
-      <div class="avatar-option" data-avatar="3" onclick="selectAvatar(3)"><img src="/hero3.png" alt="Hero 3"></div>
+    <div style="font-size:7px;color:var(--sec);text-align:center;margin-bottom:8px">ВЫБЕРИ АВАТАР</div>
+    <div class="av-sel">
+      <div class="av-opt sel" data-a="1" onclick="selAv(1)"><img src="/hero1.png"></div>
+      <div class="av-opt" data-a="2" onclick="selAv(2)"><img src="/hero2.png"></div>
+      <div class="av-opt" data-a="3" onclick="selAv(3)"><img src="/hero3.png"></div>
     </div>
   </div>
-
   <div class="pixel-box">
-    <div style="font-size:8px;color:var(--secondary);text-align:center;margin-bottom:10px;">ИМЯ ГЕРОЯ</div>
-    <input type="text" class="name-input" id="name-input" maxlength="8" placeholder="Макс 8 букв">
+    <div style="font-size:7px;color:var(--sec);text-align:center;margin-bottom:6px">ИМЯ ГЕРОЯ</div>
+    <input type="text" class="nm-inp" id="nm-inp" maxlength="8" placeholder="Макс 8 букв">
   </div>
-
   <div class="pixel-box">
-    <div style="font-size:8px;color:var(--secondary);text-align:center;margin-bottom:6px;">ХАРАКТЕРИСТИКИ</div>
-    <div class="points-left">Осталось очков: <span id="points-left">0</span></div>
-    <div class="stats-grid">
-      <div class="stat-item">
-        <span class="stat-name">💪 СИЛА</span>
-        <div class="stat-controls">
-          <button onclick="changeStat('str',-1)">-</button>
-          <span class="stat-val" id="stat-str">5</span>
-          <button onclick="changeStat('str',1)">+</button>
-        </div>
-      </div>
-      <div class="stat-item">
-        <span class="stat-name">🧠 ИНТЕЛЛЕКТ</span>
-        <div class="stat-controls">
-          <button onclick="changeStat('int',-1)">-</button>
-          <span class="stat-val" id="stat-int">5</span>
-          <button onclick="changeStat('int',1)">+</button>
-        </div>
-      </div>
-      <div class="stat-item">
-        <span class="stat-name">🗣 ХАРИЗМА</span>
-        <div class="stat-controls">
-          <button onclick="changeStat('cha',-1)">-</button>
-          <span class="stat-val" id="stat-cha">5</span>
-          <button onclick="changeStat('cha',1)">+</button>
-        </div>
-      </div>
-      <div class="stat-item">
-        <span class="stat-name">🍀 УДАЧА</span>
-        <div class="stat-controls">
-          <button onclick="changeStat('luck',-1)">-</button>
-          <span class="stat-val" id="stat-luck">5</span>
-          <button onclick="changeStat('luck',1)">+</button>
-        </div>
-      </div>
+    <div style="font-size:7px;color:var(--sec);text-align:center;margin-bottom:4px">ХАРАКТЕРИСТИКИ</div>
+    <div class="pts">Осталось: <span id="pts-left">0</span></div>
+    <div class="st-grid">
+      <div class="st-item"><span class="sn">💪 СИЛА</span><div class="sc"><button onclick="chSt('str',-1)">-</button><span class="sv" id="s-str">5</span><button onclick="chSt('str',1)">+</button></div></div>
+      <div class="st-item"><span class="sn">🧠 ИНТЕЛЛЕКТ</span><div class="sc"><button onclick="chSt('int',-1)">-</button><span class="sv" id="s-int">5</span><button onclick="chSt('int',1)">+</button></div></div>
+      <div class="st-item"><span class="sn">🗣 ХАРИЗМА</span><div class="sc"><button onclick="chSt('cha',-1)">-</button><span class="sv" id="s-cha">5</span><button onclick="chSt('cha',1)">+</button></div></div>
+      <div class="st-item"><span class="sn">🍀 УДАЧА</span><div class="sc"><button onclick="chSt('luck',-1)">-</button><span class="sv" id="s-luck">5</span><button onclick="chSt('luck',1)">+</button></div></div>
     </div>
   </div>
-
-  <div style="padding:8px;">
-    <button class="pixel-btn green" onclick="doRegister()">⚔️ НАЧАТЬ ПУТЬ ⚔️</button>
-  </div>
+  <div style="padding:6px 8px"><button class="btn filled" onclick="doReg()">⚔️ НАЧАТЬ ПУТЬ ⚔️</button></div>
 </div>
 
-<!-- ========== ГЛАВНЫЙ ЭКРАН ========== -->
+<!-- ГЛАВНАЯ -->
 <div class="screen" id="main-screen">
-  <div class="top-panel">
-    <img class="user-avatar" id="main-avatar" src="/hero1.png" alt="">
-    <div class="user-info">
-      <div class="user-name" id="main-name">...</div>
-      <div class="user-level" id="main-level">УР. 1</div>
-    </div>
+  <div class="en-bar-wrap">
+    <span style="font-size:6px;color:var(--grn)">⚡</span>
+    <div class="bar"><div class="fill en" id="en-bar" style="width:100%"></div></div>
+    <span id="en-txt">100/100</span>
   </div>
-
-  <div class="xp-section">
-    <div class="xp-label">XP: <span id="main-xp-text">0/100</span></div>
-    <div class="progress-bar"><div class="fill xp" id="main-xp-bar" style="width:0%"></div></div>
+  <div class="top-bar">
+    <img id="m-av" src="/hero1.png">
+    <div class="info"><div class="uname" id="m-name">...</div><div class="ulvl" id="m-lvl">УР. 1</div></div>
   </div>
-
-  <div class="resources-bar">
-    <div class="resource"><span class="r-icon">🪙</span><span class="r-val" id="res-coins">0</span></div>
-    <div class="resource"><span class="r-icon">🎫</span><span class="r-val" id="res-tokens">0</span></div>
-    <div class="resource"><span class="r-icon">⚡</span><span class="r-val" id="res-energy">100/100</span></div>
+  <div class="xp-wrap">
+    <span style="font-size:5px;color:var(--sec)">XP</span>
+    <div class="bar"><div class="fill xp" id="xp-bar" style="width:0%"></div></div>
+    <span id="xp-txt">0/80</span>
   </div>
-
-  <div class="tap-area" id="tap-area">
-    <img class="tap-character" id="tap-char" src="/hero1.png" alt="Tap me!" draggable="false">
-    <div class="combo-display" id="combo-display"></div>
+  <div class="res-bar">
+    <div class="res"><span>🪙</span><span class="rv" id="r-coins">0</span></div>
+    <div class="res"><span>🎫</span><span class="rv" id="r-tokens">0</span></div>
   </div>
-
-  <div class="energy-section">
-    <div class="energy-label">
-      <span>ЭНЕРГИЯ</span>
-      <span id="energy-text">100/100</span>
-    </div>
-    <div class="progress-bar"><div class="fill energy" id="energy-bar" style="width:100%"></div></div>
+  <div class="tap-zone" id="tap-zone">
+    <img class="tap-char" id="tap-img" src="/hero1.png" draggable="false">
+    <div class="mult-display" id="mult-disp"></div>
   </div>
 </div>
 
-<!-- ========== ЭКРАН ПРОФЕССИЙ ========== -->
-<div class="screen" id="professions-screen">
-  <h2>🏢 ПРОФЕССИИ</h2>
-  <div id="prof-content">
-    <!-- Заполняется динамически -->
-  </div>
+<!-- ПРОФЕССИИ -->
+<div class="screen" id="prof-screen">
+  <div class="scr-title">🏢 ПРОФЕССИИ</div>
+  <div id="prof-cont"></div>
 </div>
 
-<!-- ========== ЭКРАН УЛУЧШЕНИЙ ========== -->
-<div class="screen" id="upgrades-screen">
-  <h2>⬆️ УЛУЧШЕНИЯ</h2>
-  <div style="padding:4px 8px;">
-    <div class="resource" style="justify-content:center;margin-bottom:8px;">
-      <span class="r-icon">🪙</span><span class="r-val" id="upg-coins">0</span>
-    </div>
-  </div>
-  <div class="upgrade-list" id="upgrade-list">
-    <!-- Заполняется динамически -->
-  </div>
+<!-- УЛУЧШЕНИЯ -->
+<div class="screen" id="upg-screen">
+  <div class="scr-title">⬆️ УЛУЧШЕНИЯ</div>
+  <div style="text-align:center;padding:2px"><div class="res" style="display:inline-flex;margin-bottom:6px"><span>🪙</span><span class="rv" id="u-coins">0</span></div></div>
+  <div class="upg-list" id="upg-list"></div>
 </div>
 
-<!-- ========== ЭКРАН ЗАДАНИЯ ========== -->
+<!-- ЗАДАНИЕ -->
 <div class="screen" id="task-screen">
-  <button class="back-btn" onclick="closeTask()">← НАЗАД</button>
-  <div class="task-game" id="task-game-content">
-    <!-- Заполняется динамически -->
-  </div>
+  <button class="back-b" onclick="exitTask()">← НАЗАД</button>
+  <div class="tg-area" id="tg-area"></div>
 </div>
 
-<!-- Навигация -->
-<div id="navbar" style="display:none;">
-  <button class="nav-btn" onclick="showScreen('professions')"><span>🏢</span>Профессии</button>
-  <button class="nav-btn active" onclick="showScreen('main')"><span>👆</span>Тапалка</button>
-  <button class="nav-btn" onclick="showScreen('upgrades')"><span>⬆️</span>Улучшения</button>
+<!-- НАВ -->
+<div id="nav" style="display:none">
+  <button class="nb" onclick="goTo('prof')"><i>🏢</i>Профессии</button>
+  <button class="nb on" onclick="goTo('main')"><i>🏠</i>Главная</button>
+  <button class="nb" onclick="goTo('upg')"><i>⬆️</i>Улучшения</button>
 </div>
 
 <script>
-// ============ ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ============
-let STATE = {
-  user: null,
-  unlocked: [],
-  completed: [],
-  xpNeeded: 100,
-  professions: [],
-  tgId: 0,
-  initData: '',
-  selectedAvatar: 1,
-  stats: { str: 5, int: 5, cha: 5, luck: 5 },
-  currentSphere: null,
-  currentProf: null,
-  currentTask: null,
-  energyTimer: null,
-};
+// === СОСТОЯНИЕ ===
+const S={user:null,unlocked:[],completed:[],progress:[],xpN:80,profs:[],
+  tgId:0,initData:'',selAv:1,stats:{str:5,int:5,cha:5,luck:5},
+  curSphere:null,curProf:null,curTask:null,enTimer:null,
+  // Тап-система
+  tapMult:1,tapCount:0,lastTap:0,multTimer:null,
+  pendingCoins:0,pendingXp:0,pendingTaps:0,syncTimer:null,syncing:false};
 
-// Получаем Telegram данные
-const tg = window.Telegram?.WebApp;
-if (tg) {
-  tg.ready();
-  tg.expand();
-  STATE.initData = tg.initData || '';
-  if (tg.initDataUnsafe?.user) {
-    STATE.tgId = tg.initDataUnsafe.user.id;
-  }
-  // Тёмная тема
-  document.body.style.setProperty('--bg', tg.themeParams?.bg_color || '#0a0a1a');
+// Telegram
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();S.initData=tg.initData||'';if(tg.initDataUnsafe?.user)S.tgId=tg.initDataUnsafe.user.id}
+// Сохранённый ID для тестов
+if(!S.tgId){
+  let saved=localStorage.getItem('reality_tg_id');
+  if(saved){S.tgId=parseInt(saved)}
+  else{S.tgId=Math.floor(Math.random()*999999)+100000;localStorage.setItem('reality_tg_id',S.tgId+'')}
 }
 
-// Для тестирования без Telegram
-if (!STATE.tgId) {
-  STATE.tgId = Math.floor(Math.random() * 999999) + 100000;
-}
-
-// ============ API ============
-const API = '';
-
-async function apiCall(endpoint, body = {}) {
-  body.tg_id = STATE.tgId;
-  body.init_data = STATE.initData;
-  try {
-    const r = await fetch(API + endpoint, {
-      method: endpoint.includes('professions') ? 'GET' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: endpoint.includes('professions') ? undefined : JSON.stringify(body)
-    });
-    if (!r.ok) {
-      const err = await r.json().catch(() => ({}));
-      throw new Error(err.detail || `HTTP ${r.status}`);
-    }
+// === API ===
+async function api(ep,body={}){
+  body.tg_id=S.tgId;body.init_data=S.initData;
+  const isGet=ep.includes('professions');
+  try{
+    const r=await fetch(ep,{method:isGet?'GET':'POST',headers:{'Content-Type':'application/json'},
+      body:isGet?undefined:JSON.stringify(body)});
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'Error '+r.status)}
     return await r.json();
-  } catch (e) {
-    console.error('API Error:', e);
-    throw e;
+  }catch(e){console.error('API:',e);throw e}
+}
+
+// === ИНИЦИАЛИЗАЦИЯ ===
+async function init(){
+  try{
+    const[pd,ad]=await Promise.all([api('/api/professions'),api('/api/auth')]);
+    S.profs=pd.spheres;
+    Object.assign(S,{user:ad.user,unlocked:ad.unlocked||[],completed:ad.completed||[],
+      progress:ad.progress||[],xpN:ad.xp_needed});
+    document.getElementById('loading').style.display='none';
+    if(!S.user.registered){goTo('reg')}
+    else{goTo('main');document.getElementById('nav').style.display='flex';startEnRegen()}
+  }catch(e){
+    document.getElementById('loading').innerHTML=`<h1>RE:ALITY</h1><p style="color:var(--red)">${e.message}</p><br><button class="btn" onclick="location.reload()" style="width:auto;padding:10px 20px">Перезагрузить</button>`;
   }
 }
 
-// ============ ИНИЦИАЛИЗАЦИЯ ============
-async function init() {
-  try {
-    // Загрузить профессии
-    const profData = await apiCall('/api/professions');
-    STATE.professions = profData.spheres;
+// === НАВИГАЦИЯ ===
+function goTo(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  const map={reg:'reg-screen',main:'main-screen',prof:'prof-screen',upg:'upg-screen',task:'task-screen'};
+  document.getElementById(map[n])?.classList.add('active');
+  const navI={prof:0,main:1,upg:2};
+  if(navI[n]!==undefined)document.querySelectorAll('.nb')[navI[n]]?.classList.add('on');
+  if(n==='main')updMain();if(n==='prof')renderSpheres();if(n==='upg')renderUpg();
+}
 
-    // Авторизация
-    const data = await apiCall('/api/auth');
-    STATE.user = data.user;
-    STATE.unlocked = data.unlocked_professions || [];
-    STATE.completed = data.completed_tasks || [];
-    STATE.xpNeeded = data.xp_needed;
+// === РЕГИСТРАЦИЯ ===
+function selAv(n){S.selAv=n;document.querySelectorAll('.av-opt').forEach(e=>e.classList.toggle('sel',+e.dataset.a===n))}
+function chSt(s,d){
+  const t=S.stats.str+S.stats.int+S.stats.cha+S.stats.luck;const nv=S.stats[s]+d;
+  if(nv<1||nv>14||( d>0&&t>=20)||(d<0&&t<=4))return;
+  S.stats[s]=nv;document.getElementById('s-'+s).textContent=nv;
+  document.getElementById('pts-left').textContent=20-(S.stats.str+S.stats.int+S.stats.cha+S.stats.luck);
+}
+async function doReg(){
+  const nm=document.getElementById('nm-inp').value.trim();
+  if(!nm){modal('Ошибка','Введи имя!');return}
+  const t=S.stats.str+S.stats.int+S.stats.cha+S.stats.luck;
+  if(t!==20){modal('Ошибка',`Распредели все 20 очков! (${t})`);return}
+  try{const d=await api('/api/register',{name:nm,avatar:S.selAv,stats:S.stats});
+    S.user=d.user;S.xpN=d.xp_needed;goTo('main');
+    document.getElementById('nav').style.display='flex';startEnRegen();
+    modal('Добро пожаловать!',nm+', тапай по персонажу и открывай профессии!');
+  }catch(e){modal('Ошибка',e.message)}
+}
 
-    document.getElementById('loading').style.display = 'none';
+// === ГЛАВНАЯ ===
+function updMain(){
+  const u=S.user;if(!u)return;
+  document.getElementById('m-av').src=`/hero${u.avatar}.png`;
+  document.getElementById('tap-img').src=`/hero${u.avatar}.png`;
+  document.getElementById('m-name').textContent=u.name;
+  document.getElementById('m-lvl').textContent=`УР. ${u.level}`;
+  document.getElementById('xp-txt').textContent=`${u.xp}/${S.xpN}`;
+  document.getElementById('xp-bar').style.width=Math.min(100,(u.xp/S.xpN)*100)+'%';
+  document.getElementById('r-coins').textContent=fmt(u.coins);
+  document.getElementById('r-tokens').textContent=u.tokens;
+  document.getElementById('en-txt').textContent=`${u.energy}/${u.max_energy}`;
+  document.getElementById('en-bar').style.width=(u.energy/u.max_energy)*100+'%';
+}
+function fmt(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return n+''}
 
-    if (!STATE.user.registered) {
-      showScreen('register');
-    } else {
-      showScreen('main');
-      document.getElementById('navbar').style.display = 'flex';
-      startEnergyRegen();
-    }
-  } catch (e) {
-    document.getElementById('loading').innerHTML = `
-      <h1>RE:ALITY</h1>
-      <p style="color:var(--red)">Ошибка: ${e.message}</p>
-      <br>
-      <button class="pixel-btn" onclick="location.reload()" style="width:auto;padding:10px 20px;">Перезагрузить</button>
-    `;
+// === ТАПАЛКА С МНОЖИТЕЛЕМ ===
+document.getElementById('tap-zone').addEventListener('pointerdown',function(e){
+  e.preventDefault();if(!S.user?.registered||S.user.energy<=0)return;
+  const now=Date.now();
+
+  // Множитель: если тапнул в течение 800мс — увеличиваем
+  if(now-S.lastTap<800){S.tapCount++;S.tapMult=Math.min(5,1+S.tapCount*0.1)}
+  else{S.tapCount=0;S.tapMult=1}
+  S.lastTap=now;
+
+  // Сброс множителя при неактиве
+  clearTimeout(S.multTimer);
+  S.multTimer=setTimeout(()=>{S.tapMult=1;S.tapCount=0;updMultDisp()},1500);
+
+  // Мгновенное начисление
+  const earned=Math.floor(S.user.coins_per_tap*S.tapMult);
+  const xpGain=Math.ceil(2*(1+S.user.stat_int*0.02));
+  S.user.coins+=earned;S.user.xp+=xpGain;S.user.energy=Math.max(0,S.user.energy-1);
+  S.pendingCoins+=earned;S.pendingXp+=xpGain;S.pendingTaps++;
+
+  // Проверка левел-апа (клиентская)
+  while(S.user.xp>=S.xpN){S.user.xp-=S.xpN;S.user.level++;S.user.tokens++;
+    S.xpN=Math.floor(80*Math.pow(S.user.level,1.4));
+    modal('⬆️ УРОВЕНЬ '+S.user.level+'!','Ты получил токен профессии! 🎫');
   }
-}
 
-// ============ НАВИГАЦИЯ ============
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  updMain();updMultDisp();coinPop(e,'+'+earned);
 
-  const screen = document.getElementById(name + '-screen');
-  if (screen) screen.classList.add('active');
-
-  // Подсветка навигации
-  const navBtns = document.querySelectorAll('.nav-btn');
-  if (name === 'professions') navBtns[0]?.classList.add('active');
-  else if (name === 'main') navBtns[1]?.classList.add('active');
-  else if (name === 'upgrades') navBtns[2]?.classList.add('active');
-
-  // Обновить данные при открытии
-  if (name === 'main') updateMainScreen();
-  if (name === 'professions') renderSpheres();
-  if (name === 'upgrades') renderUpgrades();
-}
-
-// ============ РЕГИСТРАЦИЯ ============
-function selectAvatar(n) {
-  STATE.selectedAvatar = n;
-  document.querySelectorAll('.avatar-option').forEach(el => {
-    el.classList.toggle('selected', parseInt(el.dataset.avatar) === n);
-  });
-}
-
-function changeStat(stat, delta) {
-  const total = STATE.stats.str + STATE.stats.int + STATE.stats.cha + STATE.stats.luck;
-  const newVal = STATE.stats[stat] + delta;
-  if (newVal < 1 || newVal > 14) return;
-  if (delta > 0 && total >= 20) return;
-  if (delta < 0 && total <= 4) return;
-  STATE.stats[stat] = newVal;
-  document.getElementById('stat-' + stat).textContent = newVal;
-  const left = 20 - (STATE.stats.str + STATE.stats.int + STATE.stats.cha + STATE.stats.luck);
-  document.getElementById('points-left').textContent = left;
-}
-
-async function doRegister() {
-  const name = document.getElementById('name-input').value.trim();
-  if (!name) { showModal('Ошибка', 'Введи имя героя!'); return; }
-  if (name.length > 8) { showModal('Ошибка', 'Максимум 8 символов!'); return; }
-
-  const total = STATE.stats.str + STATE.stats.int + STATE.stats.cha + STATE.stats.luck;
-  if (total !== 20) { showModal('Ошибка', `Распредели все 20 очков! (сейчас ${total})`); return; }
-
-  try {
-    const data = await apiCall('/api/register', {
-      name: name,
-      avatar: STATE.selectedAvatar,
-      stats: STATE.stats
-    });
-    STATE.user = data.user;
-    STATE.xpNeeded = data.xp_needed;
-    showScreen('main');
-    document.getElementById('navbar').style.display = 'flex';
-    startEnergyRegen();
-    showModal('Добро пожаловать!', `${name}, твой путь начинается! Тапай по персонажу, чтобы зарабатывать монеты и опыт. Открывай профессии и выполняй задания!`);
-  } catch (e) {
-    showModal('Ошибка', e.message);
-  }
-}
-
-// ============ ГЛАВНЫЙ ЭКРАН ============
-function updateMainScreen() {
-  const u = STATE.user;
-  if (!u) return;
-  document.getElementById('main-avatar').src = `/hero${u.avatar}.png`;
-  document.getElementById('tap-char').src = `/hero${u.avatar}.png`;
-  document.getElementById('main-name').textContent = u.name;
-  document.getElementById('main-level').textContent = `УР. ${u.level}`;
-  document.getElementById('main-xp-text').textContent = `${u.xp}/${STATE.xpNeeded}`;
-  document.getElementById('main-xp-bar').style.width = `${Math.min(100, (u.xp / STATE.xpNeeded) * 100)}%`;
-  document.getElementById('res-coins').textContent = formatNum(u.coins);
-  document.getElementById('res-tokens').textContent = u.tokens;
-  document.getElementById('res-energy').textContent = `${u.energy}/${u.max_energy}`;
-  document.getElementById('energy-text').textContent = `${u.energy}/${u.max_energy}`;
-  document.getElementById('energy-bar').style.width = `${(u.energy / u.max_energy) * 100}%`;
-}
-
-function formatNum(n) {
-  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
-  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
-  return n.toString();
-}
-
-// ============ ТАПАЛКА ============
-let tapCooldown = false;
-let tapQueue = 0;
-let tapSendTimer = null;
-
-document.getElementById('tap-area').addEventListener('pointerdown', function(e) {
-  e.preventDefault();
-  if (!STATE.user || !STATE.user.registered) return;
-  if (STATE.user.energy <= 0) return;
-
-  // Локальная анимация
-  STATE.user.energy = Math.max(0, STATE.user.energy - 1);
-  const earned = STATE.user.coins_per_tap;
-  STATE.user.coins += earned;
-  updateMainScreen();
-
-  // Попап монет
-  showCoinPopup(e, '+' + earned);
-
-  // Собираем тапы в пакет
-  tapQueue++;
-  if (tapSendTimer) clearTimeout(tapSendTimer);
-  tapSendTimer = setTimeout(sendTaps, 300);
+  // Синхронизация: отправляем каждые 600мс
+  if(!S.syncTimer){S.syncTimer=setTimeout(syncTaps,600)}
 });
 
-async function sendTaps() {
-  if (tapQueue <= 0) return;
-  const taps = tapQueue;
-  tapQueue = 0;
-  try {
-    const data = await apiCall('/api/tap', { taps: taps });
-    STATE.user = data.user;
-    STATE.xpNeeded = data.xp_needed;
-    updateMainScreen();
+function updMultDisp(){
+  const el=document.getElementById('mult-disp');
+  if(S.tapMult<=1){el.textContent='';el.className='mult-display';return}
+  el.textContent='x'+S.tapMult.toFixed(1);
+  el.className='mult-display'+(S.tapMult>=3?' fire':S.tapMult>=2?' hot':'');
+}
 
-    // Комбо
-    if (data.combo > 1) {
-      document.getElementById('combo-display').textContent = `🔥 COMBO x${data.combo}`;
-      document.getElementById('combo-display').style.color = data.combo >= 4 ? 'var(--accent)' : 'var(--primary)';
-    } else {
-      document.getElementById('combo-display').textContent = '';
+async function syncTaps(){
+  S.syncTimer=null;if(S.pendingTaps<=0||S.syncing)return;
+  const taps=S.pendingTaps,coins=S.pendingCoins,xp=S.pendingXp;
+  S.pendingTaps=0;S.pendingCoins=0;S.pendingXp=0;S.syncing=true;
+  try{
+    const d=await api('/api/tap',{taps,coins_earned:coins,xp_earned:xp});
+    // Принимаем серверное состояние, но НЕ откатываем если у нас больше
+    if(d.user.coins>=S.user.coins-10)S.user.coins=d.user.coins;
+    S.user.level=d.user.level;S.user.tokens=d.user.tokens;
+    S.user.energy=Math.max(S.user.energy,d.user.energy);
+    S.user.xp=d.user.xp;S.xpN=d.xp_needed;updMain();
+  }catch(e){console.error(e)}
+  S.syncing=false;
+  if(S.pendingTaps>0)S.syncTimer=setTimeout(syncTaps,600);
+}
+
+function coinPop(e,txt){
+  const z=document.getElementById('tap-zone'),r=z.getBoundingClientRect();
+  const p=document.createElement('div');p.className='coin-pop';p.textContent=txt;
+  p.style.left=(e.clientX-r.left-12)+'px';p.style.top=(e.clientY-r.top-12)+'px';
+  z.appendChild(p);setTimeout(()=>p.remove(),700);
+}
+
+// Энергия — медленная регенерация
+function startEnRegen(){
+  if(S.enTimer)clearInterval(S.enTimer);
+  S.enTimer=setInterval(()=>{
+    if(!S.user||S.user.energy>=S.user.max_energy)return;
+    S.user.energy=Math.min(S.user.max_energy,S.user.energy+1);updMain();
+  },2500); // 1 ед за 2.5 сек = 0.4/сек
+}
+
+// === ПРОФЕССИИ ===
+function renderSpheres(){
+  S.curSphere=null;S.curProf=null;
+  let h='<div class="sph-list">';
+  for(const s of S.profs)h+=`<div class="sph-card" onclick="openSphere('${s.id}')"><div class="si">${s.icon}</div><div><div class="sn">${s.name}</div><div class="sc">${s.professions.length} профессий</div></div></div>`;
+  h+='</div>';document.getElementById('prof-cont').innerHTML=h;
+}
+
+function openSphere(sid){
+  const sp=S.profs.find(s=>s.id===sid);if(!sp)return;S.curSphere=sp;
+  let h=`<button class="back-b" onclick="renderSpheres()">← НАЗАД</button>`;
+  h+=`<div style="text-align:center;margin:6px 0;font-size:9px;color:var(--pri)">${sp.icon} ${sp.name}</div>`;
+  h+='<div class="prof-list">';
+  for(const p of sp.professions){
+    const open=S.unlocked.includes(p.id);
+    const done=S.completed.filter(c=>c.profession_id===p.id).length;
+    const total=p.tasks.length;
+    const pct=open?Math.floor(done/total*100):0;
+    h+=`<div class="prof-card ${open?'open':''}" onclick="openProf('${p.id}')"><div class="pi">${p.icon}</div><div style="flex:1"><div class="pn">${p.name}</div><div class="ps ${open?'op':'lk'}">${open?`✓ ${pct}% изучено (${done}/${total})`:`🔒 ${p.cost} токен`}</div></div></div>`;
+  }
+  h+='</div>';document.getElementById('prof-cont').innerHTML=h;
+}
+
+function openProf(pid){
+  let prof=null;for(const s of S.profs){prof=s.professions.find(p=>p.id===pid);if(prof)break}
+  if(!prof)return;S.curProf=prof;
+  const open=S.unlocked.includes(pid);
+  const myDone=S.completed.filter(c=>c.profession_id===pid);
+  const pct=open?Math.floor(myDone.length/prof.tasks.length*100):0;
+
+  let h=`<button class="back-b" onclick="openSphere('${S.curSphere.id}')">← НАЗАД</button>`;
+  h+=`<div class="pd-hdr"><div class="pdi">${prof.icon}</div><div class="pdn">${prof.name}</div><div class="pdd">${prof.desc}</div></div>`;
+  h+='<div class="pd-tools">';for(const t of prof.tools)h+=`<span>${t}</span>`;h+='</div>';
+
+  if(!open){
+    h+=`<div style="text-align:center;padding:14px"><div style="font-size:6px;color:var(--txt2);margin-bottom:10px">Открой, чтобы попробовать реальные задачи</div><button class="btn acc" onclick="unlockProf('${pid}')">🎫 ОТКРЫТЬ ЗА ${prof.cost} ТОКЕН</button><div style="font-size:6px;color:var(--txt2);margin-top:6px">Токенов: ${S.user.tokens}</div></div>`;
+  }else{
+    h+=`<div class="prog-section"><div class="prog-label"><span>ПРОГРЕСС</span><span>${pct}%</span></div><div class="bar"><div class="fill prog" style="width:${pct}%"></div></div></div>`;
+    if(pct===100)h+=`<div style="text-align:center;font-size:7px;color:var(--grn);margin:6px 0">✅ ПРОФЕССИЯ ИЗУЧЕНА!</div>`;
+    h+='<div style="font-size:8px;color:var(--sec);text-align:center;margin:8px 0">ЗАДАНИЯ</div>';
+    h+='<div class="task-list">';
+    for(let i=0;i<prof.tasks.length;i++){
+      const t=prof.tasks[i];const isDone=myDone.find(c=>c.task_index===i);
+      const prevOk=i===0||myDone.find(c=>c.task_index===i-1);
+      const locked=!prevOk&&!isDone;
+      const hasProg=S.progress.find(p=>p.profession_id===pid&&p.task_index===i);
+      h+=`<div class="task-card ${isDone?'done':''} ${locked?'locked':''}" onclick="${locked?'':(isDone?'':`startTask('${pid}',${i})`)}"><div class="tn">${isDone?'✓':i+1}</div><div style="flex:1"><div class="tt">${t.title}</div><div class="td">${locked?'🔒 Выполни предыдущее':t.desc}</div>${hasProg&&!isDone?'<div class="tprog">💾 Есть сохранение</div>':''}</div></div>`;
     }
-
-    // Левел-ап
-    if (data.level_up) {
-      showModal('⬆️ УРОВЕНЬ!', `Поздравляем! Ты достиг ${STATE.user.level} уровня! +1 токен профессии.`);
-      if (STATE.user.level === 2) {
-        setTimeout(() => {
-          showModal('🎫 Токены профессий', 'Теперь ты можешь открывать профессии за токены! Перейди в раздел "Профессии" и попробуй себя в настоящих задачах.');
-        }, 2000);
-      }
-    }
-  } catch (e) {
-    console.error('Tap error:', e);
+    h+='</div>';
   }
+  document.getElementById('prof-cont').innerHTML=h;
 }
 
-function showCoinPopup(e, text) {
-  const area = document.getElementById('tap-area');
-  const rect = area.getBoundingClientRect();
-  const popup = document.createElement('div');
-  popup.className = 'coin-popup';
-  popup.textContent = text;
-  popup.style.left = (e.clientX - rect.left - 15) + 'px';
-  popup.style.top = (e.clientY - rect.top - 15) + 'px';
-  area.appendChild(popup);
-  setTimeout(() => popup.remove(), 800);
+async function unlockProf(pid){
+  try{const d=await api('/api/unlock',{profession_id:pid});
+    S.user=d.user;S.unlocked=d.unlocked;S.xpN=d.xp_needed;
+    openProf(pid);modal('✅ Открыто!','Попробуй реальные задачи профессии!');
+  }catch(e){modal('Ошибка',e.message)}
 }
 
-// Регенерация энергии (клиентская)
-function startEnergyRegen() {
-  if (STATE.energyTimer) clearInterval(STATE.energyTimer);
-  STATE.energyTimer = setInterval(() => {
-    if (!STATE.user) return;
-    if (STATE.user.energy < STATE.user.max_energy) {
-      STATE.user.energy = Math.min(STATE.user.max_energy, STATE.user.energy + 1);
-      updateMainScreen();
-    }
-  }, 500); // 2 ед/сек = +1 каждые 500мс
-}
-
-// ============ ПРОФЕССИИ ============
-function renderSpheres() {
-  STATE.currentSphere = null;
-  STATE.currentProf = null;
-  const cont = document.getElementById('prof-content');
-  let html = '<div class="spheres-list">';
-  for (const s of STATE.professions) {
-    html += `
-      <div class="sphere-card" onclick="openSphere('${s.id}')">
-        <div class="s-icon">${s.icon}</div>
-        <div>
-          <div class="s-name">${s.name}</div>
-          <div class="s-count">${s.professions.length} профессий</div>
-        </div>
-      </div>`;
-  }
-  html += '</div>';
-  cont.innerHTML = html;
-}
-
-function openSphere(sphereId) {
-  const sphere = STATE.professions.find(s => s.id === sphereId);
-  if (!sphere) return;
-  STATE.currentSphere = sphere;
-
-  const cont = document.getElementById('prof-content');
-  let html = `<button class="back-btn" onclick="renderSpheres()">← НАЗАД</button>`;
-  html += `<div style="text-align:center;margin:8px 0;font-size:10px;color:var(--primary)">${sphere.icon} ${sphere.name}</div>`;
-  html += '<div class="prof-list">';
-  for (const p of sphere.professions) {
-    const isUnlocked = STATE.unlocked.includes(p.id);
-    const completedCount = STATE.completed.filter(c => c.profession_id === p.id).length;
-    html += `
-      <div class="prof-card ${isUnlocked ? 'unlocked' : ''}" onclick="openProfession('${p.id}')">
-        <div class="p-icon">${p.icon}</div>
-        <div class="p-info">
-          <div class="p-name">${p.name}</div>
-          <div class="p-status ${isUnlocked ? 'open' : 'locked'}">
-            ${isUnlocked ? `✓ Открыто (${completedCount}/5 заданий)` : `🔒 ${p.cost} токен`}
-          </div>
-        </div>
-      </div>`;
-  }
-  html += '</div>';
-  cont.innerHTML = html;
-}
-
-function openProfession(profId) {
-  let prof = null;
-  for (const s of STATE.professions) {
-    prof = s.professions.find(p => p.id === profId);
-    if (prof) break;
-  }
-  if (!prof) return;
-  STATE.currentProf = prof;
-
-  const isUnlocked = STATE.unlocked.includes(profId);
-  const cont = document.getElementById('prof-content');
-  const myCompleted = STATE.completed.filter(c => c.profession_id === profId);
-
-  let html = `<button class="back-btn" onclick="openSphere('${STATE.currentSphere.id}')">← НАЗАД</button>`;
-  html += `<div class="prof-detail">`;
-  html += `<div class="pd-header">
-    <div class="pd-icon">${prof.icon}</div>
-    <div class="pd-name">${prof.name}</div>
-    <div class="pd-desc">${prof.desc}</div>
-  </div>`;
-
-  html += `<div class="pd-tools">`;
-  for (const t of prof.tools) {
-    html += `<span class="tool-tag">${t}</span>`;
-  }
-  html += `</div>`;
-
-  if (!isUnlocked) {
-    html += `<div style="text-align:center;padding:16px;">
-      <div style="font-size:8px;color:var(--text2);margin-bottom:12px;">Открой профессию, чтобы получить доступ к практическим заданиям</div>
-      <button class="pixel-btn accent" onclick="unlockProfession('${profId}')">🎫 ОТКРЫТЬ ЗА ${prof.cost} ТОКЕН</button>
-      <div style="font-size:7px;color:var(--text2);margin-top:8px;">У тебя: ${STATE.user.tokens} токенов</div>
-    </div>`;
-  } else {
-    html += `<div style="font-size:9px;color:var(--secondary);text-align:center;margin:10px 0;">ЗАДАНИЯ</div>`;
-    html += `<div class="task-list">`;
-    for (let i = 0; i < prof.tasks.length; i++) {
-      const task = prof.tasks[i];
-      const done = myCompleted.find(c => c.task_index === i);
-      const prevDone = i === 0 || myCompleted.find(c => c.task_index === i - 1);
-      const locked = !prevDone && !done;
-      html += `
-        <div class="task-card ${done ? 'completed' : ''} ${locked ? 'locked' : ''}"
-             onclick="${locked ? '' : (done ? '' : `startTask('${profId}', ${i})`)}">
-          <div class="t-num">${done ? '✓' : i + 1}</div>
-          <div class="t-info">
-            <div class="t-title">${task.title}</div>
-            <div class="t-desc">${locked ? '🔒 Выполни предыдущее' : task.desc}</div>
-          </div>
-        </div>`;
-    }
-    html += `</div>`;
-  }
-
-  html += `</div>`;
-  cont.innerHTML = html;
-}
-
-async function unlockProfession(profId) {
-  try {
-    const data = await apiCall('/api/unlock', { profession_id: profId });
-    STATE.user = data.user;
-    STATE.unlocked = data.unlocked_professions;
-    STATE.xpNeeded = data.xp_needed;
-    openProfession(profId);
-    showModal('✅ Открыто!', 'Профессия доступна! Выполняй задания и узнавай, как работают настоящие специалисты.');
-  } catch (e) {
-    showModal('Ошибка', e.message);
-  }
-}
-
-// ============ УЛУЧШЕНИЯ ============
-const UPGRADE_INFO = [
-  { type: 'tap', name: '💪 Сила пальцев', desc: '+1 монета за тап', icon: '👆', field: 'upg_tap_level', maxLvl: 10, baseCost: 50, mult: 2.0 },
-  { type: 'energy', name: '🔋 Выносливость', desc: '+20 макс. энергии', icon: '⚡', field: 'upg_energy_level', maxLvl: 10, baseCost: 80, mult: 2.2 },
-  { type: 'multi', name: '✋ Мультитап', desc: '+1 одновременный тап', icon: '🖐', field: 'upg_multi_level', maxLvl: 4, baseCost: 200, mult: 2.5 },
-  { type: 'regen', name: '♻️ Регенерация', desc: '+0.5 восст. энергии/сек', icon: '💚', field: 'upg_regen_level', maxLvl: 10, baseCost: 100, mult: 2.0 },
+// === УЛУЧШЕНИЯ ===
+const UPG_INFO=[
+  {t:'tap',n:'💪 Сила тапа',d:'+1 монета за тап',i:'👆',f:'upg_tap_level',mx:20,bc:50,m:2},
+  {t:'energy',n:'🔋 Выносливость',d:'+20 макс. энергии',i:'⚡',f:'upg_energy_level',mx:20,bc:80,m:2.2},
+  {t:'multi',n:'✋ Мультитап',d:'+1 одновременный тап',i:'🖐',f:'upg_multi_level',mx:5,bc:200,m:2.5},
+  {t:'regen',n:'♻️ Регенерация',d:'+0.15 энергии/сек',i:'💚',f:'upg_regen_level',mx:20,bc:100,m:2},
 ];
-
-function renderUpgrades() {
-  const u = STATE.user;
-  document.getElementById('upg-coins').textContent = formatNum(u.coins);
-  const cont = document.getElementById('upgrade-list');
-  let html = '';
-  for (const up of UPGRADE_INFO) {
-    const lvl = u[up.field];
-    const maxed = lvl >= up.maxLvl;
-    const cost = maxed ? 0 : Math.floor(up.baseCost * Math.pow(up.mult, lvl));
-    const canBuy = !maxed && u.coins >= cost;
-    html += `
-      <div class="upgrade-card">
-        <div class="u-header">
-          <div class="u-icon">${up.icon}</div>
-          <div>
-            <div class="u-name">${up.name}</div>
-            <div class="u-level">Ур. ${lvl}/${up.maxLvl}</div>
-          </div>
-        </div>
-        <div class="u-desc">${up.desc}</div>
-        <button class="pixel-btn ${canBuy ? 'green' : ''}" ${canBuy ? '' : 'disabled'}
-                onclick="buyUpgrade('${up.type}')">
-          ${maxed ? 'МАКС' : `🪙 ${formatNum(cost)}`}
-        </button>
-      </div>`;
+function renderUpg(){
+  document.getElementById('u-coins').textContent=fmt(S.user.coins);
+  let h='';
+  for(const u of UPG_INFO){
+    const l=S.user[u.f],maxed=l>=u.mx,cost=maxed?0:Math.floor(u.bc*Math.pow(u.m,l)),can=!maxed&&S.user.coins>=cost;
+    h+=`<div class="upg-card"><div class="uh"><div class="ui">${u.i}</div><div><div class="un">${u.n}</div><div class="ul">Ур. ${l}/${u.mx}</div></div></div><div class="ud">${u.d}</div><button class="btn ${can?'grn':''}" ${can?'':'disabled'} onclick="buyUpg('${u.t}')">${maxed?'МАКС':'🪙 '+fmt(cost)}</button></div>`;
   }
-  cont.innerHTML = html;
+  document.getElementById('upg-list').innerHTML=h;
+}
+async function buyUpg(t){
+  try{const d=await api('/api/upgrade',{upgrade_type:t});S.user=d.user;S.xpN=d.xp_needed;renderUpg();updMain()}
+  catch(e){modal('Ошибка',e.message)}
 }
 
-async function buyUpgrade(type) {
-  try {
-    const data = await apiCall('/api/upgrade', { upgrade_type: type });
-    STATE.user = data.user;
-    STATE.xpNeeded = data.xp_needed;
-    renderUpgrades();
-    updateMainScreen();
-  } catch (e) {
-    showModal('Ошибка', e.message);
-  }
+// ================================================================
+// === СИСТЕМА ЗАДАНИЙ ===
+// ================================================================
+
+function startTask(pid,tidx){
+  let prof=null;for(const s of S.profs){prof=s.professions.find(p=>p.id===pid);if(prof)break}
+  if(!prof)return;
+  const meta=prof.tasks[tidx];
+  S.curTask={pid,tidx,meta,step:0,score:0,maxSteps:0,answers:[]};
+  // Загрузить сохранённый прогресс
+  const saved=S.progress.find(p=>p.profession_id===pid&&p.task_index===tidx);
+  if(saved)S.curTask.saved=saved.progress_data;
+  goTo('task');document.getElementById('nav').style.display='none';
+  renderTaskEngine();
 }
 
-// ============ МИНИ-ИГРЫ / ЗАДАНИЯ ============
+function exitTask(){
+  // Сохранить прогресс если начали
+  if(S.curTask&&S.curTask.step>0&&!S.curTask.finished){
+    saveTaskProg({step:S.curTask.step,score:S.curTask.score,answers:S.curTask.answers});
+  }
+  const pid=S.curTask?.pid;S.curTask=null;
+  goTo('prof');document.getElementById('nav').style.display='flex';
+  if(pid&&S.curSphere){setTimeout(()=>{openSphere(S.curSphere.id);setTimeout(()=>openProf(pid),50)},50)}
+}
 
-// Банк вопросов и данных для заданий
-const TASK_DATA = {
-  // === FRONTEND ===
-  frontend: [
-    { // Задание 0: Верстка кнопки (code_match)
-      question: "Собери CSS-код для пиксельной кнопки с hover-эффектом:",
-      slots: [
-        ".pixel-btn {",
-        "  background: ____;",
-        "  border: ____;",
-        "  color: ____;",
-        "  cursor: ____;",
-        "}"
-      ],
-      pieces: ["#1a1a2e", "2px solid #00ff88", "#00ff88", "pointer", "#ffffff", "none", "auto", "1px dashed red"],
-      correct: ["#1a1a2e", "2px solid #00ff88", "#00ff88", "pointer"]
-    },
-    { // Задание 1: Исправь баг (find_bug)
-      lines: [
-        '<!DOCTYPE html>',
-        '<html lang="ru">',
-        '<head>',
-        '  <meta charset="UTF-8">',
-        '  <title>Мой сайт<title>',
-        '</head>',
-        '<body>',
-        '  <h1>Привет!</h1>',
-        '  <p>Текст страницы</p>',
-        '</body>',
-        '</html>'
-      ],
-      bugLine: 4,
-      explanation: 'Ошибка в строке 5: незакрытый тег — нужно </title> вместо <title>'
-    },
-    { // Задание 2: Цветовая палитра (color_pick)
-      brief: "Подбери палитру для детского образовательного приложения — яркие, тёплые тона:",
-      colors: [
-        "#FF6B6B", "#4ECDC4", "#2C3E50", "#FFE66D",
-        "#95E1D3", "#F38181", "#1A1A2E", "#AA96DA",
-        "#FF4757", "#2ED573", "#FFA502", "#3742FA"
-      ],
-      correct: [0, 3, 5, 7], // Правильные индексы
-      needSelect: 4
-    },
-    { // Задание 3: Адаптивность (drag_arrange)
-      instruction: "Расположи элементы для мобильной версии сайта сверху вниз:",
-      items: ["Логотип", "Меню-бургер", "Главный баннер", "Карточки товаров", "Кнопка CTA", "Футер"],
-      correct: ["Логотип", "Меню-бургер", "Главный баннер", "Карточки товаров", "Кнопка CTA", "Футер"]
-    },
-    { // Задание 4: Финальный квиз
-      question: "Какой CSS-свойство отвечает за адаптивное расположение элементов в строку/колонку?",
-      options: ["display: flex", "position: absolute", "float: left", "margin: auto"],
-      correct: 0
-    }
-  ],
+async function saveTaskProg(data){
+  if(!S.curTask)return;
+  try{await api('/api/task/progress',{profession_id:S.curTask.pid,task_index:S.curTask.tidx,data})}catch(e){}
+}
 
-  // === BACKEND ===
-  backend: [
-    {
-      question: "Собери SQL-запрос для получения 10 самых дорогих товаров:",
-      slots: ["SELECT ____", "FROM ____", "ORDER BY ____", "LIMIT ____"],
-      pieces: ["name, price", "products", "price DESC", "10", "id ASC", "users", "*", "5"],
-      correct: ["name, price", "products", "price DESC", "10"]
-    },
-    {
-      instruction: "Расставь компоненты REST API для интернет-магазина:",
-      items: ["GET /products — список товаров", "POST /orders — создать заказ", "GET /orders/:id — детали заказа", "PUT /products/:id — обновить товар", "DELETE /cart/:id — удалить из корзины"],
-      correct: ["GET /products — список товаров", "POST /orders — создать заказ", "GET /orders/:id — детали заказа", "PUT /products/:id — обновить товар", "DELETE /cart/:id — удалить из корзины"]
-    },
-    {
-      lines: [
-        'from flask import Flask, request',
-        'app = Flask(__name__)',
-        '',
-        '@app.route("/login", methods=["POST"])',
-        'def login():',
-        '    password = request.form["password"]',
-        '    query = f"SELECT * FROM users WHERE pass=\'{password}\'"',
-        '    result = db.execute(query)',
-        '    if result:',
-        '        return "OK"',
-        '    return "Fail"'
-      ],
-      bugLine: 6,
-      explanation: 'SQL-инъекция! Строка 7: пароль подставляется прямо в запрос. Нужно использовать параметризованные запросы.'
-    },
-    {
-      question: "Сервис получает 10,000 запросов/сек. Что поможет больше всего?",
-      options: ["Кэширование (Redis)", "Больше CSS-анимаций", "Увеличить размер логов", "Добавить console.log"],
-      correct: 0
-    },
-    {
-      instruction: "Расположи слои архитектуры веб-приложения от клиента к БД:",
-      items: ["Браузер (клиент)", "Nginx (прокси)", "Приложение (Python/Node)", "ORM (SQLAlchemy)", "База данных (PostgreSQL)"],
-      correct: ["Браузер (клиент)", "Nginx (прокси)", "Приложение (Python/Node)", "ORM (SQLAlchemy)", "База данных (PostgreSQL)"]
-    }
-  ],
+async function finishTask(score){
+  if(!S.curTask)return;S.curTask.finished=true;
+  try{
+    const d=await api('/api/task/complete',{profession_id:S.curTask.pid,task_index:S.curTask.tidx,score});
+    S.user=d.user;S.completed=d.completed||S.completed;S.xpN=d.xp_needed;
+    // Удалить прогресс из локального кеша
+    S.progress=S.progress.filter(p=>!(p.profession_id===S.curTask.pid&&p.task_index===S.curTask.tidx));
+    const icon=score>=80?'🏆':score>=50?'⭐':'📝';
+    const title=score>=80?'Отлично!':score>=50?'Хорошо!':'Попробуй ещё!';
+    document.getElementById('tg-area').innerHTML=`<div class="task-result"><div class="ri">${icon}</div><div class="rt">${title}</div><div class="rs">Результат: ${score}%</div><div class="rr">+${d.coin_r||0} 🪙  +${d.xp_r||0} XP${d.leveled>0?' ⬆️ УРОВЕНЬ!':''}</div><button class="btn grn" onclick="exitTask()">ПРОДОЛЖИТЬ</button></div>`;
+  }catch(e){modal('Ошибка',e.message)}
+}
 
-  // === DATA SCIENCE ===
-  datasci: [
-    { question: "На графике продажи растут линейно 6 месяцев, потом резкий спад. Что скорее всего?", options: ["Сезонный фактор", "Ошибка в данных 100%", "Смена алгоритма сайта", "Рост конкуренции невозможен"], correct: 0 },
-    { lines: ['id,name,age,salary', '1,Анна,25,50000', '2,Борис,30,60000', '3,Вика,-5,55000', '4,Гриша,28,70000', '5,Даша,22,999999999', '6,Евгений,35,65000'], bugLine: 3, explanation: 'Строка 4: отрицательный возраст (-5) — явная аномалия в данных.' },
-    { question: "Нужно предсказать цену квартиры по площади, этажу, району. Какой алгоритм лучше?", options: ["Линейная регрессия", "Кластеризация K-means", "Классификация (да/нет)", "Генеративная сеть"], correct: 0 },
-    { brief: "Выбери лучший тип визуализации для показа изменения дохода по месяцам:", colors: ["#4CAF50", "#FF9800", "#2196F3", "#9C27B0", "#F44336", "#00BCD4", "#FFEB3B", "#607D8B", "#E91E63", "#795548", "#3F51B5", "#CDDC39"], correct: [2, 0, 5, 6], needSelect: 4 },
-    { question: "A/B тест: вариант A — конверсия 3.2% (1000 юзеров), вариант B — 3.8% (1000). Вывод?", options: ["Разница мала, нужно больше данных", "B однозначно лучше", "A лучше, т.к. стабильнее", "Тест провален"], correct: 0 }
-  ],
+// === ДВИЖКИ ЗАДАНИЙ ===
 
-  // === CYBERSECURITY ===
-  cybersec: [
-    { question: "Какой пароль самый надёжный?", options: ["Tr0ub4dor&3", "password123", "qwerty", "P@$$w0rd"], correct: 0 },
-    { lines: ['От: support@bankk.ru', 'Тема: Срочно подтвердите!', '', 'Уважаемый клиент!', 'Ваш аккаунт заблокирован.', 'Перейдите по ссылке для разблокировки:', 'http://bankk-verify.xyz/login', 'Введите логин и пароль.', '', 'С уважением, Банк'], bugLine: 6, explanation: 'Строка 7: фишинговая ссылка! Домен bankk-verify.xyz не принадлежит банку.' },
-    { question: "В логах: 500 запросов с одного IP за 10 секунд на /login. Что это?", options: ["Brute-force атака", "Обычный пользователь", "SEO-бот", "Тестирование CSS"], correct: 0 },
-    { question: "Собери команду для шифрования файла:", slots: ["openssl ____", "____", "-in secret.txt", "-out ____"], pieces: ["enc", "-aes-256-cbc", "secret.enc", "dec", "-des", "output.txt", "rm", "-rf"], correct: ["enc", "-aes-256-cbc", "secret.enc"] },
-    { instruction: "Расставь шаги реагирования на инцидент:", items: ["Обнаружение угрозы", "Изоляция системы", "Анализ масштаба", "Устранение уязвимости", "Восстановление", "Отчёт и выводы"], correct: ["Обнаружение угрозы", "Изоляция системы", "Анализ масштаба", "Устранение уязвимости", "Восстановление", "Отчёт и выводы"] }
-  ],
+function renderTaskEngine(){
+  const{pid,tidx,meta}=S.curTask;
+  const data=TASKS[pid]?.[tidx];
+  if(!data){document.getElementById('tg-area').innerHTML=`<div style="text-align:center;padding:30px"><div style="font-size:8px;color:var(--txt2);margin-bottom:12px">Задание в разработке</div><button class="btn" onclick="exitTask()">Назад</button></div>`;return}
+  S.curTask.data=data;S.curTask.maxSteps=data.steps.length;
+  // Восстановить прогресс
+  if(S.curTask.saved){S.curTask.step=S.curTask.saved.step||0;S.curTask.score=S.curTask.saved.score||0;S.curTask.answers=S.curTask.saved.answers||[]}
+  renderStep();
+}
 
-  // === ROBOTICS ===
-  robotics: [
-    { instruction: "Собери электрическую цепь робота в правильном порядке:", items: ["Аккумулятор", "Контроллер (Arduino)", "Драйвер моторов", "Моторы", "Датчики → контроллер"], correct: ["Аккумулятор", "Контроллер (Arduino)", "Драйвер моторов", "Моторы", "Датчики → контроллер"] },
-    { question: "Собери код для движения робота вперёд на 2 секунды:", slots: ["void setup() {", "  pinMode(motorPin, ____);", "}", "void loop() {", "  digitalWrite(motorPin, ____);", "  delay(____);", "  digitalWrite(motorPin, LOW);", "}"], pieces: ["OUTPUT", "HIGH", "2000", "INPUT", "LOW", "500", "ANALOG", "1000"], correct: ["OUTPUT", "HIGH", "2000"] },
-    { question: "Робот-пылесос должен объезжать препятствия. Какой датчик основной?", options: ["Ультразвуковой дальномер", "Датчик температуры", "Акселерометр", "Датчик влажности"], correct: 0 },
-    { lines: ['// Робот едет и объезжает стены', 'while (true) {', '  distance = ultrasonic.read();', '  if (distance > 20) {', '    motors.forward(100);', '  } else {', '    motors.forward(100);', '    delay(500);', '  }', '}'], bugLine: 6, explanation: 'Строка 7: при обнаружении стены робот всё равно едет вперёд! Нужно motors.turn() или motors.backward().' },
-    { instruction: "Спроектируй робота-официанта — расставь компоненты:", items: ["Шасси с колёсами", "Лидар для навигации", "Платформа для подноса", "Камера для распознавания", "Микроконтроллер", "Аккумулятор"], correct: ["Шасси с колёсами", "Аккумулятор", "Микроконтроллер", "Лидар для навигации", "Камера для распознавания", "Платформа для подноса"] }
-  ],
+function renderStep(){
+  const{data,step,maxSteps,meta}=S.curTask;
+  if(step>=maxSteps){const finalScore=Math.min(100,Math.floor(S.curTask.score/maxSteps));finishTask(finalScore);return}
+  const s=data.steps[step];
+  let h=`<h3>${meta.title}</h3>`;
+  // Индикатор шагов
+  h+='<div class="step-indicator">';
+  for(let i=0;i<maxSteps;i++)h+=`<div class="step-dot ${i<step?'done':i===step?'active':''}"></div>`;
+  h+='</div>';
+  // Обучающая панель
+  if(s.learn)h+=`<div class="info-panel">${s.learn}</div>`;
+  // Описание
+  if(s.text)h+=`<div style="font-size:6px;color:var(--txt);line-height:1.7;margin:6px 0">${s.text}</div>`;
+  // Контент по типу
+  h+=`<div class="tg-content" id="step-content">`;
+  if(s.type==='choice')h+=renderChoice(s);
+  else if(s.type==='multi_choice')h+=renderMultiChoice(s);
+  else if(s.type==='order')h+=renderOrder(s);
+  else if(s.type==='builder')h+=renderBuilder(s);
+  else if(s.type==='grid')h+=renderGrid(s);
+  else if(s.type==='input')h+=renderInput(s);
+  else if(s.type==='scenario')h+=renderScenario(s);
+  else if(s.type==='match')h+=renderMatch(s);
+  h+=`</div>`;
+  document.getElementById('tg-area').innerHTML=h;
+  // Пост-рендер инициализация
+  if(s.type==='order')initDrag();
+  if(s.type==='grid')initGrid(s);
+}
 
-  // === ENERGY ===
-  energy: [
-    { question: "Офис 200 м², 50 компьютеров по 300Вт, свет 5000Вт. Общее потребление?", options: ["20 кВт", "15 кВт", "25 кВт", "10 кВт"], correct: 0 },
-    { instruction: "Расположи солнечные панели по приоритету установки:", items: ["Южная сторона крыши (угол 30°)", "Западная стена (вертикально)", "Северная сторона (тень)", "Плоская крыша (горизонтально)", "Юго-восток (угол 45°)"], correct: ["Южная сторона крыши (угол 30°)", "Юго-восток (угол 45°)", "Плоская крыша (горизонтально)", "Западная стена (вертикально)", "Северная сторона (тень)"] },
-    { lines: ['# Электросеть здания', 'Главный щит: 380В', 'Этаж 1: автомат 32А → розетки', 'Этаж 2: автомат 16А → розетки', 'Этаж 2: серверная 10кВт на 16А', 'Этаж 3: автомат 25А → розетки', 'Заземление: подключено'], bugLine: 4, explanation: 'Строка 5: серверная на 10кВт требует ~26А, а автомат только на 16А — будет выбивать! Нужен автомат минимум 32А.' },
-    { question: "Завод тратит 500МВт·ч/мес. Солнечные панели дают 150МВт·ч. Как оптимизировать?", options: ["Ночной тариф + аккумуляторы", "Убрать все панели", "Включать станки только днём", "Ничего не делать"], correct: 0 },
-    { instruction: "Спроектируй мини-электростанцию — порядок компонентов:", items: ["Источник энергии (турбина)", "Генератор", "Трансформатор", "Распредщит", "Потребители"], correct: ["Источник энергии (турбина)", "Генератор", "Трансформатор", "Распредщит", "Потребители"] }
-  ],
+// --- Выбор одного ---
+function renderChoice(s){
+  let h='<div class="choice-list">';
+  s.options.forEach((o,i)=>h+=`<button class="choice-btn" onclick="ansChoice(${i},${s.correct})">${o}</button>`);
+  return h+'</div>';
+}
+function ansChoice(sel,cor){
+  document.querySelectorAll('.choice-btn').forEach((b,i)=>{
+    b.onclick=null;if(i===cor)b.classList.add('correct');
+    if(i===sel&&sel!==cor)b.classList.add('wrong');
+  });
+  S.curTask.score+=sel===cor?100:15;S.curTask.answers.push(sel);
+  setTimeout(nextStep,900);
+}
 
-  // === DIAGNOSTICS ===
-  diagnostics: [
-    { question: "Пациент: температура 38.5°, кашель 5 дней, слабость. Какой вопрос ПЕРВЫЙ?", options: ["Когда началось?", "Любимый цвет?", "Группа крови?", "Рост и вес?"], correct: 0 },
-    { lines: ['Анализ крови пациента:', 'Гемоглобин: 140 г/л (N)', 'Лейкоциты: 4.5 × 10⁹/л (N)', 'Тромбоциты: 250 × 10⁹/л (N)', 'Глюкоза: 15.8 ммоль/л (N: 3.3-5.5)', 'СОЭ: 12 мм/ч (N)', 'Холестерин: 4.2 ммоль/л (N)'], bugLine: 4, explanation: 'Строка 5: глюкоза 15.8 при норме 3.3-5.5 — подозрение на сахарный диабет!' },
-    { question: "Боль в животе справа внизу, температура 37.8°, тошнота. Наиболее вероятно?", options: ["Аппендицит", "Мигрень", "Перелом ноги", "Отит"], correct: 0 },
-    { instruction: "Составь план обследования при подозрении на пневмонию:", items: ["Осмотр и аускультация", "Общий анализ крови", "Рентген грудной клетки", "Анализ мокроты", "Назначение лечения"], correct: ["Осмотр и аускультация", "Общий анализ крови", "Рентген грудной клетки", "Анализ мокроты", "Назначение лечения"] },
-    { question: "У пациента 65 лет одышка, отёки ног, хрипы в лёгких. Какое обследование ключевое?", options: ["ЭхоКГ (УЗИ сердца)", "Рентген кисти", "МРТ головного мозга", "Анализ мочи"], correct: 0 }
-  ],
+// --- Множественный выбор ---
+function renderMultiChoice(s){
+  let h=`<div style="font-size:5px;color:var(--txt2);margin-bottom:4px">Выбери ${s.need} вариантов</div><div class="choice-list">`;
+  s.options.forEach((o,i)=>h+=`<button class="choice-btn" data-i="${i}" onclick="toggleMC(this,${i})">${o}</button>`);
+  h+=`</div><div style="margin-top:8px"><button class="btn sec" onclick="checkMC()">✓ ПОДТВЕРДИТЬ</button></div>`;
+  window._mcSel=[];window._mcCorrect=s.correct;
+  return h;
+}
+function toggleMC(el,i){
+  if(el.classList.contains('selected')){el.classList.remove('selected');window._mcSel=window._mcSel.filter(x=>x!==i)}
+  else{el.classList.add('selected');window._mcSel.push(i)}
+}
+function checkMC(){
+  const cor=window._mcCorrect;let hits=0;
+  window._mcSel.forEach(i=>{if(cor.includes(i))hits++});
+  document.querySelectorAll('.choice-btn').forEach((b,i)=>{
+    b.onclick=null;if(cor.includes(i))b.classList.add('correct');
+    else if(window._mcSel.includes(i))b.classList.add('wrong');
+  });
+  S.curTask.score+=Math.floor(hits/cor.length*100);
+  setTimeout(nextStep,900);
+}
 
-  // === BIOTECH ===
-  biotech: [
-    { instruction: "Расставь этапы ПЦР в правильном порядке:", items: ["Денатурация (95°C)", "Отжиг праймеров (55°C)", "Элонгация (72°C)", "Повторить 30 циклов", "Финальная элонгация"], correct: ["Денатурация (95°C)", "Отжиг праймеров (55°C)", "Элонгация (72°C)", "Повторить 30 циклов", "Финальная элонгация"] },
-    { lines: ['Последовательность ДНК:', 'ATGCCTGAATTCGGA', 'TACGGACTAAAGCCT', '', 'Ожидаемый белок:', 'Met-Pro-Glu-Phe-Gly', '', 'Результат секвенирования:', 'ATGCCTGAATTCGGA', 'Мутация не обнаружена'], bugLine: 1, explanation: 'Строка 2-3: комплементарная цепь неверная! Для A→T, T→A, G→C, C→G. Правильно: TACGGACTTAAGCCT' },
-    { question: "Для выращивания бактерий E.coli, какая среда оптимальна?", options: ["LB (Лурия-Бертани)", "Дистиллированная вода", "Молоко", "Спирт 96%"], correct: 0 },
-    { question: "Биореактор: pH падает с 7.0 до 5.5. Что делать?", options: ["Добавить NaOH (щёлочь)", "Добавить HCl (кислоту)", "Увеличить температуру", "Выключить перемешивание"], correct: 0 },
-    { question: "Собери последовательность гидовой РНК для CRISPR:", slots: ["Цель: ATGC____", "Гид: ____CGTA", "PAM: ____"], pieces: ["GCAT", "TACG", "NGG", "NCC", "AAAA", "TTTT"], correct: ["GCAT", "TACG", "NGG"] }
-  ],
+// --- Порядок (drag) ---
+function renderOrder(s){
+  const items=[...s.items].sort(()=>Math.random()-.5);
+  let h=`<div class="drag-list" id="drag-list">`;
+  items.forEach(it=>h+=`<div class="drag-item"><span class="dh">☰</span><span>${it}</span></div>`);
+  h+=`</div><div style="margin-top:8px"><button class="btn sec" onclick="checkOrder()">✓ ПОДТВЕРДИТЬ</button></div>`;
+  window._orderCorrect=s.items;
+  return h;
+}
+function initDrag(){
+  let dragEl=null,startY=0;
+  document.addEventListener('touchstart',function handler(e){
+    const item=e.target.closest('.drag-item');if(!item)return;
+    dragEl=item;startY=e.touches[0].clientY;item.classList.add('dragging');
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    if(!dragEl)return;const cy=e.touches[0].clientY,diff=cy-startY;
+    const cont=dragEl.parentElement;if(!cont)return;
+    const items=Array.from(cont.querySelectorAll('.drag-item')),idx=items.indexOf(dragEl);
+    if(diff>35&&idx<items.length-1){cont.insertBefore(items[idx+1],dragEl);startY=cy}
+    else if(diff<-35&&idx>0){cont.insertBefore(dragEl,items[idx-1]);startY=cy}
+  },{passive:true});
+  document.addEventListener('touchend',function(){if(dragEl){dragEl.classList.remove('dragging');dragEl=null}});
+}
+function checkOrder(){
+  const items=Array.from(document.querySelectorAll('#drag-list .drag-item'));
+  const cur=items.map(el=>el.querySelector('span:last-child').textContent);
+  let score=0;cur.forEach((v,i)=>{if(v===window._orderCorrect[i])score+=Math.floor(100/window._orderCorrect.length)});
+  S.curTask.score+=Math.min(100,score);nextStep();
+}
 
-  // === GAMEDEV ===
-  gamedev: [
-    { question: "Воин: 100 HP, 20 ATK. Маг: 60 HP, 35 ATK. Кто сильнее в долгом бою?", options: ["Воин (больше HP)", "Маг (больше урона)", "Одинаково", "Невозможно сравнить"], correct: 0 },
-    { instruction: "Расположи объекты на уровне платформера:", items: ["Точка спавна игрока", "Обучающие платформы", "Первые враги", "Бонусы и монеты", "Сложные препятствия", "Босс / выход"], correct: ["Точка спавна игрока", "Обучающие платформы", "Первые враги", "Бонусы и монеты", "Сложные препятствия", "Босс / выход"] },
-    { question: "Игрок зарабатывает 100 монет/мин. Меч стоит 1000. Когда покупка?", options: ["10 минут — нормально", "1 минута — слишком легко", "100 минут — слишком долго", "Бесплатно — зачем монеты"], correct: 0 },
-    { question: "NPC говорит: «Помоги!» Какой вариант диалога лучше для RPG?", options: ["3 варианта ответа с последствиями", "Только «ОК»", "Автоскип диалога", "Вырезать все диалоги"], correct: 0 },
-    { instruction: "Собери прототип игрового цикла:", items: ["Ввод игрока (Input)", "Обновление логики (Update)", "Проверка коллизий", "Отрисовка кадра (Render)", "Звук и эффекты"], correct: ["Ввод игрока (Input)", "Обновление логики (Update)", "Проверка коллизий", "Отрисовка кадра (Render)", "Звук и эффекты"] }
-  ],
+// --- Конструктор (site builder и подобные) ---
+function renderBuilder(s){
+  let h=`<div class="sb-workspace" id="sb-ws">`;
+  if(s.initial)s.initial.forEach(b=>h+=`<div class="sb-block"><div class="sb-label">${b.label}</div>${b.content}</div>`);
+  h+=`<div style="text-align:center;font-size:5px;color:var(--txt2);padding:10px">Перетащи блоки сюда ↑</div></div>`;
+  h+=`<div style="font-size:6px;color:var(--sec);margin:6px 0">Доступные блоки:</div>`;
+  h+=`<div class="sb-palette" id="sb-pal">`;
+  s.pieces.forEach((p,i)=>h+=`<div class="sb-piece" data-i="${i}" onclick="addBlock(${i})">${p.icon} ${p.name}</div>`);
+  h+=`</div><div style="margin-top:8px"><button class="btn grn" onclick="checkBuilder()">✓ ГОТОВО</button></div>`;
+  window._bPieces=s.pieces;window._bCorrect=s.correct;window._bAdded=[];
+  return h;
+}
+function addBlock(i){
+  const p=window._bPieces[i];const el=document.querySelector(`.sb-piece[data-i="${i}"]`);
+  if(el.classList.contains('used'))return;el.classList.add('used');window._bAdded.push(p.id);
+  const ws=document.getElementById('sb-ws');
+  const hint=ws.querySelector('div:last-child');
+  const block=document.createElement('div');block.className='sb-block';
+  block.innerHTML=`<div class="sb-label">${p.icon} ${p.name}</div>${p.preview||''}`;
+  ws.insertBefore(block,hint);
+}
+function checkBuilder(){
+  const cor=window._bCorrect;const added=window._bAdded;
+  let score=0;cor.forEach((c,i)=>{if(added[i]===c)score+=Math.floor(100/cor.length)});
+  S.curTask.score+=Math.min(100,score);nextStep();
+}
 
-  // === DESIGN ===
-  design: [
-    { brief: "Подбери цвета для банковского приложения — надёжность и спокойствие:", colors: ["#1A3C6D", "#FFFFFF", "#E8F0FE", "#00BFA5", "#FF1744", "#FFEB3B", "#4A148C", "#2E7D32", "#F5F5F5", "#263238", "#FF6F00", "#B71C1C"], correct: [0, 1, 2, 9], needSelect: 4 },
-    { lines: ['Экран регистрации:', '[ Логотип ]', '[ Поле email ]', '[ Поле пароль ]', '[ Ссылка "Забыл пароль" размер 4px ]', '[ Кнопка "Войти" ]', '[ Текст: "Нет аккаунта? Регистрация" ]'], bugLine: 4, explanation: 'Строка 5: ссылка размером 4px невозможна для нажатия! Минимальный размер кликабельного элемента — 44px.' },
-    { instruction: "Собери UI-кит из компонентов (от простых к сложным):", items: ["Цветовые токены", "Типографика", "Иконки", "Кнопки и поля ввода", "Карточки и списки", "Целые экраны"], correct: ["Цветовые токены", "Типографика", "Иконки", "Кнопки и поля ввода", "Карточки и списки", "Целые экраны"] },
-    { question: "Пользователь ищет кнопку «Купить». Где её разместить?", options: ["Заметно, с контрастным цветом", "Спрятать в меню", "Мелким шрифтом внизу", "В настройках"], correct: 0 },
-    { brief: "Редизайн: выбери улучшенные цвета для устаревшего интерфейса:", colors: ["#6C63FF", "#F8F9FA", "#2D3436", "#00B894", "#E17055", "#FDCB6E", "#0984E3", "#DFE6E9", "#636E72", "#A29BFE", "#74B9FF", "#55A3A4"], correct: [0, 1, 2, 3], needSelect: 4 }
-  ],
+// --- Сетка (level editor и подобные) ---
+function renderGrid(s){
+  const sz=s.size||8;
+  let h=`<div class="grid-canvas" id="game-grid" style="grid-template-columns:repeat(${sz},1fr)">`;
+  for(let i=0;i<sz*sz;i++)h+=`<div class="grid-cell" data-i="${i}"></div>`;
+  h+=`</div>`;
+  h+=`<div class="sb-palette">`;
+  s.tools.forEach((t,i)=>h+=`<div class="sb-piece ${i===0?'selected':''}" data-t="${i}" onclick="selGridTool(${i})">${t.icon} ${t.name}</div>`);
+  h+=`</div><div style="margin-top:8px"><button class="btn grn" onclick="checkGrid()">✓ ПРОВЕРИТЬ</button></div>`;
+  window._gridTools=s.tools;window._gridTool=0;window._gridData=new Array(sz*sz).fill(-1);window._gridCheck=s.check;
+  return h;
+}
+function initGrid(s){
+  document.querySelectorAll('.grid-cell').forEach(cell=>{
+    cell.addEventListener('pointerdown',()=>{
+      const i=+cell.dataset.i;const t=window._gridTool;
+      window._gridData[i]=t;cell.textContent=window._gridTools[t].icon;
+      cell.style.background=window._gridTools[t].color||'var(--bg3)';cell.classList.add('filled');
+    });
+  });
+}
+function selGridTool(i){
+  document.querySelectorAll('.sb-piece').forEach(p=>p.classList.toggle('selected',+p.dataset.t===i));
+  window._gridTool=i;
+}
+function checkGrid(){
+  const fn=window._gridCheck;const data=window._gridData;
+  let score=typeof fn==='function'?fn(data):50;
+  S.curTask.score+=Math.min(100,score);nextStep();
+}
 
-  // === MARKETING ===
-  marketing: [
-    { question: "Новый фитнес-браслет для студентов 18-25 лет. Где лучше рекламировать?", options: ["ВК + Telegram + TikTok", "Газеты и журналы", "Радио для пенсионеров", "Билборды в деревнях"], correct: 0 },
-    { question: "Бюджет 100К₽/мес. Что дороже, но эффективнее для нового бренда?", options: ["Блогеры (60К) + таргет (40К)", "Вся сумма на один баннер", "Раздача листовок", "Спам в чатах"], correct: 0 },
-    { lines: ['Баннер A: "СКИДКА 50%!!!"', 'Клики: 1200, покупки: 12', 'CTR: 2.4%, CR: 1%', '', 'Баннер B: "Попробуй бесплатно"', 'Клики: 800, покупки: 32', 'CTR: 1.6%, CR: 4%', '', 'Вывод: Баннер A лучше'], bugLine: 8, explanation: 'Вывод неверный! Баннер B имеет конверсию 4% против 1% у A. Важнее покупки (32 vs 12), а не клики.' },
-    { instruction: "Составь контент-план на неделю для кофейни:", items: ["Пн: Фото новинки меню", "Вт: Видео приготовления", "Ср: Опрос «Ваш любимый кофе?»", "Чт: Отзыв клиента", "Пт: Анонс акции выходных", "Сб: Сторис из кофейни", "Вс: Мем про понедельник"], correct: ["Пн: Фото новинки меню", "Вт: Видео приготовления", "Ср: Опрос «Ваш любимый кофе?»", "Чт: Отзыв клиента", "Пт: Анонс акции выходных", "Сб: Сторис из кофейни", "Вс: Мем про понедельник"] },
-    { question: "CPC=15₽, конверсия 2%, средний чек 3000₽. ROI рекламы?", options: ["Положительный (3000×0.02=60₽ > 15₽)", "Отрицательный", "Нулевой", "Невозможно определить"], correct: 0 }
-  ],
+// --- Ввод значения ---
+function renderInput(s){
+  let h=`<div style="margin:8px 0"><input class="game-input" id="game-inp" type="${s.inputType||'text'}" placeholder="${s.placeholder||'Введи ответ...'}"></div>`;
+  h+=`<button class="btn sec" onclick="checkInput()">✓ ОТВЕТИТЬ</button>`;
+  window._inputCorrect=s.correct;window._inputFuzzy=s.fuzzy||false;
+  return h;
+}
+function checkInput(){
+  const val=document.getElementById('game-inp').value.trim().toLowerCase();
+  const cor=window._inputCorrect;
+  let match=false;
+  if(Array.isArray(cor))match=cor.some(c=>val.includes(c.toLowerCase()));
+  else match=val===cor.toLowerCase()||(window._inputFuzzy&&val.includes(cor.toLowerCase()));
+  S.curTask.score+=match?100:10;nextStep();
+}
 
-  // === PROJECT MANAGEMENT ===
-  pm: [
-    { instruction: "Разбей проект «Мобильное приложение» на этапы:", items: ["Сбор требований", "Дизайн прототипа", "Разработка MVP", "Тестирование", "Релиз", "Поддержка"], correct: ["Сбор требований", "Дизайн прототипа", "Разработка MVP", "Тестирование", "Релиз", "Поддержка"] },
-    { question: "Дедлайн через 2 недели, готово 30%. Команда — 3 разработчика. Что делать?", options: ["Пересмотреть скоуп, убрать неважное", "Добавить 10 джунов", "Ничего не делать, авось успеем", "Отменить проект"], correct: 0 },
-    { question: "Главный риск проекта — уход ключевого разработчика. Стратегия?", options: ["Документация + обучение дублёра", "Игнорировать", "Не давать отпуск никогда", "Нанять 10 разработчиков на замену"], correct: 0 },
-    { question: "На стендапе разработчик говорит: «Застрял на баге 3 дня». Ваши действия?", options: ["Организовать парное решение с коллегой", "Уволить", "Проигнорировать", "Дать ещё 3 дня"], correct: 0 },
-    { instruction: "Проведи ретроспективу — порядок обсуждения:", items: ["Что прошло хорошо?", "Что пошло не так?", "Какие были блокеры?", "Что улучшить?", "Конкретные действия на следующий спринт"], correct: ["Что прошло хорошо?", "Что пошло не так?", "Какие были блокеры?", "Что улучшить?", "Конкретные действия на следующий спринт"] }
-  ],
+// --- Сценарий с последствиями ---
+function renderScenario(s){
+  let h=`<div style="font-size:6px;line-height:1.7;margin:4px 0;color:var(--txt)">${s.situation}</div>`;
+  h+='<div class="choice-list">';
+  s.actions.forEach((a,i)=>h+=`<button class="choice-btn" onclick="doScenario(${i})">${a.text}</button>`);
+  h+='</div>';
+  window._scenarioActions=s.actions;
+  return h;
+}
+function doScenario(i){
+  const a=window._scenarioActions[i];
+  S.curTask.score+=a.score||0;
+  document.querySelectorAll('.choice-btn').forEach(b=>b.onclick=null);
+  document.querySelectorAll('.choice-btn')[i].classList.add(a.score>=60?'correct':'wrong');
+  if(a.feedback){
+    const el=document.createElement('div');el.className='info-panel';el.style.marginTop='8px';
+    el.innerHTML=a.feedback;document.getElementById('step-content').appendChild(el);
+  }
+  setTimeout(nextStep,1200);
+}
 
-  // === CHEMISTRY ===
-  chemistry: [
-    { question: "Уравняй: Fe + O₂ → Fe₂O₃. Коэффициенты:", slots: ["____ Fe +", "____ O₂ →", "____ Fe₂O₃"], pieces: ["4", "3", "2", "1", "6", "5"], correct: ["4", "3", "2"] },
-    { lines: ['Протокол лаборатории:', 'Халат: надет ✓', 'Очки: надеты ✓', 'Перчатки: надеты ✓', 'Еда на столе рядом с реактивами', 'Вытяжка: включена ✓', 'Журнал: открыт ✓'], bugLine: 4, explanation: 'Строка 5: еда рядом с реактивами — грубое нарушение ТБ! Запрещено есть и пить в лаборатории.' },
-    { question: "Вещество: бесцветный газ, тяжелее воздуха, не горит, гасит пламя. Что это?", options: ["CO₂ (углекислый газ)", "H₂ (водород)", "O₂ (кислород)", "CH₄ (метан)"], correct: 0 },
-    { instruction: "Составь план синтеза аспирина:", items: ["Подготовить салициловую кислоту", "Добавить уксусный ангидрид", "Нагреть на водяной бане", "Охладить и отфильтровать", "Высушить и взвесить"], correct: ["Подготовить салициловую кислоту", "Добавить уксусный ангидрид", "Нагреть на водяной бане", "Охладить и отфильтровать", "Высушить и взвесить"] },
-    { question: "При смешивании NaOH и HCl образуется NaCl и H₂O. Тип реакции?", options: ["Нейтрализация", "Горение", "Разложение", "Замещение"], correct: 0 }
-  ],
+// --- Сопоставление ---
+function renderMatch(s){
+  let h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">';
+  h+='<div style="font-size:5px;color:var(--sec);text-align:center">Элемент</div><div style="font-size:5px;color:var(--sec);text-align:center">Ответ</div>';
+  const shuffledRight=[...s.right].sort(()=>Math.random()-.5);
+  s.left.forEach((l,i)=>{
+    h+=`<div style="font-size:6px;padding:6px;background:var(--bg3);border-radius:2px">${l}</div>`;
+    h+=`<select class="game-input" data-mi="${i}" style="font-size:6px;padding:4px"><option value="">выбери...</option>`;
+    shuffledRight.forEach(r=>h+=`<option value="${r}">${r}</option>`);
+    h+=`</select>`;
+  });
+  h+='</div>';
+  h+=`<div style="margin-top:8px"><button class="btn sec" onclick="checkMatch()">✓ ПОДТВЕРДИТЬ</button></div>`;
+  window._matchCorrect=s.correct;
+  return h;
+}
+function checkMatch(){
+  const cor=window._matchCorrect;let hits=0;
+  document.querySelectorAll('[data-mi]').forEach((sel,i)=>{if(sel.value===cor[i])hits++});
+  S.curTask.score+=Math.floor(hits/cor.length*100);nextStep();
+}
 
-  // === PHYSICS ===
-  physics: [
-    { question: "Тело массой 5 кг ускоряется с a=2 м/с². Сила по 2-му закону Ньютона?", options: ["10 Н", "2.5 Н", "7 Н", "25 Н"], correct: 0 },
-    { question: "На графике v(t) — прямая с наклоном. Это значит:", options: ["Равноускоренное движение", "Покой", "Равномерное движение", "Свободное падение всегда"], correct: 0 },
-    { instruction: "Собери установку для измерения ускорения свободного падения:", items: ["Штатив с зажимом", "Шарик на нити (маятник)", "Линейка для длины нити", "Секундомер", "Формула T=2π√(L/g)"], correct: ["Штатив с зажимом", "Шарик на нити (маятник)", "Линейка для длины нити", "Секундомер", "Формула T=2π√(L/g)"] },
-    { lines: ['Эксперимент: измерение сопротивления', 'Амперметр: 0.5 А', 'Вольтметр: 10 В', 'R = U/I = 10/0.5 = 20 Ом', 'Но вольтметр подключён параллельно амперметру', 'Итого R = 20 Ом (точно)'], bugLine: 4, explanation: 'Строка 5: вольтметр подключён неправильно! Он должен быть параллелен резистору, а не амперметру. Это даёт погрешность.' },
-    { question: "Планета с массой 2M и радиусом 2R. Ускорение свободного падения?", options: ["g/2 (вдвое меньше)", "2g", "g (такое же)", "4g"], correct: 0 }
-  ]
+function nextStep(){S.curTask.step++;renderStep()}
+
+// ================================================================
+// === ДАННЫЕ ЗАДАНИЙ ===
+// ================================================================
+
+const TASKS={
+
+// =================== FRONTEND ===================
+frontend:[
+  {steps:[ // Задание 0: Конструктор сайта
+    {type:'builder',learn:'<b>Лендинг</b> — это одностраничный сайт, который продаёт продукт или идею. Он состоит из блоков: шапка, герой-секция (главный баннер), преимущества, отзывы и подвал. <span class="hint">Расположи блоки в правильном порядке.</span>',
+     text:'Клиент хочет лендинг для фитнес-приложения. Собери страницу из блоков:',
+     pieces:[
+       {id:'nav',name:'Навигация',icon:'📌',preview:'<div style="font-size:5px;color:#888">Лого | Меню | Кнопка</div>'},
+       {id:'hero',name:'Герой-секция',icon:'🖼',preview:'<div style="font-size:5px;color:#888">Заголовок + CTA</div>'},
+       {id:'features',name:'Преимущества',icon:'⭐',preview:'<div style="font-size:5px;color:#888">3 карточки</div>'},
+       {id:'reviews',name:'Отзывы',icon:'💬',preview:'<div style="font-size:5px;color:#888">Слайдер отзывов</div>'},
+       {id:'footer',name:'Подвал',icon:'📋',preview:'<div style="font-size:5px;color:#888">Контакты + соцсети</div>'},
+       {id:'popup',name:'Попап рекламы',icon:'🚫',preview:'<div style="font-size:5px;color:#888">СКИДКА 90%!!!</div>'},
+     ],correct:['nav','hero','features','reviews','footer']},
+    {type:'choice',learn:'<b>CTA (Call To Action)</b> — кнопка призыва к действию. Она должна быть заметной, с контрастным цветом и чётким текстом. <span class="hint">Выбери лучший вариант.</span>',
+     text:'Какая CTA-кнопка лучше для фитнес-приложения?',
+     options:['«Попробовать бесплатно» — зелёная, крупная','«Нажми сюда» — серая, мелкая','«КУПИ СЕЙЧАС!!!» — красная, мигающая','«Подробнее...» — без цвета, внизу страницы'],correct:0},
+    {type:'multi_choice',text:'Какие элементы ОБЯЗАТЕЛЬНЫ для хорошего мобильного меню?',
+     options:['Иконка-бургер (☰)','Фоновая музыка','Крупные кнопки (мин. 44px)','Автоматическое закрытие','Анимация при открытии','Всплывающие подсказки на каждый пункт'],
+     correct:[0,2,3],need:3},
+    {type:'scenario',situation:'Дизайнер прислал макет: текст 10px, кнопка 20x20px, контраст серый на сером. Клиент говорит: «Выглядит минималистично, оставляем!» Твои действия?',
+     actions:[
+       {text:'Объяснить проблемы доступности: мелкий текст не прочитают, кнопку не нажмут, контраст нарушает WCAG',score:100,feedback:'<b>Верно!</b> Доступность — не каприз, а стандарт. Минимум: текст 14px, кнопки 44px, контраст 4.5:1.'},
+       {text:'Молча поправить всё самому',score:40,feedback:'Инициатива хороша, но нужно объяснить причины — иначе дизайнер повторит ошибки.'},
+       {text:'Согласиться — клиент всегда прав',score:10,feedback:'Клиент прав в бизнес-решениях, но не в технических стандартах. Пользователи уйдут с неудобного сайта.'},
+     ]},
+    {type:'order',text:'Расположи этапы разработки фронтенда в правильном порядке:',
+     items:['Анализ макета и ТЗ','Создание HTML-структуры','Стилизация (CSS)','Программирование (JS)','Тестирование на устройствах','Оптимизация и деплой']},
+  ]},
+  {steps:[ // Задание 1: CSS-мастер
+    {type:'choice',learn:'<b>Flexbox</b> — инструмент для расположения элементов в строку или колонку. Основные свойства: <b>display: flex</b>, <b>justify-content</b> (горизонтально), <b>align-items</b> (вертикально).',
+     text:'Три карточки должны быть в ряд с равными промежутками. Какой CSS?',
+     options:['display: flex; justify-content: space-between','display: block; text-align: center','float: left; margin: auto','position: absolute; left: 33%'],correct:0},
+    {type:'choice',text:'Текст должен быть вертикально по центру в блоке высотой 200px. Решение?',
+     options:['display: flex; align-items: center','padding-top: 100px (подбором)','vertical-align: middle (не работает для блоков)','margin: auto (только горизонтально)'],correct:0},
+    {type:'input',learn:'<b>CSS-переменные</b> позволяют хранить значения и использовать повторно: <b>--main-color: #ff6600;</b> и далее <b>color: var(--main-color)</b>.',
+     text:'Как обратиться к CSS-переменной --brand в свойстве color? Напиши значение.',
+     placeholder:'color: ???',correct:['var(--brand)','var( --brand)','var(--brand )'],fuzzy:true},
+    {type:'scenario',situation:'Верстаешь интернет-магазин. На десктопе — сетка 4 колонки, на мобильном — 1 колонка. Дизайнер не предусмотрел планшеты (768px). Что делать?',
+     actions:[
+       {text:'Добавить @media (max-width: 768px) с сеткой 2 колонки — промежуточный вариант',score:100,feedback:'<b>Отлично!</b> Добавление промежуточного брейкпоинта — стандартная практика адаптивной вёрстки.'},
+       {text:'Сделать только мобильную и десктопную версию — планшеты не важны',score:30,feedback:'34% трафика идёт с планшетов. Игнорировать их — терять клиентов.'},
+       {text:'Использовать zoom: 0.7 для планшетов',score:10,feedback:'zoom — нестандартное свойство и создаёт баги. Используй media queries.'},
+     ]},
+    {type:'order',text:'Приоритет CSS-селекторов (от низшего к высшему):',
+     items:['Селектор тега (div, p)','Класс (.button)','ID (#header)','Инлайн-стиль (style="...")','!important']},
+  ]},
+  {steps:[ // Задание 2: Исправь вёрстку
+    {type:'choice',learn:'<b>Семантический HTML</b> — использование тегов по назначению: &lt;nav&gt; для навигации, &lt;main&gt; для основного контента, &lt;article&gt; для статьи. Это помогает SEO и доступности.',
+     text:'Весь сайт сделан на &lt;div&gt;. Какой тег нужен для списка навигации?',
+     options:['<nav> с <ul> и <li>','<div class="nav">','<span id="menu">','<table> с ссылками'],correct:0},
+    {type:'multi_choice',text:'Какие проблемы есть в коде: &lt;img src="photo.jpg"&gt; ?',
+     options:['Нет атрибута alt (описание для скринридеров)','Нет width/height (сдвиг контента при загрузке)','Не использует формат WebP','Нет атрибута loading="lazy"','Файл .jpg вместо .png','Нет тега <figure>'],
+     correct:[0,1,3],need:3},
+    {type:'scenario',situation:'В проде баг: на iPhone Safari сайт съезжает, на Android Chrome всё ок. Дедлайн через 2 часа.',
+     actions:[
+       {text:'Открыть Safari DevTools, найти проблемный CSS (скорее всего -webkit-), исправить, проверить на BrowserStack',score:100,feedback:'<b>Профессиональный подход!</b> Кроссбраузерные баги чаще всего в CSS-префиксах и flexbox/grid.'},
+       {text:'Добавить viewport fix и надеяться',score:30,feedback:'Без диагностики "слепые" фиксы могут создать новые проблемы.'},
+       {text:'Написать: "Рекомендуем Chrome" и закрыть задачу',score:5,feedback:'Это антипаттерн. 50% мобильных пользователей используют Safari.'},
+     ]},
+    {type:'choice',text:'Форма регистрации: поле email. Какой тип input лучше?',
+     options:['type="email" — валидация + мобильная клавиатура с @','type="text" — подойдёт для всего','type="url" — похоже на email','type="search" — есть крестик очистки'],correct:0},
+    {type:'order',text:'Порядок загрузки страницы в браузере:',
+     items:['DNS-запрос и подключение к серверу','Загрузка HTML','Парсинг HTML, построение DOM','Загрузка CSS, построение CSSOM','Выполнение JavaScript','Отрисовка (Paint) и показ']},
+  ]},
+  {steps:[ // Задание 3: Адаптивный дизайн
+    {type:'choice',learn:'<b>Mobile-first</b> — подход, где сначала верстается мобильная версия, потом через @media (min-width) добавляются стили для больших экранов. Это эффективнее, т.к. мобильных пользователей больше.',
+     text:'Какой подход правильный для адаптивной вёрстки?',
+     options:['Mobile-first: базовые стили для мобильных + @media min-width','Desktop-first: полная версия + @media max-width','Две разные страницы: site.com и m.site.com','Один фиксированный размер с zoom'],correct:0},
+    {type:'multi_choice',text:'Какие единицы измерения подходят для адаптивного текста?',
+     options:['rem (относительно корневого шрифта)','clamp() (минимум, предпочтение, максимум)','px (фиксированные пиксели)','vw (процент ширины экрана)','cm (сантиметры)','% (от родителя)'],
+     correct:[0,1,3],need:3},
+    {type:'scenario',situation:'Клиент прислал макет только для десктопа (1920px). Говорит: "Адаптив не нужен, у наших клиентов мониторы." Статистика показывает 60% мобильных.',
+     actions:[
+       {text:'Показать статистику, объяснить потерю 60% аудитории, предложить бюджет на адаптив',score:100,feedback:'<b>Правильно!</b> Данные убедительнее мнений. Всегда подкрепляй аргументы числами.'},
+       {text:'Сделать без адаптива — клиент платит',score:20,feedback:'Клиент потеряет деньги и обвинит разработчика. Профессионал предупреждает о рисках.'},
+       {text:'Тайно добавить адаптив',score:50,feedback:'Хорошая инициатива, но скрытая работа = неоплаченный труд и проблемы с доверием.'},
+     ]},
+    {type:'order',text:'Стандартные брейкпоинты (от меньшего к большему):',
+     items:['320px — старые смартфоны','375px — стандартный мобильный','768px — планшет','1024px — маленький ноутбук','1440px — десктоп','1920px — большой монитор']},
+    {type:'choice',text:'Изображение должно быть чётким на Retina-дисплеях. Решение?',
+     options:['srcset с 2x вариантами + sizes','Увеличить resolution: 300dpi в CSS','Использовать только SVG','Загрузить одно изображение 4000px'],correct:0},
+  ]},
+  {steps:[ // Задание 4: Финальный проект
+    {type:'builder',text:'Собери сайт-портфолио для дизайнера. Клиент хочет: шапку, секцию "Обо мне", галерею работ, контакты.',
+     pieces:[
+       {id:'header',name:'Шапка с навигацией',icon:'🔝',preview:'<div style="font-size:5px;color:#888">Имя | Работы | Контакты</div>'},
+       {id:'about',name:'Обо мне',icon:'👤',preview:'<div style="font-size:5px;color:#888">Фото + текст + скиллы</div>'},
+       {id:'gallery',name:'Галерея работ',icon:'🖼',preview:'<div style="font-size:5px;color:#888">Сетка проектов</div>'},
+       {id:'contacts',name:'Контакты',icon:'📧',preview:'<div style="font-size:5px;color:#888">Форма + соцсети</div>'},
+       {id:'ticker',name:'Бегущая строка новостей',icon:'📰',preview:'<div style="font-size:5px;color:#888">Новости...</div>'},
+       {id:'counter',name:'Счётчик посещений',icon:'👀',preview:'<div style="font-size:5px;color:#888">Вы 100500-й посетитель!</div>'},
+     ],correct:['header','about','gallery','contacts']},
+    {type:'scenario',situation:'Портфолио готово. Загрузка главной страницы — 8 секунд. Google PageSpeed показывает 30/100. Клиент недоволен.',
+     actions:[
+       {text:'Оптимизировать: сжать изображения (WebP), добавить lazy loading, минифицировать CSS/JS, включить кеширование',score:100,feedback:'<b>Правильный план!</b> 80% ускорения обычно даёт оптимизация изображений + lazy loading.'},
+       {text:'Сказать "у Google строгие требования, 8 сек — нормально"',score:5,feedback:'53% пользователей уходят, если загрузка > 3 секунд.'},
+       {text:'Удалить все картинки',score:15,feedback:'Это портфолио дизайнера — без картинок оно бесполезно. Нужно оптимизировать, а не удалять.'},
+     ]},
+    {type:'choice',text:'Какой формат изображений лучше для веба в 2026?',
+     options:['WebP/AVIF — лучшее сжатие при качестве','JPEG — классика для фото','PNG — для всего','BMP — максимальное качество'],correct:0},
+    {type:'multi_choice',text:'Что проверить перед публикацией сайта?',
+     options:['Кроссбраузерное тестирование','Проверка на мобильных устройствах','Скорость загрузки','Работа форм и ссылок','Подключить jQuery','Проверить в IE6'],
+     correct:[0,1,2,3],need:4},
+    {type:'order',text:'Этапы деплоя сайта:',
+     items:['Финальное тестирование','Подготовка production-сборки','Настройка домена и SSL','Загрузка на хостинг/сервер','Проверка работоспособности','Мониторинг ошибок']},
+  ]},
+],
+
+// =================== BACKEND ===================
+backend:[
+  {steps:[
+    {type:'choice',learn:'<b>SQL</b> — язык запросов к базам данных. <b>SELECT</b> — выбрать данные, <b>FROM</b> — из какой таблицы, <b>WHERE</b> — условие фильтрации, <b>ORDER BY</b> — сортировка.',
+     text:'Таблица users: id, name, age, city. Нужны все пользователи из Москвы старше 18. Какой запрос?',
+     options:['SELECT * FROM users WHERE city="Москва" AND age > 18','SELECT * FROM users WHERE city="Москва" OR age > 18','GET users FROM city="Москва"','FIND users(city="Москва", age>18)'],correct:0},
+    {type:'input',learn:'<b>JOIN</b> объединяет данные из нескольких таблиц. <b>INNER JOIN</b> — только совпадения, <b>LEFT JOIN</b> — все из левой + совпадения из правой.',
+     text:'Таблица orders имеет user_id. Как получить имена покупателей и их заказы? Напиши тип JOIN.',
+     placeholder:'??? JOIN',correct:['inner join','join'],fuzzy:true},
+    {type:'scenario',situation:'Запрос к БД выполняется 15 секунд. Таблица — 5 млн строк. WHERE фильтрует по полю email, но индекса нет.',
+     actions:[
+       {text:'Создать индекс на поле email — ускорит поиск с O(n) до O(log n)',score:100,feedback:'<b>Точно!</b> Индексы — главный инструмент оптимизации SQL. CREATE INDEX idx_email ON users(email);'},
+       {text:'Увеличить RAM сервера',score:30,feedback:'Больше RAM поможет, но без индекса полное сканирование таблицы всё равно будет медленным.'},
+       {text:'Разбить запрос на 5 маленьких',score:10,feedback:'Это не решит проблему — каждый подзапрос всё равно будет сканировать всю таблицу.'},
+     ]},
+    {type:'order',text:'Порядок выполнения SQL-запроса в СУБД:',
+     items:['FROM — определить таблицу','WHERE — отфильтровать строки','GROUP BY — сгруппировать','HAVING — фильтр по группам','SELECT — выбрать столбцы','ORDER BY — сортировать','LIMIT — ограничить количество']},
+    {type:'multi_choice',text:'Какие практики защищают от SQL-инъекций?',
+     options:['Параметризованные запросы','Валидация ввода','Подстановка переменных через f-string','ORM (SQLAlchemy/Prisma)','Проверка длины строки','Удаление всех кавычек из ввода'],
+     correct:[0,1,3],need:3},
+  ]},
+  {steps:[
+    {type:'match',learn:'<b>REST API</b> использует HTTP-методы: <b>GET</b> — получить, <b>POST</b> — создать, <b>PUT</b> — обновить полностью, <b>PATCH</b> — обновить частично, <b>DELETE</b> — удалить.',
+     text:'Сопоставь действия с HTTP-методами:',
+     left:['Получить список товаров','Создать заказ','Обновить имя пользователя','Удалить комментарий'],
+     right:['GET','POST','PATCH','DELETE','PUT'],
+     correct:['GET','POST','PATCH','DELETE']},
+    {type:'choice',text:'Код ответа API: клиент отправил запрос без токена авторизации. Какой статус вернуть?',
+     options:['401 Unauthorized','404 Not Found','500 Internal Server Error','200 OK'],correct:0},
+    {type:'scenario',situation:'Ты проектируешь API для мессенджера. Нужен эндпоинт для отправки сообщения. Какой URL и метод выбрать?',
+     actions:[
+       {text:'POST /api/messages — тело: {chat_id, text}',score:100,feedback:'<b>Верно!</b> POST для создания ресурса, URL — существительное во множественном числе.'},
+       {text:'GET /api/sendMessage?text=hello',score:20,feedback:'GET не должен изменять данные. Параметры в URL — потенциальная утечка.'},
+       {text:'PUT /api/message/send',score:30,feedback:'PUT для обновления, а глаголы в URL — нарушение REST-конвенций.'},
+     ]},
+    {type:'order',text:'Слои архитектуры REST API (от запроса к ответу):',
+     items:['Роутер (маршрутизация)','Middleware (авторизация, логирование)','Контроллер (обработка логики)','Сервис (бизнес-логика)','Репозиторий (работа с БД)','Сериализация ответа']},
+    {type:'choice',text:'Rate limiting (ограничение запросов) — зачем?',
+     options:['Защита от DDoS и злоупотреблений','Экономия трафика для пользователя','Ускорение работы API','Улучшение SEO'],correct:0},
+  ]},
+  {steps:[
+    {type:'choice',learn:'<b>SQL-инъекция</b> — атака через ввод SQL-кода в поля формы. Пример: в поле пароля вводят: <b>\' OR 1=1 --</b>, и запрос SELECT * FROM users WHERE pass=\'\' OR 1=1 --\' возвращает всех.',
+     text:'В коде: query = f"SELECT * FROM users WHERE id={user_id}". Что не так?',
+     options:['SQL-инъекция: user_id подставляется без экранирования','Всё ок, f-string — современный подход','Нужно добавить try/except','Нет проблемы — это только SELECT'],correct:0},
+    {type:'scenario',situation:'В логах увидел: POST /api/login — 500 запросов за минуту с одного IP. Каждый с разным паролем.',
+     actions:[
+       {text:'Brute-force атака! Заблокировать IP, включить rate limiting на /login, добавить CAPTCHA после 5 попыток',score:100,feedback:'<b>Правильная реакция!</b> Комбинация мер: rate limit + IP-бан + CAPTCHA + уведомление безопасникам.'},
+       {text:'Это нормально, может быть тестировщик',score:10,feedback:'500 попыток логина за минуту — однозначно атака. Тестировщики так не работают.'},
+       {text:'Просто добавить задержку в 1 секунду',score:40,feedback:'Задержка поможет, но не остановит бота. Нужен комплексный подход.'},
+     ]},
+    {type:'multi_choice',text:'Как безопасно хранить пароли пользователей?',
+     options:['Хэширование с солью (bcrypt/argon2)','В открытом виде в БД','Шифрование AES','Хэш без соли (MD5)','В переменных окружения сервера','Base64-кодирование'],
+     correct:[0],need:1},
+    {type:'order',text:'Процесс безопасной аутентификации:',
+     items:['Клиент отправляет логин+пароль','Сервер проверяет хэш пароля','Сервер создаёт JWT-токен','Клиент сохраняет токен','При каждом запросе токен в заголовке','Сервер верифицирует токен']},
+  ]},
+  {steps:[
+    {type:'scenario',situation:'Сервис получает 50,000 запросов/сек. Время ответа выросло с 50ms до 3s. БД — PostgreSQL, один сервер.',
+     actions:[
+       {text:'Добавить кеширование (Redis), вертикальное масштабирование, потом горизонтальное + load balancer',score:100,feedback:'<b>Правильный план!</b> Redis кеш уберёт 80% запросов к БД. Далее — масштабирование.'},
+       {text:'Переписать на более быстрый язык',score:20,feedback:'Проблема не в языке, а в архитектуре. Переписывание — месяцы без гарантии.'},
+       {text:'Купить самый мощный сервер',score:40,feedback:'Вертикальное масштабирование имеет предел. Нужна комбинация подходов.'},
+     ]},
+    {type:'match',text:'Сопоставь инструменты с задачами:',
+     left:['Кеширование','Очередь задач','Поиск по тексту','Мониторинг'],
+     right:['Redis','Celery/RabbitMQ','Elasticsearch','Grafana/Prometheus','Kubernetes'],
+     correct:['Redis','Celery/RabbitMQ','Elasticsearch','Grafana/Prometheus']},
+    {type:'order',text:'Этапы обработки запроса в нагруженной системе:',
+     items:['Load Balancer принимает запрос','Nginx проксирует к приложению','Проверка кеша (Redis)','Если нет в кеше — запрос к БД','Запись результата в кеш','Ответ клиенту']},
+    {type:'choice',text:'Микросервисы vs монолит для стартапа с 3 разработчиками?',
+     options:['Монолит — быстрее разработка, проще деплой для маленькой команды','Микросервисы — всегда лучше','Serverless — не нужен сервер','Никакой архитектуры — просто кодить'],correct:0},
+  ]},
+  {steps:[
+    {type:'builder',text:'Спроектируй архитектуру маркетплейса. Выбери необходимые компоненты:',
+     pieces:[
+       {id:'api',name:'API Gateway',icon:'🚪',preview:'Точка входа'},
+       {id:'auth',name:'Сервис авторизации',icon:'🔐',preview:'JWT + OAuth'},
+       {id:'products',name:'Каталог товаров',icon:'📦',preview:'CRUD + поиск'},
+       {id:'orders',name:'Сервис заказов',icon:'🛒',preview:'Корзина + оплата'},
+       {id:'db',name:'База данных',icon:'💾',preview:'PostgreSQL'},
+       {id:'cache',name:'Кеш (Redis)',icon:'⚡',preview:'Быстрый доступ'},
+       {id:'blockchain',name:'Блокчейн',icon:'🔗',preview:'Децентрализация'},
+       {id:'ai',name:'AI-рекомендации',icon:'🤖',preview:'ML-модель'},
+     ],correct:['api','auth','products','orders','db','cache']},
+    {type:'scenario',situation:'В 3 часа ночи сервер упал. Мониторинг показывает: RAM 100%, CPU 100%, диск заполнен логами.',
+     actions:[
+       {text:'1) Ротация логов (освободить диск). 2) Перезапуск сервиса. 3) Анализ причины. 4) Настройка автоматической ротации.',score:100,feedback:'<b>Правильная последовательность!</b> Сначала восстанови работу, потом ищи причину.'},
+       {text:'Подождать до утра — ночью никто не пользуется',score:5,feedback:'Даже ночью есть пользователи. Каждая минута простоя — потеря денег и доверия.'},
+       {text:'Удалить все логи и перезапустить',score:40,feedback:'Перезапуск поможет, но без анализа логов не найдёшь причину. Сохрани последние логи!'},
+     ]},
+    {type:'order',text:'Этапы CI/CD пайплайна:',
+     items:['Коммит в Git','Автоматические тесты','Сборка Docker-образа','Деплой на staging','Интеграционные тесты','Деплой на production']},
+  ]},
+],
+
+// =================== CYBERSECURITY ===================
+cybersec:[
+  {steps:[
+    {type:'choice',learn:'<b>Сканирование портов</b> — первый шаг анализа безопасности. Открытый порт = запущенный сервис. <b>Порт 22</b> — SSH, <b>80</b> — HTTP, <b>443</b> — HTTPS, <b>3306</b> — MySQL.',
+     text:'Сканер показал открытые порты: 22, 80, 443, 3306, 8080. Какой НАИБОЛЕЕ опасен?',
+     options:['3306 (MySQL) — БД доступна извне, можно украсть данные','80 (HTTP) — веб-сервер','443 (HTTPS) — защищённый сервер','22 (SSH) — удалённый доступ'],correct:0},
+    {type:'multi_choice',text:'Какие порты должны быть ЗАКРЫТЫ для внешнего доступа?',
+     options:['3306 (MySQL)','6379 (Redis)','27017 (MongoDB)','443 (HTTPS)','22 (SSH) без VPN','80 (HTTP — если есть HTTPS)'],
+     correct:[0,1,2,4],need:4},
+    {type:'scenario',situation:'Обнаружен открытый порт 9200 (Elasticsearch) без аутентификации. В индексе — данные 50,000 пользователей.',
+     actions:[
+       {text:'Немедленно закрыть порт файрволом, настроить аутентификацию, проверить утечку, уведомить руководство',score:100,feedback:'<b>Правильно!</b> Это критическая уязвимость. Порядок: 1) Закрыть, 2) Защитить, 3) Проверить, 4) Уведомить.'},
+       {text:'Записать в отчёт и отправить email',score:20,feedback:'Пока ты пишешь отчёт, хакер скачивает данные. Критические уязвимости закрываются НЕМЕДЛЕННО.'},
+       {text:'Удалить данные из Elasticsearch',score:10,feedback:'Удаление не поможет — данные могли уже быть скопированы. И без бэкапа потеряешь всё.'},
+     ]},
+    {type:'order',text:'Этапы пентеста (тестирования безопасности):',
+     items:['Разведка (сбор информации)','Сканирование (порты, сервисы)','Поиск уязвимостей','Эксплуатация (проникновение)','Пост-эксплуатация (что доступно)','Отчёт и рекомендации']},
+    {type:'choice',text:'Nmap показал: Port 22 - filtered. Что значит "filtered"?',
+     options:['Порт закрыт файрволом — пакеты отбрасываются','Порт открыт, но требует пароль','Порт не существует','Сервис не отвечает'],correct:0},
+  ]},
+  {steps:[
+    {type:'scenario',learn:'<b>Фишинг</b> — поддельные письма/сайты для кражи данных. Признаки: подозрительный домен, срочность, ошибки, ссылки не на официальный сайт.',
+     situation:'Письмо от "Сбербанк": "Ваша карта заблокирована! Срочно перейдите: sberbank-verify.xyz/login". Отправитель: support@sber-bank.info.',
+     actions:[
+       {text:'Фишинг! Домен .xyz и sber-bank.info — поддельные. Не переходить, отметить как спам, уведомить ИБ-отдел',score:100,feedback:'<b>Верно!</b> Признаки: 1) Домен не sberbank.ru, 2) Давление срочностью, 3) Нестандартный email.'},
+       {text:'Перейти по ссылке и проверить',score:0,feedback:'НИКОГДА не переходи по подозрительным ссылкам! Даже «просто посмотреть» может запустить вредоносный код.'},
+       {text:'Позвонить в банк по номеру из письма',score:30,feedback:'Номер в письме тоже может быть поддельным. Звони только по номеру с официального сайта или карты.'},
+     ]},
+    {type:'multi_choice',text:'Какие признаки фишингового письма?',
+     options:['Домен отличается от официального','Грамматические ошибки','Давление срочностью','Просьба ввести пароль по ссылке','Наличие логотипа компании','Обращение по имени'],
+     correct:[0,1,2,3],need:4},
+    {type:'choice',text:'Коллега получил письмо с вложением invoice.pdf.exe. Что делать?',
+     options:['Не открывать! .pdf.exe — исполняемый файл, замаскированный под PDF','Открыть — PDF безопасен','Переименовать в .pdf и открыть','Отправить антивирусу на проверку и подождать'],correct:0},
+    {type:'scenario',situation:'Ты обнаружил фишинговый сайт, копирующий интернет-банк твоей компании. На сайте уже есть данные 200 клиентов.',
+     actions:[
+       {text:'Уведомить CERT/FinCERT, заблокировать домен через регистратора, оповестить клиентов, зафиксировать доказательства',score:100,feedback:'<b>Профессионально!</b> Ключ — скорость. Каждый час = больше жертв.'},
+       {text:'Написать пост в соцсетях о мошенниках',score:20,feedback:'Публичное оповещение полезно, но сначала нужно заблокировать сайт и уведомить регулятора.'},
+       {text:'Взломать фишинговый сайт',score:5,feedback:'Ответный взлом — уголовное преступление. Даже с благими намерениями.'},
+     ]},
+  ]},
+  {steps:[
+    {type:'input',learn:'<b>Шифр Цезаря</b> — сдвиг каждой буквы на N позиций. Например, сдвиг 3: А→Г, Б→Д. Для расшифровки сдвигаем обратно.',
+     text:'Сообщение зашифровано сдвигом 3: "КХООР". Расшифруй (сдвинь каждую букву на 3 назад).',
+     placeholder:'Расшифрованное слово',correct:['hello','HELLO','хелло'],fuzzy:true},
+    {type:'choice',learn:'<b>Симметричное шифрование</b> (AES) — один ключ для шифрования и дешифрования. <b>Асимметричное</b> (RSA) — пара ключей: публичный (шифрует) и приватный (расшифровывает).',
+     text:'Для HTTPS используется:',
+     options:['Сначала RSA для обмена ключами, потом AES для данных','Только RSA — он надёжнее','Только AES — он быстрее','Не используется шифрование'],correct:0},
+    {type:'scenario',situation:'Начальник просит: "Установи везде один пароль company2024 чтобы никто не забывал."',
+     actions:[
+       {text:'Отказать, объяснить риски, предложить менеджер паролей + 2FA',score:100,feedback:'<b>Абсолютно верно!</b> Общие пароли — катастрофа. Менеджер паролей + 2FA — стандарт.'},
+       {text:'Согласиться — начальник знает лучше',score:0,feedback:'Один утёкший пароль = доступ ко ВСЕМУ. Это грубейшее нарушение безопасности.'},
+       {text:'Сделать разные пароли: company2024-1, company2024-2...',score:10,feedback:'Это иллюзия безопасности. Паттерн слишком предсказуем.'},
+     ]},
+    {type:'order',text:'Уровни защиты данных (от базового к продвинутому):',
+     items:['Сложные уникальные пароли','Двухфакторная аутентификация (2FA)','Шифрование данных (AES-256)','VPN для удалённого доступа','Zero Trust архитектура','Аппаратные ключи безопасности (YubiKey)']},
+  ]},
+  {steps:[
+    {type:'scenario',learn:'<b>Анализ логов</b> — ключевой навык. Паттерны атак: много 401 с одного IP (brute-force), необычные User-Agent, запросы к /admin, /wp-login.php.',
+     situation:'В логах: 06:30 - 2000 запросов POST /login с IP 185.x.x.x. 06:35 - один успешный 200 OK. 06:36 - GET /admin/users. Что произошло?',
+     actions:[
+       {text:'Успешная brute-force атака! IP подобрал пароль и зашёл в админку. Срочно: заблокировать IP, сбросить пароли, включить 2FA',score:100,feedback:'<b>Верная интерпретация!</b> 2000 попыток → 1 успех → доступ к данным. Классический brute-force.'},
+       {text:'Это администратор забыл пароль и пробовал варианты',score:15,feedback:'2000 попыток за 5 минут — явно автоматизированная атака, не человек.'},
+       {text:'Баг в логировании, ничего серьёзного',score:5,feedback:'Игнорировать такие паттерны — преступная халатность.'},
+     ]},
+    {type:'multi_choice',text:'Какие записи в логах указывают на атаку?',
+     options:['500 запросов к /wp-admin с разных IP за минуту','Один GET /index.html — 200 OK','POST /api/login — 50 попыток с 401, потом 200','Запросы с User-Agent: sqlmap/1.5','Обычный трафик с мобильных','Запрос: GET /../../etc/passwd'],
+     correct:[0,2,3,5],need:4},
+    {type:'order',text:'Действия при обнаружении взлома:',
+     items:['Изолировать поражённую систему','Сохранить улики (логи, снимки)','Определить масштаб взлома','Устранить уязвимость','Восстановить из бэкапа','Уведомить руководство и пользователей','Написать отчёт и усилить защиту']},
+  ]},
+  {steps:[
+    {type:'scenario',situation:'Пятница, 23:00. Мониторинг: трафик на сервер вырос в 100 раз. Сайт недоступен. CPU 100%. Это DDoS.',
+     actions:[
+       {text:'Включить DDoS-защиту (Cloudflare), заблокировать паттерн трафика, масштабировать мощности, уведомить команду',score:100,feedback:'<b>Правильный план!</b> DDoS-защита на уровне CDN — первый шаг. Далее: анализ и фильтрация.'},
+       {text:'Выключить сервер и уйти домой',score:5,feedback:'Без защиты атакующие просто подождут и продолжат. Проблему нужно решать.'},
+       {text:'Атаковать IP злоумышленника в ответ',score:0,feedback:'Ответная атака: 1) Незаконна, 2) IP могут быть поддельными, 3) Ты атакуешь невинных.'},
+     ]},
+    {type:'choice',text:'После DDoS-атаки. Какой главный вывод?',
+     options:['Настроить постоянную DDoS-защиту + план реагирования на инциденты','Поменять IP-адрес сервера','Перейти на другой хостинг','Ничего — DDoS случается у всех'],correct:0},
+    {type:'order',text:'Составь план реагирования на инциденты:',
+     items:['Подготовка (планы, контакты, инструменты)','Обнаружение (мониторинг, алерты)','Сдерживание (изоляция угрозы)','Устранение (патчи, настройки)','Восстановление (из бэкапов)','Анализ (что случилось, как предотвратить)']},
+    {type:'multi_choice',text:'Что включить в план информационной безопасности компании?',
+     options:['Регулярные аудиты безопасности','Обучение сотрудников','Политика паролей + 2FA','Резервное копирование','Бесплатный Wi-Fi для всех гостей','Хранение паролей в Excel'],
+     correct:[0,1,2,3],need:4},
+  ]},
+],
+
+// =================== DIAGNOSTICS ===================
+diagnostics:[
+  {steps:[
+    {type:'scenario',learn:'<b>Сбор анамнеза</b> — основа диагностики. Врач узнаёт: когда началось, какие симптомы, что провоцирует/облегчает, хронические болезни, лекарства, аллергии.',
+     situation:'Пациент, 35 лет: "Доктор, у меня болит голова уже 3 дня, таблетки не помогают." Какой вопрос задать ПЕРВЫМ?',
+     actions:[
+       {text:'Где именно болит? Как болит — давит, пульсирует, стреляет? Есть ли тошнота или нарушения зрения?',score:100,feedback:'<b>Отлично!</b> Характер и локализация боли — ключ к дифференциальной диагностике.'},
+       {text:'Какую группу крови имеете?',score:5,feedback:'Группа крови не связана с головной болью. Фокусируйся на симптомах.'},
+       {text:'Вы принимаете витамины?',score:10,feedback:'Это может быть важно позже, но сейчас нужно понять характер самой боли.'},
+     ]},
+    {type:'multi_choice',text:'Пациент жалуется на головную боль. Какие "красные флаги" требуют СРОЧНОГО обследования?',
+     options:['Внезапная "громовая" боль — самая сильная в жизни','Боль + высокая температура + ригидность шеи','Нарастающая боль + нарушения зрения','Боль усиливается при наклоне','Боль после стресса','Боль к вечеру'],
+     correct:[0,1,2],need:3},
+    {type:'choice',text:'Головная боль + тошнота + светобоязнь + пульсация с одной стороны. Наиболее вероятно:',
+     options:['Мигрень','Менингит','Гипертонический криз','ОРВИ'],correct:0},
+    {type:'order',text:'Алгоритм действий при подозрении на менингит:',
+     items:['Оценка сознания и состояния','Проверка менингеальных симптомов','Срочная госпитализация','Люмбальная пункция','Антибиотикотерапия','КТ головного мозга']},
+    {type:'scenario',situation:'Анализ крови пациента: лейкоциты 18×10⁹ (норма 4-9), СОЭ 45 мм/ч (норма <15), температура 39°C. Вывод?',
+     actions:[
+       {text:'Выраженный воспалительный процесс — вероятно бактериальная инфекция. Нужен посев крови и антибиотики',score:100,feedback:'<b>Верно!</b> Лейкоцитоз + высокое СОЭ + лихорадка = классическая картина бактериальной инфекции.'},
+       {text:'Норма — организм борется с простудой',score:10,feedback:'Лейкоциты в 2 раза выше нормы — это НЕ норма. Требуется лечение.'},
+       {text:'Нужно пересдать анализы через неделю',score:20,feedback:'При такой клинике ждать неделю опасно. Нужно действовать сейчас.'},
+     ]},
+  ]},
+  {steps:[
+    {type:'match',learn:'<b>Биохимия крови</b> — анализ, показывающий работу органов. Ключевые показатели: глюкоза (диабет), креатинин (почки), АЛТ/АСТ (печень), холестерин (сосуды).',
+     text:'Сопоставь показатели с органами:',
+     left:['Глюкоза 15.8 ммоль/л','АЛТ 250 Ед/л','Креатинин 350 мкмоль/л','Тропонин повышен'],
+     right:['Поджелудочная (диабет)','Печень','Почки','Сердце','Лёгкие'],
+     correct:['Поджелудочная (диабет)','Печень','Почки','Сердце']},
+    {type:'choice',text:'Глюкоза натощак 15.8 ммоль/л (норма 3.3-5.5). Какой диагноз наиболее вероятен?',
+     options:['Сахарный диабет','Грипп','Анемия','Гастрит'],correct:0},
+    {type:'scenario',situation:'Пациент 50 лет: боль за грудиной, отдаёт в левую руку, одышка, холодный пот. Давление 160/100.',
+     actions:[
+       {text:'Подозрение на инфаркт! ЭКГ + тропонин СРОЧНО, аспирин под язык, вызвать кардиобригаду',score:100,feedback:'<b>Правильно!</b> Классическая картина острого коронарного синдрома. Время = жизнь.'},
+       {text:'Дать обезболивающее и понаблюдать',score:5,feedback:'При инфаркте каждая минута промедления = гибель клеток сердца. Нужна экстренная помощь!'},
+       {text:'Сделать рентген грудной клетки',score:20,feedback:'Рентген не покажет инфаркт. Нужны ЭКГ и тропонин.'},
+     ]},
+    {type:'order',text:'Алгоритм при подозрении на инфаркт:',
+     items:['Аспирин 300 мг разжевать','ЭКГ в первые 10 минут','Тропонин I/T (анализ крови)','Нитроглицерин под язык (если нет противопоказаний)','Вызов кардиобригады/cath-lab','Решение о тромболизисе или стентировании']},
+  ]},
+  {steps:[
+    {type:'scenario',situation:'Пациент 25 лет: боль в правой нижней части живота, началась вчера в центре, "переехала" вправо. Температура 37.8°. Тошнота.',
+     actions:[
+       {text:'Симптом Кохера! Типичная картина аппендицита. УЗИ + анализ крови срочно, консультация хирурга',score:100,feedback:'<b>Классика!</b> Миграция боли из эпигастрия в правую подвздошную — симптом Кохера, характерный для аппендицита.'},
+       {text:'Отравление — промыть желудок',score:10,feedback:'Промывание при аппендиците опасно и может вызвать перитонит!'},
+       {text:'Дать обезболивающее и отправить домой',score:0,feedback:'Обезболивание при остром животе запрещено! Оно маскирует симптомы и задерживает операцию.'},
+     ]},
+    {type:'choice',text:'При осмотре живота нельзя давать обезболивающие. Почему?',
+     options:['Маскируют симптомы, усложняя диагностику','Могут вызвать аллергию','Вредят печени','Нет причины — это миф'],correct:0},
+    {type:'multi_choice',text:'Какие анализы нужны при подозрении на аппендицит?',
+     options:['Общий анализ крови (лейкоциты)','УЗИ брюшной полости','КТ при сомнениях','С-реактивный белок','Анализ мочи (исключить почечную колику)','МРТ головного мозга'],
+     correct:[0,1,2,3,4],need:5},
+    {type:'order',text:'Действия при остром аппендиците:',
+     items:['Осмотр и сбор анамнеза','Анализ крови + мочи','УЗИ брюшной полости','Консультация хирурга','Подготовка к операции','Лапароскопическая аппендэктомия']},
+  ]},
+  {steps:[
+    {type:'scenario',situation:'Мать привела ребёнка 7 лет: кашель 2 недели, хрипы в лёгких, температура 38°. Педиатр назначил антибиотик 5 дней назад — не помогло.',
+     actions:[
+       {text:'Рентген грудной клетки, посев мокроты, смена антибиотика (возможна резистентность) + проверить не астма ли',score:100,feedback:'<b>Комплексный подход!</b> Если антибиотик не помогает за 48-72 часа — пересмотр диагноза и терапии.'},
+       {text:'Продолжить тот же антибиотик ещё неделю',score:15,feedback:'Если нет эффекта за 5 дней — продолжать бессмысленно. Нужно менять тактику.'},
+       {text:'Отменить антибиотик, дать отхаркивающее',score:20,feedback:'При бактериальной пневмонии отмена антибиотика опасна. Нужна замена, не отмена.'},
+     ]},
+    {type:'choice',text:'На рентгене — очаговое затемнение в правом нижнем лёгком. Диагноз:',
+     options:['Пневмония','Бронхит','Астма','Туберкулёз'],correct:0},
+    {type:'order',text:'Полный алгоритм ведения пневмонии:',
+     items:['Рентген + анализ крови','Определение возбудителя (посев)','Эмпирический антибиотик','Оценка эффекта через 48-72 часа','Коррекция терапии по результатам посева','Контрольный рентген через 2 недели','Реабилитация (дыхательная гимнастика)']},
+    {type:'scenario',situation:'Пациент 60 лет, жалобы нечёткие: слабость, потеря веса, субфебрильная температура 2 месяца.',
+     actions:[
+       {text:'Полное обследование: кровь развёрнутая, биохимия, онкомаркеры, КТ грудной/брюшной полости, УЗИ',score:100,feedback:'<b>Правильный подход!</b> Длительная субфебрильная температура + потеря веса — онконастороженность. Нужно исключить рак.'},
+       {text:'Витамины и отдых',score:5,feedback:'Потеря веса + длительная температура — серьёзные симптомы. Витамины не помогут.'},
+       {text:'Антибиотик широкого спектра',score:15,feedback:'Без диагноза назначать антибиотик — ошибка. Сначала обследование!'},
+     ]},
+  ]},
+],
+
+// =================== GAMEDEV ===================
+gamedev:[
+  {steps:[
+    {type:'grid',learn:'<b>Левел-дизайн</b> — проектирование игровых уровней. Правила: плавное нарастание сложности, чёткий путь игрока, награды за исследование, безопасные зоны перед боссом. <span class="hint">Размести элементы на сетке 8×8.</span>',
+     text:'Построй простой платформер-уровень. Размести: 🟩 платформы, 🟥 врагов, ⭐ монеты, 🚪 выход.',
+     size:8,
+     tools:[
+       {name:'Платформа',icon:'🟩',color:'#1a3a1a'},
+       {name:'Враг',icon:'🟥',color:'#3a1a1a'},
+       {name:'Монета',icon:'⭐',color:'#3a3a1a'},
+       {name:'Выход',icon:'🚪',color:'#1a1a3a'},
+       {name:'Ластик',icon:'⬛',color:'var(--bg)'},
+     ],
+     check:(data)=>{const has=t=>data.includes(t);return(has(0)?25:0)+(has(1)?25:0)+(has(2)?25:0)+(has(3)?25:0)}},
+    {type:'scenario',situation:'Тестировщик сообщает: "На уровне 3 игроки застревают — не понимают куда идти. Среднее время прохождения — 15 минут вместо планируемых 3."',
+     actions:[
+       {text:'Добавить визуальные подсказки: свет на путь, частицы, стрелки — не ломая геймплей',score:100,feedback:'<b>Отлично!</b> Невидимая рука дизайнера: освещение, цвет, движение — направляют игрока без текстовых подсказок.'},
+       {text:'Добавить большую стрелку "ИДТИ СЮДА"',score:30,feedback:'Слишком навязчиво. Разрушает иммерсию и ощущение исследования.'},
+       {text:'Это нормально, сложность — фича',score:10,feedback:'15 минут на 3-минутный уровень — это не сложность, а плохой дизайн. Сложность должна быть в геймплее, не в навигации.'},
+     ]},
+    {type:'choice',text:'Правило "30 секунд" в геймдизайне означает:',
+     options:['Игрок должен понять базовую механику за 30 секунд без туториала','Каждый уровень длится 30 секунд','Загрузка не больше 30 секунд','Реклама показывается каждые 30 секунд'],correct:0},
+    {type:'order',text:'Кривая сложности правильного уровня:',
+     items:['Безопасная зона (изучение механик)','Первое лёгкое испытание','Награда за успех','Усложнение + новая механика','Кульминация (комбо механик)','Финальная награда / чекпоинт']},
+    {type:'multi_choice',text:'Что делает первый уровень хорошим?',
+     options:['Обучает без текста — через геймплей','Невозможно умереть в первые 30 секунд','Показывает все основные механики','Даёт чувство достижения','Содержит 50 врагов-боссов','Длится 45 минут'],
+     correct:[0,1,2,3],need:4},
+  ]},
+  {steps:[
+    {type:'scenario',learn:'<b>Баланс</b> — соотношение характеристик персонажей, чтобы ни один не был слишком сильным или слабым. Метрики: DPS (урон/сек), EHP (эффективные HP).',
+     situation:'Воин: 1000 HP, 50 ATK, 10 DEF. Маг: 400 HP, 120 ATK, 0 DEF. Игроки жалуются, что маг убивает всех за 2 удара. Как балансировать?',
+     actions:[
+       {text:'Снизить ATK мага до 80, дать кулдауны на заклинания, увеличить DEF воина — сделать бои дольше',score:100,feedback:'<b>Грамотный подход!</b> Баланс через time-to-kill: бои должны длиться достаточно для тактических решений.'},
+       {text:'Дать воину 200 ATK — пусть тоже быстро убивает',score:20,feedback:'Это гонка мощностей. Бои станут по 1 удару — нет тактики.'},
+       {text:'Удалить мага из игры',score:5,feedback:'Удаление контента — крайняя мера. Сначала — балансировка.'},
+     ]},
+    {type:'input',text:'Воин: 500 HP, маг наносит 80 урон за удар. Сколько ударов нужно, чтобы убить воина? (округли вверх)',
+     placeholder:'Количество ударов',correct:['7'],fuzzy:false},
+    {type:'choice',text:'Камень-ножницы-бумага в RPG: Воин бьёт Лучника, Лучник бьёт Мага, Маг бьёт Воина. Это:',
+     options:['Хороший баланс — у каждого есть контрпик','Плохой баланс — Воин слабее всех','Нет баланса — нужно убрать классы','Не имеет значения'],correct:0},
+    {type:'scenario',situation:'Новый предмет "Меч Хаоса": +500% ATK. Игроки требуют добавить в магазин. Твоё решение?',
+     actions:[
+       {text:'Отказать: это сломает баланс. Предложить альтернативу +20% ATK с интересной механикой',score:100,feedback:'<b>Верно!</b> Power creep (инфляция мощи) — главный враг баланса. Лучше интересные механики, чем большие числа.'},
+       {text:'Добавить — игроки будут рады',score:10,feedback:'Краткосрочно — да. Через неделю все жалуются на дисбаланс и уходят.'},
+       {text:'Добавить, но за $100 реальных денег',score:0,feedback:'Pay-to-win убивает сообщество. Это самый быстрый путь к потере игроков.'},
+     ]},
+  ]},
+  {steps:[
+    {type:'scenario',learn:'<b>Внутриигровая экономика</b> — система ресурсов, цен, наград. Цель: поддерживать мотивацию, не делая игру "гриндом" или "халявой".',
+     situation:'В твоей игре: монеты (из боёв) и кристаллы (за реальные деньги). Игрок зарабатывает 100 монет/час. Меч стоит 10,000 монет. Проблема?',
+     actions:[
+       {text:'100 часов гринда = 4 дня нон-стоп. Это слишком! Снизить цену до 2000 или добавить разнообразные источники монет',score:100,feedback:'<b>Точно!</b> Правило: ключевые предметы — 2-4 часа фарма. Длинный гринд = отток игроков.'},
+       {text:'Нормально — пусть покупают кристаллы',score:15,feedback:'Это aggressive monetization. Быстро отпугнёт 90% аудитории.'},
+       {text:'Дать меч бесплатно всем',score:10,feedback:'Без чувства прогресса игра теряет смысл. Нужен баланс усилий и наград.'},
+     ]},
+    {type:'choice',text:'Sink/Faucet: игроки накопили миллионы монет. Как "слить" излишек?',
+     options:['Ограниченные предметы, крафт, ремонт снаряжения — трата через геймплей','Отобрать монеты при обновлении','Обнулить всем баланс','Увеличить цены в 100 раз'],correct:0},
+    {type:'multi_choice',text:'Хорошая монетизация F2P-игры:',
+     options:['Косметические предметы (скины)','Боевой пропуск (Battle Pass)','Pay-to-win оружие','Энергия (плати чтобы играть)','Ранний доступ к контенту','Рандомные лутбоксы за деньги'],
+     correct:[0,1,4],need:3},
+    {type:'order',text:'Элементы мотивации игрока (от базовых к продвинутым):',
+     items:['Мгновенная обратная связь (звуки, эффекты)','Прогресс (уровни, достижения)','Социальное взаимодействие','Соревнование (рейтинги)','Самовыражение (кастомизация)','Мастерство (сложные механики)']},
+  ]},
+  {steps:[
+    {type:'scenario',situation:'Ты пишешь диалоги для RPG. НПС-кузнец просит помощь. Какую структуру диалога выбрать?',
+     actions:[
+       {text:'Три варианта с последствиями: помочь (квест), торговаться (деньги за помощь), отказать (закрытие ветки + репутация)',score:100,feedback:'<b>Правильный подход!</b> Значимые выборы с последствиями — основа хорошего нарратива. Каждый вариант меняет мир.'},
+       {text:'Один вариант "Ок, помогу" — без выбора',score:20,feedback:'Без выбора нет вовлечения. Игрок чувствует себя зрителем, а не участником.'},
+       {text:'Десять вариантов на каждый случай',score:30,feedback:'Слишком много вариантов перегружают. 2-4 значимых выбора — золотая середина.'},
+     ]},
+    {type:'choice',text:'В диалогах "показывай, не рассказывай" означает:',
+     options:['Вместо "он злой" — показать злые поступки через геймплей и диалоги','Убрать весь текст, оставить картинки','Показывать катсцены вместо текста','Каждый диалог с озвучкой'],correct:0},
+    {type:'order',text:'Структура квеста:',
+     items:['Завязка (проблема НПС)','Принятие квеста (выбор игрока)','Путь к цели (геймплей)','Неожиданный поворот','Кульминация (босс/решение)','Награда + влияние на мир']},
+    {type:'multi_choice',text:'Что делает историю в игре запоминающейся?',
+     options:['Выборы с необратимыми последствиями','Персонажи с мотивацией и слабостями','Неочевидные моральные дилеммы','Длинные катсцены которые нельзя пропустить','Twist в конце, меняющий восприятие','Максимум текста на экране'],
+     correct:[0,1,2,4],need:4},
+  ]},
+  {steps:[
+    {type:'builder',text:'Создай прототип игровой механики. Выбери компоненты для рогалика (roguelike):',
+     pieces:[
+       {id:'proc',name:'Процедурная генерация',icon:'🎲',preview:'Случайные уровни'},
+       {id:'perma',name:'Permadeath',icon:'💀',preview:'Смерть = начало с нуля'},
+       {id:'loot',name:'Лут-система',icon:'🎁',preview:'Случайные предметы'},
+       {id:'prog',name:'Метапрогресс',icon:'📈',preview:'Разблокировки между забегами'},
+       {id:'pvp',name:'PvP-режим',icon:'⚔️'},
+       {id:'autobattle',name:'Автобой',icon:'🤖'},
+     ],correct:['proc','perma','loot','prog']},
+    {type:'scenario',situation:'Прототип готов. Тестировщики говорят: "Базовый геймплей прикольный, но быстро надоедает — однообразно." Что добавить?',
+     actions:[
+       {text:'Разнообразие: новые враги, предметы с синергией, случайные события, боссы с уникальными механиками',score:100,feedback:'<b>Верно!</b> Replayability (перепроходимость) = разнообразие × случайность × глубина механик.'},
+       {text:'Больше уровней с тем же геймплеем',score:20,feedback:'Количество без качества усиливает однообразие, а не решает его.'},
+       {text:'Добавить кат-сцены между уровнями',score:15,feedback:'Кат-сцены не решают проблему геймплея. Ядро должно быть интересным.'},
+     ]},
+    {type:'order',text:'Цикл разработки игры:',
+     items:['Концепт и документация (GDD)','Прототип ядровой механики','Тестирование прототипа','Полная разработка (арт, звук, уровни)','Альфа → закрытый бета-тест','Релиз + пост-поддержка']},
+  ]},
+],
+
+// Для остальных профессий добавим более компактные, но тоже качественные задания
+chemistry:[
+  {steps:[
+    {type:'scenario',learn:'<b>Химический эксперимент</b> требует планирования: гипотеза → методика → проведение → анализ → вывод. <b>ТБ</b>: халат, очки, перчатки, вытяжка — обязательны!',
+     situation:'Задача: определить, содержит ли раствор ионы железа (Fe³⁺). В лаборатории есть роданид калия (KSCN), NaOH, HCl.',
+     actions:[
+       {text:'Добавить KSCN — если есть Fe³⁺, раствор станет кроваво-красным (роданид железа)',score:100,feedback:'<b>Классическая реакция!</b> Fe³⁺ + 3SCN⁻ → Fe(SCN)₃ — ярко-красная окраска. Качественная реакция на железо(III).'},
+       {text:'Нагреть раствор и понюхать',score:0,feedback:'Нюхать химические растворы ОПАСНО! Всегда используй вытяжку и никогда не нюхай напрямую.'},
+       {text:'Добавить HCl для проверки',score:20,feedback:'HCl не даст характерной реакции на Fe³⁺. Правильный реагент — KSCN или NaOH.'},
+     ]},
+    {type:'multi_choice',text:'Какие правила ТБ нарушены? Студент: без очков, с бутербродом, сливает реактивы в раковину.',
+     options:['Нет защитных очков','Еда в лаборатории','Реактивы в канализацию (нужна спецёмкость)','Нет халата (предположительно)','Использует стеклянную посуду','Работает при включённом свете'],
+     correct:[0,1,2,3],need:4},
+    {type:'order',text:'Этапы проведения титрования:',
+     items:['Приготовить стандартный раствор','Отобрать аликвоту анализируемого раствора','Добавить индикатор','Медленно добавлять титрант из бюретки','Зафиксировать момент перехода окраски','Рассчитать концентрацию']},
+    {type:'choice',text:'Раствор стал красным с фенолфталеином. Среда:',
+     options:['Щелочная (pH > 8.2)','Кислая','Нейтральная','Невозможно определить'],correct:0},
+    {type:'input',text:'Уравняй реакцию: _Fe + _O₂ → _Fe₂O₃. Введи коэффициенты через запятую.',
+     placeholder:'4,3,2',correct:['4,3,2','4, 3, 2'],fuzzy:true},
+  ]},
+  {steps:[
+    {type:'match',text:'Сопоставь вещества с их свойствами:',
+     left:['H₂SO₄','NaOH','NaCl','C₂H₅OH'],
+     right:['Сильная кислота','Щёлочь','Поваренная соль','Этиловый спирт','Глюкоза'],
+     correct:['Сильная кислота','Щёлочь','Поваренная соль','Этиловый спирт']},
+    {type:'scenario',situation:'При смешивании двух растворов произошла бурная реакция с выделением газа и тепла. Раствор вспенился и полез из пробирки.',
+     actions:[
+       {text:'Не паниковать! Отойти. Проветрить (вытяжка). Если попало на кожу — промыть водой 15 минут.',score:100,feedback:'<b>Правильная реакция!</b> Первое — безопасность людей. Промывка водой — универсальная мера при попадании на кожу.'},
+       {text:'Долить воды чтобы разбавить',score:5,feedback:'При экзотермической реакции добавление воды может УСИЛИТЬ выброс!'},
+       {text:'Накрыть пробирку ладонью',score:0,feedback:'НИКОГДА не накрывай рукой! Это химический ожог + порез от стекла.'},
+     ]},
+    {type:'order',text:'Этапы синтеза аспирина:',
+     items:['Взвесить салициловую кислоту','Добавить уксусный ангидрид + каплю H₂SO₄','Нагреть на водяной бане 15 минут','Охладить и добавить воду','Отфильтровать кристаллы','Высушить и определить температуру плавления']},
+    {type:'choice',text:'Температура плавления полученного аспирина — 128°C вместо 135°C. Вывод:',
+     options:['Продукт содержит примеси — нужна перекристаллизация','Продукт чистый, 128°C — допустимо','Термометр сломан','Нужно нагревать дольше'],correct:0},
+  ]},
+  {steps:[
+    {type:'choice',learn:'<b>Типы реакций:</b> соединение (A+B→C), разложение (C→A+B), замещение (A+BC→AC+B), обмен (AB+CD→AD+CB).',
+     text:'2Na + 2H₂O → 2NaOH + H₂↑. Тип реакции:',
+     options:['Замещение','Соединение','Разложение','Обмен'],correct:0},
+    {type:'multi_choice',text:'Какие признаки указывают на прохождение химической реакции?',
+     options:['Изменение цвета','Выделение газа','Образование осадка','Выделение/поглощение тепла','Изменение объёма ёмкости','Звук при перемешивании'],
+     correct:[0,1,2,3],need:4},
+    {type:'scenario',situation:'Клиент фармкомпании хочет ускорить производство лекарства. Предлагает пропустить этап контроля качества: "Мы уже 100 раз это делали!"',
+     actions:[
+       {text:'Отказать категорически: контроль качества обязателен для каждой партии. Одна плохая партия = отравление людей',score:100,feedback:'<b>Абсолютно верно!</b> В фарме нет "100 раз без проблем". Каждая партия уникальна. Контроль — закон, не опция.'},
+       {text:'Согласиться — экономия времени важна',score:0,feedback:'Это уголовное преступление. Некачественные лекарства убивают.'},
+       {text:'Сделать сокращённый контроль',score:20,feedback:'Регулятор (Росздравнадзор) проверяет полный протокол. Сокращение = штраф + отзыв лицензии.'},
+     ]},
+    {type:'order',text:'Этапы контроля качества лекарственного препарата:',
+     items:['Проверка внешнего вида','Определение подлинности (реакции)','Количественный анализ (содержание)','Проверка примесей (хроматография)','Микробиологический контроль','Проверка растворимости/распадаемости','Маркировка и упаковка']},
+  ]},
+],
+
+// Заглушки для остальных профессий — полноценные задания с теми же механиками
+datasci:[{steps:[
+  {type:'choice',learn:'<b>Exploratory Data Analysis (EDA)</b> — первый этап работы с данными. Цель: понять структуру, найти паттерны, обнаружить аномалии.',
+   text:'Датасет: 10,000 строк. Первое действие?',
+   options:['df.describe() + df.info() — статистика и типы данных','Сразу строить ML-модель','Удалить половину строк для скорости','Визуализировать каждый столбец'],correct:0},
+  {type:'scenario',situation:'В данных: возраст клиента -5 лет, зарплата 999,999,999₽. Остальные 9,998 строк — нормальные.',
+   actions:[
+     {text:'Аномалии! Возраст <0 и зарплата-выброс. Заменить медианой или удалить строки + проверить источник данных',score:100,feedback:'<b>Верно!</b> Обработка выбросов — обязательный этап. Медиана устойчивее среднего к выбросам.'},
+     {text:'Оставить — ML-модель разберётся',score:10,feedback:'Мусор на входе = мусор на выходе. Модель научится на ошибочных данных.'},
+     {text:'Удалить весь датасет',score:5,feedback:'2 из 10,000 строк — не повод удалять всё. Очисти и продолжай.'},
+   ]},
+  {type:'match',text:'Сопоставь тип задачи с алгоритмом ML:',
+   left:['Предсказание цены квартиры','Спам или не спам','Группировка клиентов','Рекомендация фильмов'],
+   right:['Линейная регрессия','Логистическая регрессия','K-means кластеризация','Collaborative Filtering','Нейронная сеть'],
+   correct:['Линейная регрессия','Логистическая регрессия','K-means кластеризация','Collaborative Filtering']},
+  {type:'order',text:'Этапы ML-проекта:',
+   items:['Постановка задачи','Сбор и очистка данных','Разведочный анализ (EDA)','Feature Engineering','Обучение модели','Валидация (тест на новых данных)','Деплой в продакшн']},
+  {type:'choice',text:'Модель показывает 99% accuracy на тренировочных данных и 50% на тестовых. Что это?',
+   options:['Переобучение (overfitting)','Отличная модель','Недообучение (underfitting)','Баг в коде'],correct:0},
+]}],
+
+robotics:[{steps:[
+  {type:'order',learn:'<b>Arduino</b> — микроконтроллер для прототипирования. Программа: <b>setup()</b> — выполняется один раз, <b>loop()</b> — повторяется бесконечно.',
+   text:'Расставь компоненты робота-объезжальщика препятствий:',
+   items:['Аккумулятор (питание)','Arduino (мозг)','Ультразвуковой датчик (глаза)','Драйвер моторов (усилитель)','Моторы + колёса (ноги)']},
+  {type:'choice',text:'Ультразвуковой датчик показывает 15 см. Порог препятствия — 20 см. Что должен делать робот?',
+   options:['Остановиться, повернуть, проверить новое направление','Ехать вперёд — ещё далеко','Выключиться','Ускориться чтобы проскочить'],correct:0},
+  {type:'scenario',situation:'Робот всегда поворачивает вправо и ездит по кругу. Левый мотор работает, правый — нет.',
+   actions:[
+     {text:'Проверить: 1) Подключение правого мотора к драйверу, 2) Пин на Arduino, 3) Сам мотор мультиметром',score:100,feedback:'<b>Системная отладка!</b> От простого к сложному: провод → контроллер → мотор.'},
+     {text:'Заменить Arduino на новый',score:15,feedback:'Arduino редко ломается. Проблема скорее в подключении.'},
+     {text:'Написать код "ехать только влево"',score:5,feedback:'Это компенсация, а не решение. Нужно найти причину.'},
+   ]},
+  {type:'multi_choice',text:'Какие датчики нужны роботу-доставщику?',
+   options:['Лидар (карта окружения)','GPS (навигация)','Камера (распознавание)','Бампер (контакт с препятствием)','Датчик вкуса','Детектор лжи'],
+   correct:[0,1,2,3],need:4},
+  {type:'order',text:'Этапы создания робота:',
+   items:['Определение задачи','Выбор компонентов','Сборка механики','Подключение электроники','Программирование','Тестирование и отладка']},
+]}],
+
+energy:[{steps:[
+  {type:'input',learn:'<b>Мощность (P)</b> = Напряжение × Ток. <b>Энергия (E)</b> = Мощность × Время. Единицы: Вт, кВт, кВт·ч.',
+   text:'Офис: 30 компьютеров по 200Вт + освещение 3000Вт + кондиционер 5000Вт. Общая мощность? (в кВт)',
+   placeholder:'Ответ в кВт',correct:['14','14.0','14 квт'],fuzzy:true},
+  {type:'scenario',situation:'Клиент хочет установить солнечные панели на крышу. Крыша ориентирована на северо-запад. Бюджет — 500,000₽.',
+   actions:[
+     {text:'Честно предупредить: СЗ ориентация даёт на 40% меньше энергии. Предложить альтернативу: фасадные панели или наземная установка',score:100,feedback:'<b>Честный подход!</b> Профессионал предупреждает о снижении эффективности и предлагает оптимальное решение.'},
+     {text:'Установить на северо-западной стороне — клиент хочет на крышу',score:15,feedback:'Потеря 40% — это значительно. Клиент будет недоволен результатом.'},
+     {text:'Отказаться от проекта',score:20,feedback:'Не нужно отказываться — предложи альтернативное решение!'},
+   ]},
+  {type:'order',text:'Путь электричества от электростанции до розетки:',
+   items:['Генерация (электростанция)','Повышение напряжения (трансформатор)','Передача по ЛЭП (110-750 кВ)','Понижение на подстанции','Распределение по городу (10 кВ)','Понижение у дома (220В)','Розетка потребителя']},
+  {type:'choice',text:'Автомат на 16А выбивает каждый вечер. В квартире: электроплита + чайник + стиральная. Причина:',
+   options:['Суммарный ток превышает 16А — нужен автомат побольше или разделение на линии','Автомат бракованный','Проводка плохая','Нужно реже включать приборы'],correct:0},
+  {type:'multi_choice',text:'Преимущества возобновляемой энергии:',
+   options:['Нет выбросов CO₂','Неисчерпаемость источника','Снижение зависимости от импорта','Стабильная выработка 24/7','Дешевле угольной станции всегда','Не требует обслуживания'],
+   correct:[0,1,2],need:3},
+]}],
+
+biotech:[{steps:[
+  {type:'order',learn:'<b>ПЦР (полимеразная цепная реакция)</b> — метод копирования ДНК. Каждый цикл удваивает количество. 30 циклов = 2³⁰ ≈ 1 миллиард копий!',
+   text:'Расставь этапы одного цикла ПЦР:',
+   items:['Денатурация 95°C (разделение цепей ДНК)','Отжиг 55°C (присоединение праймеров)','Элонгация 72°C (достройка цепей полимеразой)']},
+  {type:'choice',text:'После 30 циклов ПЦР результат отрицательный. Но вы уверены, что ДНК есть. Причина?',
+   options:['Праймеры не подходят к целевому участку — нужно перепроектировать','ПЦР-машина всегда работает','ДНК самоуничтожилась','Температура в лаборатории слишком высокая'],correct:0},
+  {type:'scenario',situation:'При секвенировании генома пациента обнаружена мутация в гене BRCA1 — маркер повышенного риска рака молочной железы.',
+   actions:[
+     {text:'Направить к генетику-консультанту для интерпретации. Объяснить, что мутация = повышенный РИСК, не диагноз.',score:100,feedback:'<b>Этично и профессионально!</b> Генетическая консультация обязательна. Мутация ≠ болезнь, это вероятность.'},
+     {text:'Сказать пациенту: "У вас будет рак"',score:0,feedback:'Это НЕПРАВДА и вредит пациенту. Мутация = риск 60-80%, не 100%. Нужен генетик.'},
+     {text:'Скрыть результат, чтобы не пугать',score:5,feedback:'Сокрытие медицинской информации — нарушение прав пациента и этики.'},
+   ]},
+  {type:'multi_choice',text:'Что нужно для CRISPR-редактирования гена?',
+   options:['Гидовая РНК (направляет к цели)','Белок Cas9 (молекулярные ножницы)','Донорная ДНК (для замены)','Чашка Петри','Обычный микроскоп','Программа Excel'],
+   correct:[0,1,2],need:3},
+  {type:'order',text:'Этапы создания нового лекарства:',
+   items:['Открытие молекулы-кандидата','Доклинические испытания (in vitro, на животных)','Фаза I: безопасность (малая группа)','Фаза II: эффективность (средняя группа)','Фаза III: масштабное испытание','Регистрация и выход на рынок']},
+]}],
+
+design:[{steps:[
+  {type:'multi_choice',learn:'<b>Цветовая система</b> — набор цветов бренда: основной (primary), вторичный (secondary), акцентный, фоновые, текстовые + состояния (success, error, warning).',
+   text:'Выбери правила хорошей цветовой системы:',
+   options:['Контраст текста к фону минимум 4.5:1 (WCAG)','Не больше 3-5 основных цветов','Цвет ошибки — красный (привычный для пользователей)','Чем больше цветов — тем лучше','Фон всегда чёрный','Все кнопки разного цвета'],
+   correct:[0,1,2],need:3},
+  {type:'scenario',situation:'Заказчик: "Сделайте всё ярко-красным и с Comic Sans. Так веселее!"',
+   actions:[
+     {text:'Объяснить: красный = тревога для пользователя, Comic Sans непрофессионален. Предложить альтернативы с мудбордом',score:100,feedback:'<b>Дипломатично и профессионально!</b> Покажи визуальные примеры — они убедительнее слов.'},
+     {text:'Сделать как просят — клиент платит',score:15,feedback:'Плохой дизайн отпугнёт клиентов заказчика. Это ударит по твоей репутации.'},
+     {text:'Отказаться от проекта',score:20,feedback:'Лучше образовать клиента, чем потерять проект.'},
+   ]},
+  {type:'choice',text:'Кнопка "Удалить аккаунт" — какой цвет и размер?',
+   options:['Красная, небольшая, с подтверждением "Вы уверены?"','Зелёная и крупная — чтобы легко найти','Скрыта в меню — пусть ищут','Серая, неактивная — зачем удалять'],correct:0},
+  {type:'order',text:'Этапы UX-дизайна:',
+   items:['Исследование пользователей','Персоны и пользовательские сценарии','Wireframes (каркасы)','Прототип с интерактивом','Юзабилити-тестирование','UI-дизайн (визуал)','Передача разработчикам']},
+  {type:'match',text:'Сопоставь UX-принцип с примером:',
+   left:['Закон Фиттса','Закон Хика','Принцип близости','Правило 3 кликов'],
+   right:['Большие кнопки легче нажать','Меньше вариантов — быстрее выбор','Связанные элементы рядом','Любая функция за 3 клика','Яркие цвета привлекают'],
+   correct:['Большие кнопки легче нажать','Меньше вариантов — быстрее выбор','Связанные элементы рядом','Любая функция за 3 клика']},
+]}],
+
+marketing:[{steps:[
+  {type:'scenario',learn:'<b>Целевая аудитория (ЦА)</b> — люди, которым нужен твой продукт. Сегментация: демография, география, поведение, интересы. Чем точнее ЦА — тем дешевле реклама.',
+   situation:'Новый онлайн-курс по программированию. Бюджет 200К₽/мес. Определи ЦА и каналы.',
+   actions:[
+     {text:'ЦА: 18-30 лет, студенты и карьеристы. Каналы: ВК + Telegram таргет, YouTube (обзоры IT), блогеры-программисты',score:100,feedback:'<b>Точное попадание!</b> Узкая ЦА + релевантные каналы = максимум конверсий за бюджет.'},
+     {text:'Показать всем жителям России',score:10,feedback:'200К₽ на всю Россию — по 0.001₽ на человека. Результат: ноль.'},
+     {text:'Билборды у метро',score:15,feedback:'IT-курсы через билборды — низкая конверсия. Целевая аудитория онлайн.'},
+   ]},
+  {type:'choice',text:'Бюджет 100К₽. CTR рекламы 2%, конверсия сайта 3%, средний чек 5000₽. Стоимость клика 10₽. Прибыль?',
+   options:['CTR и конверсия дают: 10К кликов × 3% = 300 заказов × 5000₽ = 1.5М₽. ROAS = 15x','0₽ — реклама не работает','100К₽ — вернётся столько же','Невозможно рассчитать'],correct:0},
+  {type:'multi_choice',text:'Какие метрики важны для оценки рекламной кампании?',
+   options:['CTR (кликабельность)','CPA (стоимость привлечения)','ROAS (возврат на рекламу)','LTV (пожизненная ценность клиента)','Количество подписчиков у блогера','Количество лайков на посте'],
+   correct:[0,1,2,3],need:4},
+  {type:'order',text:'Воронка продаж:',
+   items:['Осведомлённость (увидел рекламу)','Интерес (перешёл на сайт)','Рассмотрение (изучил продукт)','Намерение (добавил в корзину)','Покупка (оплата)','Лояльность (повторная покупка)']},
+  {type:'scenario',situation:'A/B тест: версия A — скидка 20%, версия B — бесплатная доставка. Результат после 1000 показов: A — 2.1%, B — 2.3%. Что делать?',
+   actions:[
+     {text:'Недостаточно данных! 1000 показов мало для статистической значимости. Продолжить до 5000+ и проверить p-value < 0.05',score:100,feedback:'<b>Правильно!</b> Маленькая выборка = случайный результат. Нужна статистическая значимость.'},
+     {text:'B лучше — выбрать бесплатную доставку',score:30,feedback:'Разница 0.2% на 1000 показов — это шум, не сигнал.'},
+     {text:'Обе плохие — отменить тест',score:10,feedback:'2% конверсия — нормальный показатель. Проблема в размере выборки.'},
+   ]},
+]}],
+
+pm:[{steps:[
+  {type:'order',learn:'<b>Scrum</b> — фреймворк разработки. Спринт — итерация 1-4 недели. Ключевые церемонии: планирование, стендап, ревью, ретроспектива.',
+   text:'Расставь церемонии Scrum в хронологическом порядке спринта:',
+   items:['Sprint Planning (планирование)','Daily Standup (ежедневные встречи)','Sprint Review (показ результатов)','Sprint Retrospective (анализ процесса)']},
+  {type:'scenario',situation:'До релиза 2 недели. Готовность — 40%. В бэклоге: 20 задач, в команде 4 разработчика. Что делать?',
+   actions:[
+     {text:'Пересмотреть скоуп: выбрать 8 самых важных фич (MVP), остальное — в следующий релиз. Согласовать с заказчиком.',score:100,feedback:'<b>Правильный подход!</b> Scope management — ключевой навык PM. Лучше выпустить 8 фич качественно, чем 20 с багами.'},
+     {text:'Добавить 6 разработчиков',score:15,feedback:'Закон Брукса: "Добавление людей к опаздывающему проекту задерживает его ещё больше." Нужно время на онбординг.'},
+     {text:'Работать по 16 часов в день',score:10,feedback:'Кранч = выгорание + баги. Через неделю качество упадёт, через две — люди уволятся.'},
+   ]},
+  {type:'multi_choice',text:'Какие метрики помогают оценить здоровье проекта?',
+   options:['Velocity (скорость команды в story points)','Burndown chart (сколько работы осталось)','Cycle time (время выполнения задачи)','Количество коммитов в день','Часы проведённые на работе','Количество совещаний'],
+   correct:[0,1,2],need:3},
+  {type:'scenario',situation:'На стендапе разработчик: "Я уже 3 дня на одной задаче — не получается." Другой: "Всё ок" (но его задачи не двигаются). Твои действия?',
+   actions:[
+     {text:'Первому — предложить парное программирование или помощь. Второму — уточнить конкретный прогресс и блокеры.',score:100,feedback:'<b>Профессионально!</b> PM не давит, а помогает. "Что конкретно мешает?" лучше чем "Почему не сделал?"'},
+     {text:'Пожурить обоих публично',score:0,feedback:'Публичная критика демотивирует. Обратная связь — только лично.'},
+     {text:'Переназначить задачи другим',score:20,feedback:'Это подорвёт доверие и не решит проблему. Сначала разберись в причинах.'},
+   ]},
+  {type:'order',text:'Шаги управления рисками:',
+   items:['Идентификация рисков','Оценка вероятности и влияния','Приоритизация (матрица рисков)','Разработка плана действий','Назначение ответственных','Мониторинг и обновление']},
+]}],
+
+physics:[{steps:[
+  {type:'input',learn:'<b>Второй закон Ньютона:</b> F = m × a. Сила (Н) = масса (кг) × ускорение (м/с²).',
+   text:'Тело массой 10 кг ускоряется с a = 3 м/с². Какая сила приложена? (в Ньютонах)',
+   placeholder:'Ответ в Н',correct:['30','30 н','30н'],fuzzy:true},
+  {type:'choice',text:'Мяч бросили вверх. В высшей точке скорость = 0. Ускорение в этот момент:',
+   options:['g = 9.8 м/с² (вниз) — гравитация действует всегда','0 — ведь скорость 0','∞ — резкая смена направления','Зависит от массы мяча'],correct:0},
+  {type:'scenario',situation:'Лабораторная: измерить ускорение свободного падения с помощью маятника. Нить 1 метр, секундомер в руке.',
+   actions:[
+     {text:'Измерить 20 полных колебаний (для точности), разделить время на 20, по формуле T=2π√(L/g) найти g',score:100,feedback:'<b>Правильная методика!</b> Много колебаний = меньше ошибка реакции. T=2π√(L/g) → g=4π²L/T².'},
+     {text:'Замерить одно колебание',score:30,feedback:'Ошибка реакции (~0.2с) при одном колебании (~2с) = 10% погрешность. Нужно больше.'},
+     {text:'Бросить мяч с высоты и засечь время',score:40,feedback:'Тоже работает, но маятник точнее. Время падения с 1м ≈ 0.45с — трудно замерить.'},
+   ]},
+  {type:'order',text:'Этапы физического эксперимента:',
+   items:['Гипотеза (что проверяем)','Подготовка установки','Серия измерений (5-10 раз)','Расчёт среднего и погрешности','Анализ результатов','Вывод (подтвердилась ли гипотеза)']},
+  {type:'match',text:'Сопоставь величины с единицами СИ:',
+   left:['Сила','Энергия','Мощность','Давление'],
+   right:['Ньютон (Н)','Джоуль (Дж)','Ватт (Вт)','Паскаль (Па)','Ампер (А)'],
+   correct:['Ньютон (Н)','Джоуль (Дж)','Ватт (Вт)','Паскаль (Па)']},
+]}],
+
 };
 
-function getTaskData(profId, taskIdx) {
-  const tasks = TASK_DATA[profId];
-  if (!tasks || !tasks[taskIdx]) return null;
-  return tasks[taskIdx];
-}
-
-function startTask(profId, taskIdx) {
-  // Найти профессию и задание
-  let prof = null;
-  for (const s of STATE.professions) {
-    prof = s.professions.find(p => p.id === profId);
-    if (prof) break;
-  }
-  if (!prof) return;
-
-  const taskMeta = prof.tasks[taskIdx];
-  const taskData = getTaskData(profId, taskIdx);
-  if (!taskData) {
-    showModal('Упс', 'Задание в разработке!');
-    return;
-  }
-
-  STATE.currentTask = { profId, taskIdx, meta: taskMeta, data: taskData };
-  showScreen('task');
-  document.getElementById('navbar').style.display = 'none';
-
-  renderTask();
-}
-
-function closeTask() {
-  const profId = STATE.currentTask?.profId;
-  STATE.currentTask = null;
-  showScreen('professions');
-  document.getElementById('navbar').style.display = 'flex';
-  if (profId) {
-    // Вернуться к профессии
-    setTimeout(() => {
-      if (STATE.currentSphere) openSphere(STATE.currentSphere.id);
-      setTimeout(() => openProfession(profId), 50);
-    }, 50);
-  }
-}
-
-function renderTask() {
-  const { meta, data } = STATE.currentTask;
-  const cont = document.getElementById('task-game-content');
-  const type = meta.type;
-
-  let html = `<h3>${meta.title}</h3><div class="task-desc">${meta.desc}</div><div class="task-content">`;
-
-  if (type === 'quiz') {
-    html += renderQuizTask(data);
-  } else if (type === 'find_bug') {
-    html += renderFindBugTask(data);
-  } else if (type === 'drag_arrange') {
-    html += renderDragTask(data);
-  } else if (type === 'color_pick') {
-    html += renderColorTask(data);
-  } else if (type === 'code_match') {
-    html += renderCodeMatchTask(data);
-  }
-
-  html += '</div>';
-  cont.innerHTML = html;
-}
-
-// === QUIZ ===
-function renderQuizTask(data) {
-  let html = `<div class="quiz-question">${data.question}</div><div class="quiz-options">`;
-  data.options.forEach((opt, i) => {
-    html += `<button class="quiz-opt" onclick="answerQuiz(${i}, ${data.correct})">${opt}</button>`;
-  });
-  html += '</div>';
-  return html;
-}
-
-function answerQuiz(selected, correct) {
-  const opts = document.querySelectorAll('.quiz-opt');
-  opts.forEach((btn, i) => {
-    btn.onclick = null;
-    if (i === correct) btn.classList.add('correct');
-    if (i === selected && selected !== correct) btn.classList.add('wrong');
-  });
-  const score = selected === correct ? 100 : 20;
-  setTimeout(() => finishTask(score), 1000);
-}
-
-// === FIND BUG ===
-function renderFindBugTask(data) {
-  let html = '<div class="code-block">';
-  data.lines.forEach((line, i) => {
-    html += `<span class="code-line" onclick="selectBugLine(${i}, ${data.bugLine})">${i + 1}. ${escapeHtml(line)}</span>`;
-  });
-  html += '</div><div style="font-size:7px;color:var(--text2);text-align:center;margin-top:8px;">Нажми на строку с ошибкой</div>';
-  return html;
-}
-
-function selectBugLine(selected, correct) {
-  const lines = document.querySelectorAll('.code-line');
-  lines.forEach((el, i) => { el.onclick = null; });
-  if (selected === correct) {
-    lines[selected].classList.add('bug-found');
-    const data = STATE.currentTask.data;
-    showModal('✅ Верно!', data.explanation);
-    setTimeout(() => finishTask(100), 1500);
-  } else {
-    lines[selected].classList.add('bug-wrong');
-    lines[correct].classList.add('bug-found');
-    const data = STATE.currentTask.data;
-    showModal('❌ Не совсем', data.explanation);
-    setTimeout(() => finishTask(30), 1500);
-  }
-}
-
-// === DRAG & ARRANGE ===
-function renderDragTask(data) {
-  // Перемешиваем
-  const shuffled = [...data.items].sort(() => Math.random() - 0.5);
-  let html = `<div style="font-size:7px;color:var(--secondary);margin-bottom:8px;">${data.instruction || 'Расставь в правильном порядке:'}</div>`;
-  html += '<div class="drag-container" id="drag-container">';
-  shuffled.forEach((item, i) => {
-    html += `<div class="drag-item" data-index="${i}" draggable="false">
-      <span class="drag-handle">☰</span>
-      <span>${item}</span>
-    </div>`;
-  });
-  html += '</div>';
-  html += `<div style="margin-top:12px;"><button class="pixel-btn green" onclick="checkDragOrder()">✓ ПРОВЕРИТЬ</button></div>`;
-  return html;
-}
-
-// Простое перетаскивание через кнопки вверх/вниз (мобильно-дружелюбно)
-function checkDragOrder() {
-  const container = document.getElementById('drag-container');
-  const items = container.querySelectorAll('.drag-item');
-  const current = Array.from(items).map(el => el.querySelector('span:last-child').textContent);
-  const correct = STATE.currentTask.data.correct;
-
-  let score = 0;
-  for (let i = 0; i < current.length; i++) {
-    if (current[i] === correct[i]) score += Math.floor(100 / correct.length);
-  }
-  score = Math.min(100, score);
-  finishTask(score);
-}
-
-// Touch-based reorder
-(function() {
-  let dragEl = null;
-  let startY = 0;
-
-  document.addEventListener('touchstart', function(e) {
-    const handle = e.target.closest('.drag-item');
-    if (!handle) return;
-    dragEl = handle;
-    startY = e.touches[0].clientY;
-    dragEl.classList.add('dragging');
-  }, { passive: true });
-
-  document.addEventListener('touchmove', function(e) {
-    if (!dragEl) return;
-    const currentY = e.touches[0].clientY;
-    const diff = currentY - startY;
-    const container = dragEl.parentElement;
-    const items = Array.from(container.querySelectorAll('.drag-item'));
-    const idx = items.indexOf(dragEl);
-
-    if (diff > 40 && idx < items.length - 1) {
-      container.insertBefore(items[idx + 1], dragEl);
-      startY = currentY;
-    } else if (diff < -40 && idx > 0) {
-      container.insertBefore(dragEl, items[idx - 1]);
-      startY = currentY;
-    }
-  }, { passive: true });
-
-  document.addEventListener('touchend', function() {
-    if (dragEl) {
-      dragEl.classList.remove('dragging');
-      dragEl = null;
-    }
-  });
-})();
-
-// === COLOR PICK ===
-function renderColorTask(data) {
-  let html = `<div class="quiz-question">${data.brief}</div>`;
-  html += `<div style="font-size:7px;color:var(--text2);margin-bottom:8px;">Выбери ${data.needSelect} цвета:</div>`;
-  html += '<div class="color-palette">';
-  data.colors.forEach((color, i) => {
-    html += `<div class="color-swatch" style="background:${color}" data-idx="${i}" onclick="toggleColor(this, ${i})"></div>`;
-  });
-  html += '</div>';
-  html += `<div style="margin-top:12px;"><button class="pixel-btn green" onclick="checkColors()">✓ ПРОВЕРИТЬ</button></div>`;
-  return html;
-}
-
-let selectedColors = [];
-function toggleColor(el, idx) {
-  const data = STATE.currentTask.data;
-  if (el.classList.contains('selected')) {
-    el.classList.remove('selected');
-    selectedColors = selectedColors.filter(i => i !== idx);
-  } else {
-    if (selectedColors.length >= data.needSelect) return;
-    el.classList.add('selected');
-    selectedColors.push(idx);
-  }
-}
-
-function checkColors() {
-  const data = STATE.currentTask.data;
-  const correct = data.correct;
-  let matched = 0;
-  selectedColors.forEach(s => { if (correct.includes(s)) matched++; });
-  const score = Math.floor((matched / correct.length) * 100);
-
-  document.querySelectorAll('.color-swatch').forEach((el, i) => {
-    if (correct.includes(i)) el.classList.add('correct');
-    else if (selectedColors.includes(i)) el.classList.add('wrong');
-  });
-
-  setTimeout(() => finishTask(score), 1000);
-}
-
-// === CODE MATCH ===
-function renderCodeMatchTask(data) {
-  let html = `<div class="quiz-question">${data.question || 'Заполни пропуски:'}</div>`;
-  html += '<div class="code-slots" id="code-slots">';
-  let slotIdx = 0;
-  data.slots.forEach(slot => {
-    if (slot.includes('____')) {
-      html += `<div class="code-slot" data-slot="${slotIdx}" onclick="clearSlot(${slotIdx})">${slot.replace('____', '<span class="slot-val" id="slot-${slotIdx}">???</span>')}</div>`;
-      slotIdx++;
-    } else {
-      html += `<div class="code-slot filled" style="color:var(--text2)">${slot}</div>`;
-    }
-  });
-  html += '</div>';
-  html += '<div class="code-pieces" id="code-pieces">';
-  data.pieces.forEach((piece, i) => {
-    html += `<div class="code-piece" data-piece="${i}" onclick="placePiece(${i})">${piece}</div>`;
-  });
-  html += '</div>';
-  html += `<div style="margin-top:12px;"><button class="pixel-btn green" onclick="checkCodeMatch()">✓ ПРОВЕРИТЬ</button></div>`;
-  window._codeSlots = new Array(slotIdx).fill(null);
-  window._nextSlot = 0;
-  selectedColors = []; // Reset
-  return html;
-}
-
-function placePiece(pieceIdx) {
-  const data = STATE.currentTask.data;
-  const piece = document.querySelector(`.code-piece[data-piece="${pieceIdx}"]`);
-  if (piece.classList.contains('used')) return;
-  if (window._nextSlot >= window._codeSlots.length) return;
-
-  piece.classList.add('used');
-  window._codeSlots[window._nextSlot] = data.pieces[pieceIdx];
-  document.getElementById('slot-' + window._nextSlot).textContent = data.pieces[pieceIdx];
-  document.querySelector(`.code-slot[data-slot="${window._nextSlot}"]`).classList.add('filled');
-  window._nextSlot++;
-}
-
-function clearSlot(idx) {
-  // Упрощённый сброс всех слотов
-  window._codeSlots.fill(null);
-  window._nextSlot = 0;
-  document.querySelectorAll('.slot-val').forEach(el => el.textContent = '???');
-  document.querySelectorAll('.code-slot[data-slot]').forEach(el => el.classList.remove('filled'));
-  document.querySelectorAll('.code-piece').forEach(el => el.classList.remove('used'));
-}
-
-function checkCodeMatch() {
-  const data = STATE.currentTask.data;
-  const correct = data.correct;
-  let matched = 0;
-  window._codeSlots.forEach((val, i) => {
-    if (val === correct[i]) matched++;
-  });
-  const score = Math.floor((matched / correct.length) * 100);
-  finishTask(score);
-}
-
-// === РЕЗУЛЬТАТ ЗАДАНИЯ ===
-async function finishTask(score) {
-  const { profId, taskIdx } = STATE.currentTask;
-
-  try {
-    const data = await apiCall('/api/task/complete', {
-      profession_id: profId,
-      task_index: taskIdx,
-      score: score
-    });
-    STATE.user = data.user;
-    STATE.completed = data.completed_tasks || STATE.completed;
-    STATE.xpNeeded = data.xp_needed;
-
-    const cont = document.getElementById('task-game-content');
-    const icon = score >= 80 ? '🏆' : score >= 50 ? '⭐' : '📝';
-    const title = score >= 80 ? 'Отлично!' : score >= 50 ? 'Хорошо!' : 'Попробуй ещё!';
-
-    cont.innerHTML = `
-      <div class="task-result">
-        <div class="result-icon">${icon}</div>
-        <div class="result-title">${title}</div>
-        <div class="result-score">Результат: ${score}%</div>
-        <div class="result-rewards">+${data.coin_reward || 0} 🪙  +${data.xp_reward || 0} XP</div>
-        <button class="pixel-btn green" onclick="closeTask()">ПРОДОЛЖИТЬ</button>
-      </div>`;
-  } catch (e) {
-    showModal('Ошибка', e.message);
-  }
-}
-
 // ============ УТИЛИТЫ ============
-
-function showModal(title, text) {
-  const modal = document.getElementById('modal');
-  document.getElementById('modal-content').innerHTML = `
-    <h3>${title}</h3>
-    <p>${text}</p>
-    <button class="pixel-btn" onclick="closeModal()">ОК</button>
-  `;
-  modal.classList.add('active');
+function modal(t,txt){
+  document.getElementById('mcont').innerHTML=`<h3>${t}</h3><p>${txt}</p><button class="btn" onclick="closeModal()">ОК</button>`;
+  document.getElementById('modal').classList.add('on');
 }
+function closeModal(){document.getElementById('modal').classList.remove('on')}
 
-function closeModal() {
-  document.getElementById('modal').classList.remove('active');
-}
-
-function escapeHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// ============ СТАРТ ============
+// СТАРТ
 init();
 </script>
 </body>
