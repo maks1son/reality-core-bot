@@ -30,7 +30,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Статика (аватары и т.п.)
+# Статика (аватары и т.п.) — создаём папку если нет
+os.makedirs("static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
