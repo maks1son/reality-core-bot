@@ -14,7 +14,6 @@ from typing import Optional
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -29,13 +28,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Статика (аватары и т.п.) — создаём папку если нет
-os.makedirs("static", exist_ok=True)
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
-
 # ============ Константы ============
 
 XP_PER_LEVEL = [0, 100, 250, 500, 900, 1500, 2500, 4000, 6500, 10000]  # XP для уровней 1-10
