@@ -1,5 +1,6 @@
 #!/bin/bash
-# Запускаем и бота, и веб-сервер
-
+# Запускаем Telegram бота в фоне
 python bot.py &
-uvicorn main:app --host 0.0.0.0 --port $PORT
+
+# Запускаем FastAPI сервер (основной процесс)
+python main.py
