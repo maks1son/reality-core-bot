@@ -3,1357 +3,1697 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>REALITY Профессии</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>RE:ALITY — Профессии</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;overflow:hidden;touch-action:manipulation}
-body{font-family:'Press Start 2P',monospace;background:#0a0a1a;color:#e0e0e0;font-size:10px;line-height:1.6;display:flex;justify-content:center;align-items:center}
-#app{width:100%;max-width:420px;height:100vh;height:100dvh;position:relative;overflow:hidden;background:linear-gradient(180deg,#0a0a2e 0%,#1a0a3e 50%,#0a0a2e 100%)}
-#app::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(2px 2px at 20px 30px,#fff,transparent),radial-gradient(2px 2px at 40px 70px,rgba(255,255,255,.8),transparent),radial-gradient(1px 1px at 90px 40px,#fff,transparent),radial-gradient(1px 1px at 130px 80px,rgba(255,255,255,.6),transparent),radial-gradient(2px 2px at 160px 30px,#fff,transparent),radial-gradient(1px 1px at 200px 90px,rgba(255,255,255,.7),transparent),radial-gradient(2px 2px at 250px 50px,#fff,transparent),radial-gradient(1px 1px at 300px 70px,rgba(255,255,255,.5),transparent),radial-gradient(2px 2px at 350px 20px,#fff,transparent);background-size:400px 100px;animation:stars 60s linear infinite;pointer-events:none;opacity:.4;z-index:0}
-@keyframes stars{to{background-position:0 1000px}}
-.screen{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;z-index:1}
-.screen.active{display:flex}
-.scrollable{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:70px}
-.scrollable::-webkit-scrollbar{width:4px}
-.scrollable::-webkit-scrollbar-track{background:#1a1a3e}
-.scrollable::-webkit-scrollbar-thumb{background:#6c3baa;border-radius:2px}
-.top-bar{background:linear-gradient(180deg,#1a0a3e,#0d0620);padding:10px 12px 8px;border-bottom:2px solid #2a1a4e;position:relative;z-index:10;flex-shrink:0}
-.top-bar .name-level{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.top-bar .name{font-size:11px;color:#ffcc00;text-shadow:0 0 8px rgba(255,204,0,.5)}
-.top-bar .level-badge{background:#6c3baa;padding:3px 8px;border-radius:2px;font-size:8px;border:1px solid #9b59b6}
-.xp-bar-wrap{background:#1a1a2e;height:10px;border-radius:2px;border:1px solid #2a2a4e;overflow:hidden}
-.xp-bar{height:100%;background:linear-gradient(90deg,#6c3baa,#9b59b6);transition:width .3s;border-radius:1px}
-.resources{display:flex;gap:10px;margin-top:6px;font-size:8px}
-.resource{display:flex;align-items:center;gap:4px;background:rgba(26,10,62,.6);padding:3px 6px;border-radius:2px;border:1px solid #2a1a4e}
-.resource span{color:#ffcc00}
-#register{justify-content:center;align-items:center;padding:20px}
-.reg-title{font-size:16px;color:#ffcc00;text-align:center;margin-bottom:4px;text-shadow:0 0 10px rgba(255,204,0,.5)}
-.reg-subtitle{font-size:8px;color:#9b59b6;text-align:center;margin-bottom:20px}
-.avatar-select{display:flex;gap:16px;justify-content:center;margin-bottom:16px}
-.avatar-option{width:80px;height:90px;border:3px solid #2a1a4e;border-radius:4px;cursor:pointer;transition:.2s;background:#0d0620;display:flex;align-items:center;justify-content:center;flex-direction:column}
-.avatar-option.selected{border-color:#ffcc00;box-shadow:0 0 12px rgba(255,204,0,.4)}
-.avatar-option:active{transform:scale(.95)}
-.avatar-option canvas{width:60px;height:60px;image-rendering:pixelated}
-.avatar-label{font-size:6px;color:#9b59b6;margin-top:2px}
-.reg-input{width:100%;max-width:280px;background:#1a1a3e;border:2px solid #2a1a4e;color:#e0e0e0;padding:10px;font-family:'Press Start 2P',monospace;font-size:10px;border-radius:2px;text-align:center;margin-bottom:16px;outline:none}
-.reg-input:focus{border-color:#6c3baa;box-shadow:0 0 8px rgba(108,59,170,.4)}
-.reg-input::placeholder{color:#4a4a6e}
-.stats-section{width:100%;max-width:300px;margin-bottom:16px}
-.stats-header{display:flex;justify-content:space-between;font-size:8px;margin-bottom:8px}
-.stats-header .pts{color:#ffcc00}
-.stat-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-.stat-label{font-size:7px;width:72px;color:#ccc}
-.stat-btn{width:24px;height:24px;background:#2a1a4e;border:1px solid #6c3baa;color:#e0e0e0;font-family:'Press Start 2P',monospace;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:2px}
-.stat-btn:active{background:#6c3baa}
-.stat-val{font-size:10px;color:#ffcc00;width:20px;text-align:center}
-.stat-bar{flex:1;height:8px;background:#1a1a2e;border-radius:1px;overflow:hidden;border:1px solid #2a2a4e}
-.stat-bar-fill{height:100%;transition:width .2s}
-.s-str .stat-bar-fill{background:#e74c3c}
-.s-int .stat-bar-fill{background:#3498db}
-.s-chr .stat-bar-fill{background:#e67e22}
-.s-lck .stat-bar-fill{background:#2ecc71}
-.btn{font-family:'Press Start 2P',monospace;font-size:10px;padding:12px 24px;border:2px solid;border-radius:2px;cursor:pointer;transition:.15s;text-transform:uppercase}
-.btn:active{transform:scale(.96)}
-.btn-primary{background:#6c3baa;border-color:#9b59b6;color:#fff}
-.btn-gold{background:linear-gradient(180deg,#f0c040,#d4a020);border-color:#ffcc00;color:#1a0a3e}
-.btn-sm{font-size:8px;padding:8px 14px}
-.btn-block{width:100%;max-width:280px}
-.btn:disabled{opacity:.4;cursor:default;transform:none}
-#main .tap-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;user-select:none}
-.char-wrap{position:relative;width:140px;height:140px;margin-bottom:16px}
-.char-wrap canvas{width:100%;height:100%;image-rendering:pixelated}
-.tap-hint{font-size:7px;color:#6c3baa;text-align:center;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
-.energy-wrap{width:80%;max-width:280px;margin:12px auto 0}
-.energy-lbl{display:flex;justify-content:space-between;font-size:7px;margin-bottom:3px;color:#aaa}
-.energy-outer{height:12px;background:#1a1a2e;border:1px solid #2a2a4e;border-radius:2px;overflow:hidden}
-.energy-fill{height:100%;background:linear-gradient(90deg,#27ae60,#2ecc71);transition:width .15s}
-.energy-fill.low{background:linear-gradient(90deg,#e74c3c,#c0392b)}
-.combo-show{position:absolute;top:10px;right:16px;font-size:16px;color:#ffcc00;text-shadow:0 0 10px rgba(255,204,0,.6);opacity:0;transition:opacity .2s}
-.combo-show.on{opacity:1}
-.tap-num{position:absolute;font-size:12px;color:#ffcc00;text-shadow:0 0 6px rgba(255,204,0,.5);pointer-events:none;animation:floatUp .8s ease-out forwards;z-index:100}
-.tap-num.crit{font-size:16px;color:#e74c3c;text-shadow:0 0 10px rgba(231,76,60,.6)}
-@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-60px)}}
-.bottom-nav{position:absolute;bottom:0;left:0;right:0;display:flex;background:linear-gradient(180deg,#0d0620,#1a0a3e);border-top:2px solid #2a1a4e;z-index:20;padding-bottom:env(safe-area-inset-bottom)}
-.nav-btn{flex:1;padding:10px 4px;text-align:center;font-family:'Press Start 2P',monospace;font-size:7px;color:#6c6c8e;cursor:pointer;transition:.2s;border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:4px}
-.nav-btn .ni{font-size:18px}
-.nav-btn.active{color:#ffcc00}
-.nav-btn:active{background:rgba(108,59,170,.2)}
-.prof-header{padding:12px;text-align:center;font-size:11px;color:#ffcc00;border-bottom:2px solid #2a1a4e;flex-shrink:0;background:linear-gradient(180deg,#1a0a3e,#0d0620)}
-.sphere-section{padding:8px 12px}
-.sphere-title{font-size:9px;color:#9b59b6;margin:8px 0;padding-bottom:4px;border-bottom:1px solid #2a1a4e}
-.prof-card{background:linear-gradient(135deg,#1a1a3e,#0d0d2e);border:2px solid #2a1a4e;border-radius:4px;padding:10px;margin-bottom:8px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:10px}
-.prof-card:active{transform:scale(.98);border-color:#6c3baa}
-.prof-card.unlocked{border-color:#27ae60}
-.prof-card .pi{font-size:24px;width:40px;text-align:center}
-.prof-card .pinfo{flex:1}
-.prof-card .pn{font-size:8px;color:#e0e0e0;margin-bottom:4px}
-.prof-card .pd{font-size:7px;color:#6c6c8e}
-.prof-card .pc{font-size:7px;color:#ffcc00;white-space:nowrap}
-.prof-card .pp{font-size:7px;color:#27ae60}
-.pd-header{padding:12px;border-bottom:2px solid #2a1a4e;flex-shrink:0;background:linear-gradient(180deg,#1a0a3e,#0d0620)}
-.back-btn{font-size:8px;color:#9b59b6;cursor:pointer;margin-bottom:8px;display:inline-block}
-.back-btn:active{color:#ffcc00}
-.pd-title{display:flex;align-items:center;gap:10px}
-.pd-title .icon{font-size:28px}
-.pd-title .info h2{font-size:10px;color:#ffcc00;margin-bottom:4px}
-.pd-title .info p{font-size:7px;color:#aaa}
-.pd-tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.pd-tool{font-size:7px;background:#2a1a4e;padding:3px 6px;border-radius:2px;color:#9b59b6}
-.task-list{padding:12px}
-.task-card{background:linear-gradient(135deg,#1a1a3e,#0d0d2e);border:2px solid #2a1a4e;border-radius:4px;padding:10px;margin-bottom:8px;cursor:pointer;transition:.2s}
-.task-card:active{transform:scale(.98)}
-.task-card.done{border-color:#27ae60;opacity:.7}
-.task-card.locked{opacity:.4;cursor:default}
-.task-card h3{font-size:8px;color:#e0e0e0;margin-bottom:4px}
-.task-card p{font-size:7px;color:#6c6c8e}
-.task-card .tr{font-size:7px;color:#ffcc00;margin-top:4px}
-.up-header{padding:12px;text-align:center;font-size:11px;color:#ffcc00;border-bottom:2px solid #2a1a4e;flex-shrink:0;background:linear-gradient(180deg,#1a0a3e,#0d0620)}
-.up-list{padding:12px}
-.up-card{background:linear-gradient(135deg,#1a1a3e,#0d0d2e);border:2px solid #2a1a4e;border-radius:4px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
-.up-card .ui{font-size:24px;width:40px;text-align:center}
-.up-card .uinfo{flex:1}
-.up-card .un{font-size:8px;color:#e0e0e0;margin-bottom:3px}
-.up-card .udesc{font-size:7px;color:#6c6c8e;margin-bottom:3px}
-.up-card .ulvl{font-size:7px;color:#9b59b6}
-.up-card .ubuy{flex-shrink:0}
-.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
-.modal-overlay.active{display:flex}
-.modal{background:linear-gradient(180deg,#1a0a3e,#0d0620);border:2px solid #6c3baa;border-radius:4px;padding:20px;max-width:340px;width:100%;text-align:center;max-height:90vh;overflow-y:auto}
-.modal h2{font-size:11px;color:#ffcc00;margin-bottom:12px}
-.modal p{font-size:8px;color:#ccc;margin-bottom:12px;line-height:1.8}
-.task-screen{padding:12px}
-.task-title{font-size:10px;color:#ffcc00;text-align:center;margin-bottom:4px}
-.task-desc{font-size:7px;color:#aaa;text-align:center;margin-bottom:12px}
-.task-game{background:#0d0d2e;border:2px solid #2a1a4e;border-radius:4px;padding:12px;min-height:260px;position:relative}
-.mg-grid{display:grid;gap:6px;margin:8px 0}
-.mg-item{background:#1a1a3e;border:2px solid #2a1a4e;border-radius:2px;padding:8px;font-size:7px;cursor:pointer;transition:.2s;text-align:center}
-.mg-item:active{transform:scale(.95)}
-.mg-item.sel{border-color:#ffcc00;background:#2a1a4e}
-.mg-item.ok{border-color:#27ae60;background:rgba(39,174,96,.2)}
-.mg-item.no{border-color:#e74c3c;background:rgba(231,76,60,.2)}
-.mg-slider{width:100%;margin:8px 0}
-.mg-slider input[type=range]{width:100%;accent-color:#6c3baa}
-.sl-labels{display:flex;justify-content:space-between;font-size:7px;color:#6c6c8e}
-.sl-val{text-align:center;font-size:10px;color:#ffcc00;margin:4px 0}
-.mg-code{background:#0a0a1a;border:1px solid #2a2a4e;border-radius:2px;padding:8px;font-family:monospace;font-size:8px;color:#2ecc71;margin:8px 0;white-space:pre-wrap;line-height:1.6}
-.gfb{font-size:8px;text-align:center;margin:8px 0;padding:6px;border-radius:2px}
-.gfb.good{color:#2ecc71;background:rgba(46,204,113,.1);border:1px solid #27ae60}
-.gfb.bad{color:#e74c3c;background:rgba(231,76,60,.1);border:1px solid #e74c3c}
-#loading{display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;background:#0a0a1a}
-#loading .logo{font-size:18px;color:#ffcc00;margin-bottom:8px;text-shadow:0 0 12px rgba(255,204,0,.5)}
-#loading .sub{font-size:9px;color:#9b59b6;margin-bottom:24px}
-.dots{display:flex;gap:8px}
-.dots span{width:8px;height:8px;background:#6c3baa;animation:dp 1.2s infinite}
-.dots span:nth-child(2){animation-delay:.2s}
-.dots span:nth-child(3){animation-delay:.4s}
-@keyframes dp{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-@keyframes lvlUp{0%{filter:brightness(1)}50%{filter:brightness(2) hue-rotate(30deg)}100%{filter:brightness(1)}}
-.shake{animation:shake .3s}
-.lvl-up{animation:lvlUp .8s}
+/* ============ ОБЩИЕ СТИЛИ ============ */
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #0a0a1a;
+  --bg2: #12122a;
+  --bg3: #1a1a3a;
+  --primary: #ffcc00;
+  --secondary: #00ccff;
+  --accent: #ff6699;
+  --green: #33ff66;
+  --red: #ff4444;
+  --text: #e0e0ff;
+  --text2: #8888aa;
+  --pixel-border: 3px solid var(--primary);
+}
+body {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg);
+  color: var(--text);
+  max-width: 420px;
+  margin: 0 auto;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+/* Отключаем все нежелательные мобильные поведения */
+input { font-family: 'Press Start 2P', monospace; }
+
+/* Пиксельная рамка */
+.pixel-box {
+  background: var(--bg2);
+  border: 3px solid var(--primary);
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.5), inset 0 0 20px rgba(255,204,0,0.05);
+  padding: 12px;
+  margin: 8px;
+  image-rendering: pixelated;
+}
+.pixel-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg3);
+  color: var(--primary);
+  border: 3px solid var(--primary);
+  padding: 10px 16px;
+  font-size: 10px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+  transition: all 0.1s;
+  text-transform: uppercase;
+  width: 100%;
+  text-align: center;
+}
+.pixel-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+}
+.pixel-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.pixel-btn.accent { border-color: var(--accent); color: var(--accent); }
+.pixel-btn.green { border-color: var(--green); color: var(--green); }
+.pixel-btn.secondary { border-color: var(--secondary); color: var(--secondary); }
+
+/* Прогресс-бар */
+.progress-bar {
+  width: 100%;
+  height: 14px;
+  background: var(--bg);
+  border: 2px solid var(--text2);
+  position: relative;
+  overflow: hidden;
+}
+.progress-bar .fill {
+  height: 100%;
+  transition: width 0.3s;
+}
+.progress-bar .fill.xp { background: var(--secondary); }
+.progress-bar .fill.energy { background: var(--green); }
+
+/* Скрытие экранов */
+.screen { display: none; flex-direction: column; min-height: 100vh; padding-bottom: 70px; }
+.screen.active { display: flex; }
+
+/* Нижняя навигация */
+#navbar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  background: var(--bg2);
+  border-top: 3px solid var(--primary);
+  z-index: 100;
+}
+#navbar .nav-btn {
+  flex: 1;
+  padding: 8px 4px;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--text2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+#navbar .nav-btn.active { color: var(--primary); background: var(--bg3); }
+#navbar .nav-btn span { display: block; font-size: 16px; margin-bottom: 2px; }
+
+/* ============ ЭКРАН РЕГИСТРАЦИИ ============ */
+#register-screen {
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+#register-screen h1 {
+  font-size: 16px;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 4px;
+  text-shadow: 2px 2px 0 #664400;
+}
+#register-screen .subtitle {
+  font-size: 8px;
+  color: var(--secondary);
+  text-align: center;
+  margin-bottom: 16px;
+}
+.avatar-select {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 12px 0;
+}
+.avatar-option {
+  width: 80px;
+  height: 80px;
+  border: 3px solid var(--text2);
+  cursor: pointer;
+  image-rendering: pixelated;
+  transition: all 0.2s;
+  background: var(--bg3);
+  padding: 4px;
+}
+.avatar-option.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 12px rgba(255,204,0,0.5);
+  transform: scale(1.1);
+}
+.avatar-option img { width: 100%; height: 100%; image-rendering: pixelated; object-fit: contain; }
+.name-input {
+  width: 100%;
+  background: var(--bg);
+  border: 3px solid var(--secondary);
+  color: var(--text);
+  padding: 10px;
+  font-size: 12px;
+  text-align: center;
+  outline: none;
+}
+.name-input:focus { border-color: var(--primary); }
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 0;
+}
+.stat-item {
+  background: var(--bg3);
+  border: 2px solid var(--text2);
+  padding: 8px;
+  text-align: center;
+}
+.stat-item .stat-name { font-size: 7px; color: var(--secondary); margin-bottom: 6px; display: block; }
+.stat-item .stat-controls { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.stat-item .stat-val { font-size: 14px; color: var(--primary); min-width: 24px; }
+.stat-item button {
+  font-family: 'Press Start 2P', monospace;
+  width: 28px;
+  height: 28px;
+  background: var(--bg);
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stat-item button:disabled { opacity: 0.3; }
+.points-left { font-size: 9px; color: var(--accent); text-align: center; margin: 6px 0; }
+
+/* ============ ГЛАВНЫЙ ЭКРАН (ТАПАЛКА) ============ */
+#main-screen { padding: 8px; }
+.top-panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+}
+.top-panel .user-info { flex: 1; }
+.top-panel .user-name { font-size: 10px; color: var(--primary); }
+.top-panel .user-level { font-size: 7px; color: var(--secondary); margin-top: 2px; }
+.top-panel .user-avatar {
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+  border: 2px solid var(--primary);
+}
+
+.resources-bar {
+  display: flex;
+  gap: 6px;
+  padding: 6px 8px;
+  flex-wrap: wrap;
+}
+.resource {
+  background: var(--bg3);
+  border: 2px solid var(--text2);
+  padding: 5px 8px;
+  font-size: 7px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 80px;
+}
+.resource .r-icon { font-size: 12px; }
+.resource .r-val { color: var(--primary); }
+
+.xp-section { padding: 4px 8px; }
+.xp-label { font-size: 7px; color: var(--text2); margin-bottom: 3px; }
+
+.tap-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  min-height: 300px;
+  position: relative;
+}
+.tap-character {
+  width: 140px;
+  height: 140px;
+  image-rendering: pixelated;
+  cursor: pointer;
+  animation: breathe 2s ease-in-out infinite;
+  transition: transform 0.08s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.tap-character:active { transform: scale(0.92); }
+@keyframes breathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.03); }
+}
+
+.energy-section { padding: 4px 16px; width: 100%; }
+.energy-label { font-size: 7px; color: var(--text2); margin-bottom: 3px; display: flex; justify-content: space-between; }
+
+.combo-display {
+  font-size: 10px;
+  color: var(--accent);
+  text-align: center;
+  margin-top: 8px;
+  min-height: 16px;
+}
+
+/* Анимация получения монет */
+.coin-popup {
+  position: absolute;
+  font-size: 12px;
+  color: var(--primary);
+  pointer-events: none;
+  animation: coinFloat 0.8s ease-out forwards;
+  text-shadow: 1px 1px 0 #000;
+  z-index: 50;
+}
+@keyframes coinFloat {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
+}
+
+/* ============ ЭКРАН ПРОФЕССИЙ ============ */
+#professions-screen { padding: 8px; }
+#professions-screen h2 {
+  font-size: 12px;
+  color: var(--primary);
+  text-align: center;
+  margin: 8px;
+}
+.spheres-list { display: flex; flex-direction: column; gap: 8px; padding: 4px; }
+.sphere-card {
+  background: var(--bg2);
+  border: 3px solid var(--text2);
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sphere-card:active { border-color: var(--primary); transform: scale(0.98); }
+.sphere-card .s-icon { font-size: 28px; }
+.sphere-card .s-name { font-size: 9px; color: var(--text); }
+.sphere-card .s-count { font-size: 7px; color: var(--text2); margin-top: 3px; }
+
+/* Список профессий в сфере */
+.prof-list { display: flex; flex-direction: column; gap: 6px; padding: 4px; }
+.prof-card {
+  background: var(--bg3);
+  border: 2px solid var(--text2);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.prof-card.unlocked { border-color: var(--green); }
+.prof-card .p-icon { font-size: 22px; }
+.prof-card .p-info { flex: 1; }
+.prof-card .p-name { font-size: 8px; color: var(--text); }
+.prof-card .p-status { font-size: 6px; margin-top: 3px; }
+.prof-card .p-status.locked { color: var(--accent); }
+.prof-card .p-status.open { color: var(--green); }
+
+/* Детальный экран профессии */
+.prof-detail { padding: 4px; }
+.prof-detail .pd-header { text-align: center; margin: 8px 0; }
+.prof-detail .pd-icon { font-size: 40px; }
+.prof-detail .pd-name { font-size: 11px; color: var(--primary); margin: 6px 0; }
+.prof-detail .pd-desc { font-size: 7px; color: var(--text2); line-height: 1.6; }
+.pd-tools { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 0; }
+.pd-tools .tool-tag {
+  background: var(--bg);
+  border: 1px solid var(--secondary);
+  color: var(--secondary);
+  font-size: 6px;
+  padding: 4px 8px;
+}
+.task-list { display: flex; flex-direction: column; gap: 6px; }
+.task-card {
+  background: var(--bg3);
+  border: 2px solid var(--text2);
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.task-card.completed { border-color: var(--green); opacity: 0.7; }
+.task-card.locked { opacity: 0.4; cursor: default; }
+.task-card .t-num {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.task-card.completed .t-num { border-color: var(--green); color: var(--green); }
+.task-card .t-info { flex: 1; }
+.task-card .t-title { font-size: 8px; color: var(--text); }
+.task-card .t-desc { font-size: 6px; color: var(--text2); margin-top: 3px; }
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--secondary);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============ ЭКРАН УЛУЧШЕНИЙ ============ */
+#upgrades-screen { padding: 8px; }
+#upgrades-screen h2 { font-size: 12px; color: var(--primary); text-align: center; margin: 8px; }
+.upgrade-list { display: flex; flex-direction: column; gap: 8px; padding: 4px; }
+.upgrade-card {
+  background: var(--bg2);
+  border: 3px solid var(--text2);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.upgrade-card .u-header { display: flex; align-items: center; gap: 8px; }
+.upgrade-card .u-icon { font-size: 24px; }
+.upgrade-card .u-name { font-size: 9px; color: var(--text); }
+.upgrade-card .u-level { font-size: 7px; color: var(--secondary); margin-top: 2px; }
+.upgrade-card .u-desc { font-size: 7px; color: var(--text2); line-height: 1.4; }
+.upgrade-card .u-cost { font-size: 8px; color: var(--primary); }
+
+/* ============ ЭКРАН ЗАДАНИЯ (МИНИ-ИГРА) ============ */
+#task-screen { padding: 8px; }
+.task-game { padding: 8px; }
+.task-game h3 { font-size: 10px; color: var(--primary); text-align: center; margin: 8px 0; }
+.task-game .task-desc { font-size: 7px; color: var(--text2); text-align: center; margin-bottom: 12px; line-height: 1.6; }
+.task-game .task-content { min-height: 200px; }
+
+/* Quiz задание */
+.quiz-question { font-size: 8px; color: var(--text); line-height: 1.6; margin-bottom: 12px; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg3);
+  border: 2px solid var(--text2);
+  color: var(--text);
+  padding: 10px;
+  font-size: 7px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1.5;
+}
+.quiz-opt:active { border-color: var(--primary); }
+.quiz-opt.correct { border-color: var(--green); color: var(--green); background: rgba(51,255,102,0.1); }
+.quiz-opt.wrong { border-color: var(--red); color: var(--red); background: rgba(255,68,68,0.1); }
+
+/* Find Bug задание */
+.code-block {
+  background: var(--bg);
+  border: 2px solid var(--text2);
+  padding: 10px;
+  font-size: 7px;
+  line-height: 1.8;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.code-line {
+  padding: 3px 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: block;
+}
+.code-line:hover { background: rgba(255,204,0,0.1); }
+.code-line.selected { background: rgba(255,204,0,0.2); border-left: 3px solid var(--primary); }
+.code-line.bug-found { background: rgba(51,255,102,0.2); border-left: 3px solid var(--green); }
+.code-line.bug-wrong { background: rgba(255,68,68,0.2); border-left: 3px solid var(--red); }
+
+/* Drag & Arrange задание */
+.drag-container { display: flex; flex-direction: column; gap: 6px; }
+.drag-item {
+  background: var(--bg3);
+  border: 2px solid var(--secondary);
+  padding: 10px;
+  font-size: 7px;
+  cursor: grab;
+  touch-action: none;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.4;
+}
+.drag-item:active { cursor: grabbing; border-color: var(--primary); }
+.drag-item .drag-handle { color: var(--text2); font-size: 10px; }
+.drag-item.dragging { opacity: 0.5; border-color: var(--primary); }
+
+/* Color Pick задание */
+.color-palette { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
+.color-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 3px solid var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.color-swatch.selected { border-color: var(--primary); transform: scale(1.1); box-shadow: 0 0 10px rgba(255,204,0,0.5); }
+.color-swatch.correct { border-color: var(--green); }
+.color-swatch.wrong { border-color: var(--red); opacity: 0.5; }
+
+/* Code Match задание */
+.code-slots { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; }
+.code-slot {
+  background: var(--bg);
+  border: 2px dashed var(--text2);
+  padding: 8px;
+  font-size: 7px;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  color: var(--text2);
+}
+.code-slot.filled { border-style: solid; border-color: var(--secondary); color: var(--text); }
+.code-pieces { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.code-piece {
+  background: var(--bg3);
+  border: 2px solid var(--secondary);
+  padding: 6px 10px;
+  font-size: 7px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.code-piece.used { opacity: 0.3; cursor: default; }
+.code-piece:active { border-color: var(--primary); }
+
+/* Результат задания */
+.task-result {
+  text-align: center;
+  padding: 20px;
+}
+.task-result .result-icon { font-size: 40px; margin-bottom: 12px; }
+.task-result .result-title { font-size: 12px; color: var(--primary); margin-bottom: 8px; }
+.task-result .result-score { font-size: 9px; color: var(--secondary); margin-bottom: 6px; }
+.task-result .result-rewards { font-size: 8px; color: var(--green); margin-bottom: 16px; }
+
+/* Модальное окно */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 200;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+  background: var(--bg2);
+  border: 3px solid var(--primary);
+  padding: 20px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 8px 8px 0 rgba(0,0,0,0.5);
+}
+.modal-box h3 { font-size: 10px; color: var(--primary); margin-bottom: 10px; }
+.modal-box p { font-size: 7px; color: var(--text2); line-height: 1.6; margin-bottom: 14px; }
+
+/* Загрузка */
+#loading {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+#loading h1 { font-size: 16px; color: var(--primary); margin-bottom: 8px; text-shadow: 2px 2px 0 #664400; }
+#loading p { font-size: 8px; color: var(--secondary); animation: blink 1s infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Скроллбар */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--primary); }
 </style>
 </head>
 <body>
-<div id="app">
 
-<div id="loading" class="screen active">
-  <div class="logo">REALITY</div>
-  <div class="sub">ПРОФЕССИИ</div>
-  <div class="dots"><span></span><span></span><span></span></div>
+<!-- Загрузка -->
+<div id="loading">
+  <h1>RE:ALITY</h1>
+  <p>Загрузка...</p>
 </div>
 
-<div id="register" class="screen">
-  <div class="reg-title">REALITY</div>
-  <div class="reg-subtitle">ПРОФЕССИИ &middot; СОЗДАЙ ПЕРСОНАЖА</div>
-  <div class="avatar-select" id="avatarSelect"></div>
-  <input type="text" class="reg-input" id="nameInput" placeholder="Имя (макс 8)" maxlength="8" autocomplete="off">
-  <div class="stats-section">
-    <div class="stats-header">
-      <span>ХАРАКТЕРИСТИКИ</span>
-      <span class="pts">Осталось: <span id="pointsLeft">20</span></span>
-    </div>
-    <div class="stat-row s-str">
-      <span class="stat-label">&#x1F4AA; СИЛА</span>
-      <button class="stat-btn" onclick="chStat('strength',-1)">-</button>
-      <span class="stat-val" id="sv-strength">5</span>
-      <button class="stat-btn" onclick="chStat('strength',1)">+</button>
-      <div class="stat-bar"><div class="stat-bar-fill" id="sb-strength" style="width:25%"></div></div>
-    </div>
-    <div class="stat-row s-int">
-      <span class="stat-label">&#x1F9E0; ИНТЕЛЛ</span>
-      <button class="stat-btn" onclick="chStat('intellect',-1)">-</button>
-      <span class="stat-val" id="sv-intellect">5</span>
-      <button class="stat-btn" onclick="chStat('intellect',1)">+</button>
-      <div class="stat-bar"><div class="stat-bar-fill" id="sb-intellect" style="width:25%"></div></div>
-    </div>
-    <div class="stat-row s-chr">
-      <span class="stat-label">&#x2728; ХАРИЗ</span>
-      <button class="stat-btn" onclick="chStat('charisma',-1)">-</button>
-      <span class="stat-val" id="sv-charisma">5</span>
-      <button class="stat-btn" onclick="chStat('charisma',1)">+</button>
-      <div class="stat-bar"><div class="stat-bar-fill" id="sb-charisma" style="width:25%"></div></div>
-    </div>
-    <div class="stat-row s-lck">
-      <span class="stat-label">&#x1F340; УДАЧА</span>
-      <button class="stat-btn" onclick="chStat('luck',-1)">-</button>
-      <span class="stat-val" id="sv-luck">5</span>
-      <button class="stat-btn" onclick="chStat('luck',1)">+</button>
-      <div class="stat-bar"><div class="stat-bar-fill" id="sb-luck" style="width:25%"></div></div>
-    </div>
-  </div>
-  <button class="btn btn-gold btn-block" onclick="createChar()">НАЧАТЬ ПУТЬ</button>
+<!-- Модальное окно -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box" id="modal-content"></div>
 </div>
 
-<div id="main" class="screen">
-  <div class="top-bar">
-    <div class="name-level">
-      <span class="name" id="pName">---</span>
-      <span class="level-badge" id="pLevel">Ур. 1</span>
-    </div>
-    <div class="xp-bar-wrap"><div class="xp-bar" id="xpBar" style="width:0%"></div></div>
-    <div class="resources">
-      <div class="resource">&#x1FA99; <span id="coinCt">0</span></div>
-      <div class="resource">&#x1F39F;&#xFE0F; <span id="tokenCt">0</span></div>
-      <div class="resource">&#x26A1; <span id="energyCt">100</span></div>
-    </div>
-  </div>
-  <div class="tap-area" id="tapArea">
-    <div class="combo-show" id="comboD">x1</div>
-    <div class="char-wrap" id="charWrap"><canvas id="mainChar" width="32" height="32"></canvas></div>
-    <div class="tap-hint">TAP!</div>
-    <div class="energy-wrap">
-      <div class="energy-lbl"><span>ЭНЕРГИЯ</span><span id="energyTxt">100/100</span></div>
-      <div class="energy-outer"><div class="energy-fill" id="energyBar" style="width:100%"></div></div>
+<!-- ========== ЭКРАН РЕГИСТРАЦИИ ========== -->
+<div class="screen" id="register-screen">
+  <h1>RE:ALITY</h1>
+  <div class="subtitle">ПРОФЕССИИ</div>
+
+  <div class="pixel-box">
+    <div style="font-size:8px;color:var(--secondary);text-align:center;margin-bottom:10px;">ВЫБЕРИ АВАТАР</div>
+    <div class="avatar-select">
+      <div class="avatar-option selected" data-avatar="1" onclick="selectAvatar(1)"><img src="/hero1.png" alt="Hero 1"></div>
+      <div class="avatar-option" data-avatar="2" onclick="selectAvatar(2)"><img src="/hero2.png" alt="Hero 2"></div>
+      <div class="avatar-option" data-avatar="3" onclick="selectAvatar(3)"><img src="/hero3.png" alt="Hero 3"></div>
     </div>
   </div>
-  <div class="bottom-nav">
-    <div class="nav-btn" onclick="go('professions')"><span class="ni">&#x1F4CB;</span>ПРОФЕССИИ</div>
-    <div class="nav-btn active" onclick="go('main')"><span class="ni">&#x1F3E0;</span>ГЛАВНАЯ</div>
-    <div class="nav-btn" onclick="go('upgrades')"><span class="ni">&#x2B06;&#xFE0F;</span>УЛУЧШЕНИЯ</div>
+
+  <div class="pixel-box">
+    <div style="font-size:8px;color:var(--secondary);text-align:center;margin-bottom:10px;">ИМЯ ГЕРОЯ</div>
+    <input type="text" class="name-input" id="name-input" maxlength="8" placeholder="Макс 8 букв">
+  </div>
+
+  <div class="pixel-box">
+    <div style="font-size:8px;color:var(--secondary);text-align:center;margin-bottom:6px;">ХАРАКТЕРИСТИКИ</div>
+    <div class="points-left">Осталось очков: <span id="points-left">0</span></div>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <span class="stat-name">💪 СИЛА</span>
+        <div class="stat-controls">
+          <button onclick="changeStat('str',-1)">-</button>
+          <span class="stat-val" id="stat-str">5</span>
+          <button onclick="changeStat('str',1)">+</button>
+        </div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-name">🧠 ИНТЕЛЛЕКТ</span>
+        <div class="stat-controls">
+          <button onclick="changeStat('int',-1)">-</button>
+          <span class="stat-val" id="stat-int">5</span>
+          <button onclick="changeStat('int',1)">+</button>
+        </div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-name">🗣 ХАРИЗМА</span>
+        <div class="stat-controls">
+          <button onclick="changeStat('cha',-1)">-</button>
+          <span class="stat-val" id="stat-cha">5</span>
+          <button onclick="changeStat('cha',1)">+</button>
+        </div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-name">🍀 УДАЧА</span>
+        <div class="stat-controls">
+          <button onclick="changeStat('luck',-1)">-</button>
+          <span class="stat-val" id="stat-luck">5</span>
+          <button onclick="changeStat('luck',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:8px;">
+    <button class="pixel-btn green" onclick="doRegister()">⚔️ НАЧАТЬ ПУТЬ ⚔️</button>
   </div>
 </div>
 
-<div id="professions" class="screen">
-  <div class="prof-header">ПРОФЕССИИ</div>
-  <div class="scrollable" id="profList"></div>
-  <div class="bottom-nav">
-    <div class="nav-btn active" onclick="go('professions')"><span class="ni">&#x1F4CB;</span>ПРОФЕССИИ</div>
-    <div class="nav-btn" onclick="go('main')"><span class="ni">&#x1F3E0;</span>ГЛАВНАЯ</div>
-    <div class="nav-btn" onclick="go('upgrades')"><span class="ni">&#x2B06;&#xFE0F;</span>УЛУЧШЕНИЯ</div>
-  </div>
-</div>
-
-<div id="profDetail" class="screen">
-  <div class="pd-header">
-    <div class="back-btn" onclick="go('professions')">&larr; НАЗАД</div>
-    <div class="pd-title">
-      <span class="icon" id="pdI"></span>
-      <div class="info"><h2 id="pdN"></h2><p id="pdD"></p></div>
+<!-- ========== ГЛАВНЫЙ ЭКРАН ========== -->
+<div class="screen" id="main-screen">
+  <div class="top-panel">
+    <img class="user-avatar" id="main-avatar" src="/hero1.png" alt="">
+    <div class="user-info">
+      <div class="user-name" id="main-name">...</div>
+      <div class="user-level" id="main-level">УР. 1</div>
     </div>
-    <div class="pd-tools" id="pdT"></div>
   </div>
-  <div class="scrollable" id="pdTasks"></div>
-  <div class="bottom-nav">
-    <div class="nav-btn" onclick="go('professions')"><span class="ni">&#x1F4CB;</span>ПРОФЕССИИ</div>
-    <div class="nav-btn" onclick="go('main')"><span class="ni">&#x1F3E0;</span>ГЛАВНАЯ</div>
-    <div class="nav-btn" onclick="go('upgrades')"><span class="ni">&#x2B06;&#xFE0F;</span>УЛУЧШЕНИЯ</div>
-  </div>
-</div>
 
-<div id="taskScreen" class="screen">
-  <div class="task-screen scrollable">
-    <div class="back-btn" onclick="backTask()" style="padding:12px;cursor:pointer;font-size:8px;color:#9b59b6">&larr; НАЗАД</div>
-    <div class="task-title" id="tsT"></div>
-    <div class="task-desc" id="tsD"></div>
-    <div class="task-game" id="tsG"></div>
+  <div class="xp-section">
+    <div class="xp-label">XP: <span id="main-xp-text">0/100</span></div>
+    <div class="progress-bar"><div class="fill xp" id="main-xp-bar" style="width:0%"></div></div>
   </div>
-</div>
 
-<div id="upgrades" class="screen">
-  <div class="up-header">УЛУЧШЕНИЯ</div>
-  <div class="scrollable"><div class="up-list" id="upList"></div></div>
-  <div class="bottom-nav">
-    <div class="nav-btn" onclick="go('professions')"><span class="ni">&#x1F4CB;</span>ПРОФЕССИИ</div>
-    <div class="nav-btn" onclick="go('main')"><span class="ni">&#x1F3E0;</span>ГЛАВНАЯ</div>
-    <div class="nav-btn active" onclick="go('upgrades')"><span class="ni">&#x2B06;&#xFE0F;</span>УЛУЧШЕНИЯ</div>
+  <div class="resources-bar">
+    <div class="resource"><span class="r-icon">🪙</span><span class="r-val" id="res-coins">0</span></div>
+    <div class="resource"><span class="r-icon">🎫</span><span class="r-val" id="res-tokens">0</span></div>
+    <div class="resource"><span class="r-icon">⚡</span><span class="r-val" id="res-energy">100/100</span></div>
+  </div>
+
+  <div class="tap-area" id="tap-area">
+    <img class="tap-character" id="tap-char" src="/hero1.png" alt="Tap me!" draggable="false">
+    <div class="combo-display" id="combo-display"></div>
+  </div>
+
+  <div class="energy-section">
+    <div class="energy-label">
+      <span>ЭНЕРГИЯ</span>
+      <span id="energy-text">100/100</span>
+    </div>
+    <div class="progress-bar"><div class="fill energy" id="energy-bar" style="width:100%"></div></div>
   </div>
 </div>
 
-<div class="modal-overlay" id="modalOv">
-  <div class="modal" id="modalC"></div>
+<!-- ========== ЭКРАН ПРОФЕССИЙ ========== -->
+<div class="screen" id="professions-screen">
+  <h2>🏢 ПРОФЕССИИ</h2>
+  <div id="prof-content">
+    <!-- Заполняется динамически -->
+  </div>
 </div>
 
+<!-- ========== ЭКРАН УЛУЧШЕНИЙ ========== -->
+<div class="screen" id="upgrades-screen">
+  <h2>⬆️ УЛУЧШЕНИЯ</h2>
+  <div style="padding:4px 8px;">
+    <div class="resource" style="justify-content:center;margin-bottom:8px;">
+      <span class="r-icon">🪙</span><span class="r-val" id="upg-coins">0</span>
+    </div>
+  </div>
+  <div class="upgrade-list" id="upgrade-list">
+    <!-- Заполняется динамически -->
+  </div>
+</div>
+
+<!-- ========== ЭКРАН ЗАДАНИЯ ========== -->
+<div class="screen" id="task-screen">
+  <button class="back-btn" onclick="closeTask()">← НАЗАД</button>
+  <div class="task-game" id="task-game-content">
+    <!-- Заполняется динамически -->
+  </div>
+</div>
+
+<!-- Навигация -->
+<div id="navbar" style="display:none;">
+  <button class="nav-btn" onclick="showScreen('professions')"><span>🏢</span>Профессии</button>
+  <button class="nav-btn active" onclick="showScreen('main')"><span>👆</span>Тапалка</button>
+  <button class="nav-btn" onclick="showScreen('upgrades')"><span>⬆️</span>Улучшения</button>
 </div>
 
 <script>
-// === REALITY Профессии — Frontend ===
-
-var S = {
-  tgId: null, user: null, profs: {}, userProfs: {},
-  curProf: null, curTask: null, selAvatar: 1,
-  stats: {strength:5, intellect:5, charisma:5, luck:5},
-  combo: 1, lastTap: 0, eInt: null, bAnim: null
+// ============ ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ============
+let STATE = {
+  user: null,
+  unlocked: [],
+  completed: [],
+  xpNeeded: 100,
+  professions: [],
+  tgId: 0,
+  initData: '',
+  selectedAvatar: 1,
+  stats: { str: 5, int: 5, cha: 5, luck: 5 },
+  currentSphere: null,
+  currentProf: null,
+  currentTask: null,
+  energyTimer: null,
 };
 
-var COMBO_MS = 800, MAX_COMBO = 5, API_URL = '';
+// Получаем Telegram данные
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  STATE.initData = tg.initData || '';
+  if (tg.initDataUnsafe?.user) {
+    STATE.tgId = tg.initDataUnsafe.user.id;
+  }
+  // Тёмная тема
+  document.body.style.setProperty('--bg', tg.themeParams?.bg_color || '#0a0a1a');
+}
 
-// === Аватары на Canvas ===
-var AVT = {
-  1:{body:'#4a90d9',hair:'#f0c040',skin:'#fdbcb4',name:'ВОИН'},
-  2:{body:'#9b59b6',hair:'#e74c3c',skin:'#fdbcb4',name:'МАГ'},
-  3:{body:'#27ae60',hair:'#2c3e50',skin:'#fdbcb4',name:'РАЗВЕДЧИК'}
-};
-var PX = [
-  '....ffff....',
-  '...ffffff...',
-  '..fsssssf..',
-  '..fsessef..',
-  '..fsssssf..',
-  '..fssmssf..',
-  '...ssssss..',
-  '....bbbb...',
-  '...bbbbbb..',
-  '..bbbbbbb..',
-  '..bb.bb.bb.',
-  '..b..bb..b.',
-  '.....ll....',
-  '....llll...',
-  '...ll..ll..',
-  '..ll....ll.'
+// Для тестирования без Telegram
+if (!STATE.tgId) {
+  STATE.tgId = Math.floor(Math.random() * 999999) + 100000;
+}
+
+// ============ API ============
+const API = '';
+
+async function apiCall(endpoint, body = {}) {
+  body.tg_id = STATE.tgId;
+  body.init_data = STATE.initData;
+  try {
+    const r = await fetch(API + endpoint, {
+      method: endpoint.includes('professions') ? 'GET' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: endpoint.includes('professions') ? undefined : JSON.stringify(body)
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.detail || `HTTP ${r.status}`);
+    }
+    return await r.json();
+  } catch (e) {
+    console.error('API Error:', e);
+    throw e;
+  }
+}
+
+// ============ ИНИЦИАЛИЗАЦИЯ ============
+async function init() {
+  try {
+    // Загрузить профессии
+    const profData = await apiCall('/api/professions');
+    STATE.professions = profData.spheres;
+
+    // Авторизация
+    const data = await apiCall('/api/auth');
+    STATE.user = data.user;
+    STATE.unlocked = data.unlocked_professions || [];
+    STATE.completed = data.completed_tasks || [];
+    STATE.xpNeeded = data.xp_needed;
+
+    document.getElementById('loading').style.display = 'none';
+
+    if (!STATE.user.registered) {
+      showScreen('register');
+    } else {
+      showScreen('main');
+      document.getElementById('navbar').style.display = 'flex';
+      startEnergyRegen();
+    }
+  } catch (e) {
+    document.getElementById('loading').innerHTML = `
+      <h1>RE:ALITY</h1>
+      <p style="color:var(--red)">Ошибка: ${e.message}</p>
+      <br>
+      <button class="pixel-btn" onclick="location.reload()" style="width:auto;padding:10px 20px;">Перезагрузить</button>
+    `;
+  }
+}
+
+// ============ НАВИГАЦИЯ ============
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+  const screen = document.getElementById(name + '-screen');
+  if (screen) screen.classList.add('active');
+
+  // Подсветка навигации
+  const navBtns = document.querySelectorAll('.nav-btn');
+  if (name === 'professions') navBtns[0]?.classList.add('active');
+  else if (name === 'main') navBtns[1]?.classList.add('active');
+  else if (name === 'upgrades') navBtns[2]?.classList.add('active');
+
+  // Обновить данные при открытии
+  if (name === 'main') updateMainScreen();
+  if (name === 'professions') renderSpheres();
+  if (name === 'upgrades') renderUpgrades();
+}
+
+// ============ РЕГИСТРАЦИЯ ============
+function selectAvatar(n) {
+  STATE.selectedAvatar = n;
+  document.querySelectorAll('.avatar-option').forEach(el => {
+    el.classList.toggle('selected', parseInt(el.dataset.avatar) === n);
+  });
+}
+
+function changeStat(stat, delta) {
+  const total = STATE.stats.str + STATE.stats.int + STATE.stats.cha + STATE.stats.luck;
+  const newVal = STATE.stats[stat] + delta;
+  if (newVal < 1 || newVal > 14) return;
+  if (delta > 0 && total >= 20) return;
+  if (delta < 0 && total <= 4) return;
+  STATE.stats[stat] = newVal;
+  document.getElementById('stat-' + stat).textContent = newVal;
+  const left = 20 - (STATE.stats.str + STATE.stats.int + STATE.stats.cha + STATE.stats.luck);
+  document.getElementById('points-left').textContent = left;
+}
+
+async function doRegister() {
+  const name = document.getElementById('name-input').value.trim();
+  if (!name) { showModal('Ошибка', 'Введи имя героя!'); return; }
+  if (name.length > 8) { showModal('Ошибка', 'Максимум 8 символов!'); return; }
+
+  const total = STATE.stats.str + STATE.stats.int + STATE.stats.cha + STATE.stats.luck;
+  if (total !== 20) { showModal('Ошибка', `Распредели все 20 очков! (сейчас ${total})`); return; }
+
+  try {
+    const data = await apiCall('/api/register', {
+      name: name,
+      avatar: STATE.selectedAvatar,
+      stats: STATE.stats
+    });
+    STATE.user = data.user;
+    STATE.xpNeeded = data.xp_needed;
+    showScreen('main');
+    document.getElementById('navbar').style.display = 'flex';
+    startEnergyRegen();
+    showModal('Добро пожаловать!', `${name}, твой путь начинается! Тапай по персонажу, чтобы зарабатывать монеты и опыт. Открывай профессии и выполняй задания!`);
+  } catch (e) {
+    showModal('Ошибка', e.message);
+  }
+}
+
+// ============ ГЛАВНЫЙ ЭКРАН ============
+function updateMainScreen() {
+  const u = STATE.user;
+  if (!u) return;
+  document.getElementById('main-avatar').src = `/hero${u.avatar}.png`;
+  document.getElementById('tap-char').src = `/hero${u.avatar}.png`;
+  document.getElementById('main-name').textContent = u.name;
+  document.getElementById('main-level').textContent = `УР. ${u.level}`;
+  document.getElementById('main-xp-text').textContent = `${u.xp}/${STATE.xpNeeded}`;
+  document.getElementById('main-xp-bar').style.width = `${Math.min(100, (u.xp / STATE.xpNeeded) * 100)}%`;
+  document.getElementById('res-coins').textContent = formatNum(u.coins);
+  document.getElementById('res-tokens').textContent = u.tokens;
+  document.getElementById('res-energy').textContent = `${u.energy}/${u.max_energy}`;
+  document.getElementById('energy-text').textContent = `${u.energy}/${u.max_energy}`;
+  document.getElementById('energy-bar').style.width = `${(u.energy / u.max_energy) * 100}%`;
+}
+
+function formatNum(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n.toString();
+}
+
+// ============ ТАПАЛКА ============
+let tapCooldown = false;
+let tapQueue = 0;
+let tapSendTimer = null;
+
+document.getElementById('tap-area').addEventListener('pointerdown', function(e) {
+  e.preventDefault();
+  if (!STATE.user || !STATE.user.registered) return;
+  if (STATE.user.energy <= 0) return;
+
+  // Локальная анимация
+  STATE.user.energy = Math.max(0, STATE.user.energy - 1);
+  const earned = STATE.user.coins_per_tap;
+  STATE.user.coins += earned;
+  updateMainScreen();
+
+  // Попап монет
+  showCoinPopup(e, '+' + earned);
+
+  // Собираем тапы в пакет
+  tapQueue++;
+  if (tapSendTimer) clearTimeout(tapSendTimer);
+  tapSendTimer = setTimeout(sendTaps, 300);
+});
+
+async function sendTaps() {
+  if (tapQueue <= 0) return;
+  const taps = tapQueue;
+  tapQueue = 0;
+  try {
+    const data = await apiCall('/api/tap', { taps: taps });
+    STATE.user = data.user;
+    STATE.xpNeeded = data.xp_needed;
+    updateMainScreen();
+
+    // Комбо
+    if (data.combo > 1) {
+      document.getElementById('combo-display').textContent = `🔥 COMBO x${data.combo}`;
+      document.getElementById('combo-display').style.color = data.combo >= 4 ? 'var(--accent)' : 'var(--primary)';
+    } else {
+      document.getElementById('combo-display').textContent = '';
+    }
+
+    // Левел-ап
+    if (data.level_up) {
+      showModal('⬆️ УРОВЕНЬ!', `Поздравляем! Ты достиг ${STATE.user.level} уровня! +1 токен профессии.`);
+      if (STATE.user.level === 2) {
+        setTimeout(() => {
+          showModal('🎫 Токены профессий', 'Теперь ты можешь открывать профессии за токены! Перейди в раздел "Профессии" и попробуй себя в настоящих задачах.');
+        }, 2000);
+      }
+    }
+  } catch (e) {
+    console.error('Tap error:', e);
+  }
+}
+
+function showCoinPopup(e, text) {
+  const area = document.getElementById('tap-area');
+  const rect = area.getBoundingClientRect();
+  const popup = document.createElement('div');
+  popup.className = 'coin-popup';
+  popup.textContent = text;
+  popup.style.left = (e.clientX - rect.left - 15) + 'px';
+  popup.style.top = (e.clientY - rect.top - 15) + 'px';
+  area.appendChild(popup);
+  setTimeout(() => popup.remove(), 800);
+}
+
+// Регенерация энергии (клиентская)
+function startEnergyRegen() {
+  if (STATE.energyTimer) clearInterval(STATE.energyTimer);
+  STATE.energyTimer = setInterval(() => {
+    if (!STATE.user) return;
+    if (STATE.user.energy < STATE.user.max_energy) {
+      STATE.user.energy = Math.min(STATE.user.max_energy, STATE.user.energy + 1);
+      updateMainScreen();
+    }
+  }, 500); // 2 ед/сек = +1 каждые 500мс
+}
+
+// ============ ПРОФЕССИИ ============
+function renderSpheres() {
+  STATE.currentSphere = null;
+  STATE.currentProf = null;
+  const cont = document.getElementById('prof-content');
+  let html = '<div class="spheres-list">';
+  for (const s of STATE.professions) {
+    html += `
+      <div class="sphere-card" onclick="openSphere('${s.id}')">
+        <div class="s-icon">${s.icon}</div>
+        <div>
+          <div class="s-name">${s.name}</div>
+          <div class="s-count">${s.professions.length} профессий</div>
+        </div>
+      </div>`;
+  }
+  html += '</div>';
+  cont.innerHTML = html;
+}
+
+function openSphere(sphereId) {
+  const sphere = STATE.professions.find(s => s.id === sphereId);
+  if (!sphere) return;
+  STATE.currentSphere = sphere;
+
+  const cont = document.getElementById('prof-content');
+  let html = `<button class="back-btn" onclick="renderSpheres()">← НАЗАД</button>`;
+  html += `<div style="text-align:center;margin:8px 0;font-size:10px;color:var(--primary)">${sphere.icon} ${sphere.name}</div>`;
+  html += '<div class="prof-list">';
+  for (const p of sphere.professions) {
+    const isUnlocked = STATE.unlocked.includes(p.id);
+    const completedCount = STATE.completed.filter(c => c.profession_id === p.id).length;
+    html += `
+      <div class="prof-card ${isUnlocked ? 'unlocked' : ''}" onclick="openProfession('${p.id}')">
+        <div class="p-icon">${p.icon}</div>
+        <div class="p-info">
+          <div class="p-name">${p.name}</div>
+          <div class="p-status ${isUnlocked ? 'open' : 'locked'}">
+            ${isUnlocked ? `✓ Открыто (${completedCount}/5 заданий)` : `🔒 ${p.cost} токен`}
+          </div>
+        </div>
+      </div>`;
+  }
+  html += '</div>';
+  cont.innerHTML = html;
+}
+
+function openProfession(profId) {
+  let prof = null;
+  for (const s of STATE.professions) {
+    prof = s.professions.find(p => p.id === profId);
+    if (prof) break;
+  }
+  if (!prof) return;
+  STATE.currentProf = prof;
+
+  const isUnlocked = STATE.unlocked.includes(profId);
+  const cont = document.getElementById('prof-content');
+  const myCompleted = STATE.completed.filter(c => c.profession_id === profId);
+
+  let html = `<button class="back-btn" onclick="openSphere('${STATE.currentSphere.id}')">← НАЗАД</button>`;
+  html += `<div class="prof-detail">`;
+  html += `<div class="pd-header">
+    <div class="pd-icon">${prof.icon}</div>
+    <div class="pd-name">${prof.name}</div>
+    <div class="pd-desc">${prof.desc}</div>
+  </div>`;
+
+  html += `<div class="pd-tools">`;
+  for (const t of prof.tools) {
+    html += `<span class="tool-tag">${t}</span>`;
+  }
+  html += `</div>`;
+
+  if (!isUnlocked) {
+    html += `<div style="text-align:center;padding:16px;">
+      <div style="font-size:8px;color:var(--text2);margin-bottom:12px;">Открой профессию, чтобы получить доступ к практическим заданиям</div>
+      <button class="pixel-btn accent" onclick="unlockProfession('${profId}')">🎫 ОТКРЫТЬ ЗА ${prof.cost} ТОКЕН</button>
+      <div style="font-size:7px;color:var(--text2);margin-top:8px;">У тебя: ${STATE.user.tokens} токенов</div>
+    </div>`;
+  } else {
+    html += `<div style="font-size:9px;color:var(--secondary);text-align:center;margin:10px 0;">ЗАДАНИЯ</div>`;
+    html += `<div class="task-list">`;
+    for (let i = 0; i < prof.tasks.length; i++) {
+      const task = prof.tasks[i];
+      const done = myCompleted.find(c => c.task_index === i);
+      const prevDone = i === 0 || myCompleted.find(c => c.task_index === i - 1);
+      const locked = !prevDone && !done;
+      html += `
+        <div class="task-card ${done ? 'completed' : ''} ${locked ? 'locked' : ''}"
+             onclick="${locked ? '' : (done ? '' : `startTask('${profId}', ${i})`)}">
+          <div class="t-num">${done ? '✓' : i + 1}</div>
+          <div class="t-info">
+            <div class="t-title">${task.title}</div>
+            <div class="t-desc">${locked ? '🔒 Выполни предыдущее' : task.desc}</div>
+          </div>
+        </div>`;
+    }
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  cont.innerHTML = html;
+}
+
+async function unlockProfession(profId) {
+  try {
+    const data = await apiCall('/api/unlock', { profession_id: profId });
+    STATE.user = data.user;
+    STATE.unlocked = data.unlocked_professions;
+    STATE.xpNeeded = data.xp_needed;
+    openProfession(profId);
+    showModal('✅ Открыто!', 'Профессия доступна! Выполняй задания и узнавай, как работают настоящие специалисты.');
+  } catch (e) {
+    showModal('Ошибка', e.message);
+  }
+}
+
+// ============ УЛУЧШЕНИЯ ============
+const UPGRADE_INFO = [
+  { type: 'tap', name: '💪 Сила пальцев', desc: '+1 монета за тап', icon: '👆', field: 'upg_tap_level', maxLvl: 10, baseCost: 50, mult: 2.0 },
+  { type: 'energy', name: '🔋 Выносливость', desc: '+20 макс. энергии', icon: '⚡', field: 'upg_energy_level', maxLvl: 10, baseCost: 80, mult: 2.2 },
+  { type: 'multi', name: '✋ Мультитап', desc: '+1 одновременный тап', icon: '🖐', field: 'upg_multi_level', maxLvl: 4, baseCost: 200, mult: 2.5 },
+  { type: 'regen', name: '♻️ Регенерация', desc: '+0.5 восст. энергии/сек', icon: '💚', field: 'upg_regen_level', maxLvl: 10, baseCost: 100, mult: 2.0 },
 ];
 
-function drawAv(cvs, id) {
-  var ctx = cvs.getContext('2d');
-  var a = AVT[id];
-  cvs.width = 12; cvs.height = 16;
-  ctx.clearRect(0,0,12,16);
-  var cm = {f:a.hair,h:a.hair,s:a.skin,e:'#2c3e50',b:a.body,l:'#8B4513',m:'#e74c3c','.':null};
-  for (var y=0; y<16 && y<PX.length; y++)
-    for (var x=0; x<12 && x<PX[y].length; x++) {
-      var c = cm[PX[y][x]];
-      if (c) { ctx.fillStyle = c; ctx.fillRect(x,y,1,1); }
-    }
-}
-
-// === API ===
-function api(url, method, body) {
-  var opts = {method: method || 'GET', headers: {'Content-Type':'application/json'}};
-  if (body) opts.body = JSON.stringify(body);
-  return fetch(API_URL + url, opts).then(function(r) {
-    return r.text().then(function(text) {
-      try {
-        var d = JSON.parse(text);
-      } catch(e) {
-        throw new Error('Ответ сервера не JSON');
-      }
-      if (!r.ok) throw new Error(d.detail || 'Ошибка ' + r.status);
-      return d;
-    });
-  });
-}
-
-// === Telegram Init ===
-function initTg() {
-  if (window.Telegram && window.Telegram.WebApp) {
-    var tg = window.Telegram.WebApp;
-    tg.expand(); tg.ready();
-    S.tgId = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+function renderUpgrades() {
+  const u = STATE.user;
+  document.getElementById('upg-coins').textContent = formatNum(u.coins);
+  const cont = document.getElementById('upgrade-list');
+  let html = '';
+  for (const up of UPGRADE_INFO) {
+    const lvl = u[up.field];
+    const maxed = lvl >= up.maxLvl;
+    const cost = maxed ? 0 : Math.floor(up.baseCost * Math.pow(up.mult, lvl));
+    const canBuy = !maxed && u.coins >= cost;
+    html += `
+      <div class="upgrade-card">
+        <div class="u-header">
+          <div class="u-icon">${up.icon}</div>
+          <div>
+            <div class="u-name">${up.name}</div>
+            <div class="u-level">Ур. ${lvl}/${up.maxLvl}</div>
+          </div>
+        </div>
+        <div class="u-desc">${up.desc}</div>
+        <button class="pixel-btn ${canBuy ? 'green' : ''}" ${canBuy ? '' : 'disabled'}
+                onclick="buyUpgrade('${up.type}')">
+          ${maxed ? 'МАКС' : `🪙 ${formatNum(cost)}`}
+        </button>
+      </div>`;
   }
-  if (!S.tgId) {
-    try {
-      var saved = localStorage.getItem('reality_id');
-      S.tgId = saved ? parseInt(saved) : (Math.floor(Math.random()*900000)+100000);
-      localStorage.setItem('reality_id', S.tgId);
-    } catch(e) {
-      S.tgId = Math.floor(Math.random()*900000)+100000;
-    }
-  }
+  cont.innerHTML = html;
 }
 
-// === Загрузка ===
-function loadApp() {
-  initTg();
-
-  // Fallback: если через 4 сек всё ещё загрузка — показать регистрацию
-  var _fb = setTimeout(function() {
-    var ld = document.getElementById('loading');
-    if (ld && ld.classList.contains('active')) {
-      console.warn('Fallback: force register');
-      go('register'); initReg();
-    }
-  }, 4000);
-
-  api('/api/user/'+S.tgId).then(function(u) {
-    return api('/api/professions').then(function(p) {
-      clearTimeout(_fb);
-      S.profs = p;
-      if (u.exists) {
-        S.user = u;
-        return api('/api/professions/'+S.tgId).then(function(up) {
-          S.userProfs = up;
-          go('main'); updateUI(); startEnergy(); startBreath();
-        });
-      } else {
-        go('register'); initReg();
-      }
-    });
-  }).catch(function(e) {
-    clearTimeout(_fb);
-    console.error('Load error:', e);
-    go('register'); initReg();
-  });
-}
-
-// === Экраны ===
-function go(id) {
-  var screens = document.querySelectorAll('.screen');
-  for (var i=0; i<screens.length; i++) screens[i].classList.remove('active');
-  var el = document.getElementById(id);
-  if (el) el.classList.add('active');
-  if (id === 'professions') renderProfs();
-  if (id === 'upgrades') renderUps();
-  if (id === 'main') updateUI();
-}
-
-// === Регистрация ===
-function initReg() {
-  var c = document.getElementById('avatarSelect');
-  c.innerHTML = '';
-  [1,2,3].forEach(function(id) {
-    var d = document.createElement('div');
-    d.className = 'avatar-option' + (id===1?' selected':'');
-    d.onclick = function() { selAv(id); };
-    var cv = document.createElement('canvas');
-    drawAv(cv, id);
-    d.appendChild(cv);
-    var lb = document.createElement('div');
-    lb.className = 'avatar-label';
-    lb.textContent = AVT[id].name;
-    d.appendChild(lb);
-    c.appendChild(d);
-  });
-}
-
-function selAv(id) {
-  S.selAvatar = id;
-  var opts = document.querySelectorAll('.avatar-option');
-  for (var i=0; i<opts.length; i++) opts[i].classList.toggle('selected', i+1===id);
-}
-
-function chStat(stat, d) {
-  var cur = S.stats[stat];
-  var total = S.stats.strength + S.stats.intellect + S.stats.charisma + S.stats.luck;
-  if (d > 0 && total >= 20) return;
-  if (d < 0 && cur <= 0) return;
-  S.stats[stat] = cur + d;
-  document.getElementById('sv-'+stat).textContent = S.stats[stat];
-  document.getElementById('sb-'+stat).style.width = (S.stats[stat]/20*100)+'%';
-  var nt = S.stats.strength + S.stats.intellect + S.stats.charisma + S.stats.luck;
-  document.getElementById('pointsLeft').textContent = 20 - nt;
-}
-
-function createChar() {
-  var name = document.getElementById('nameInput').value.trim();
-  if (!name) { showModal('Ошибка','Введи имя персонажа!'); return; }
-  if (name.length > 8) { showModal('Ошибка','Имя до 8 символов!'); return; }
-  var total = S.stats.strength + S.stats.intellect + S.stats.charisma + S.stats.luck;
-  if (total !== 20) { showModal('Ошибка','Распредели все 20 очков!'); return; }
-
-  api('/api/create', 'POST', {
-    telegram_id: S.tgId, name: name, avatar: S.selAvatar,
-    strength: S.stats.strength, intellect: S.stats.intellect,
-    charisma: S.stats.charisma, luck: S.stats.luck
-  }).then(function() {
-    return api('/api/user/'+S.tgId);
-  }).then(function(u) {
-    S.user = u;
-    S.userProfs = {};
-    go('main'); updateUI(); startEnergy(); startBreath();
-    showModal('Добро пожаловать!',
-      name+', твоё приключение начинается!<br>Тапай персонажа чтобы зарабатывать монеты.<br>Копи токены для изучения профессий!', 'ВПЕРЁД!');
-  }).catch(function(e) { showModal('Ошибка', e.message); });
-}
-
-// === UI Update ===
-function updateUI() {
-  if (!S.user) return;
-  var u = S.user;
-  document.getElementById('pName').textContent = u.name;
-  document.getElementById('pLevel').textContent = 'Ур. ' + u.level;
-  document.getElementById('coinCt').textContent = fmtN(u.coins);
-  document.getElementById('tokenCt').textContent = u.tokens;
-  var xpPct = (u.xp / u.xp_needed) * 100;
-  document.getElementById('xpBar').style.width = Math.min(xpPct, 100) + '%';
-  updateEnUI();
-  drawAv(document.getElementById('mainChar'), u.avatar);
-}
-
-function updateEnUI() {
-  if (!S.user) return;
-  var e = Math.floor(S.user.energy);
-  var mx = S.user.max_energy;
-  var pct = (e / mx) * 100;
-  document.getElementById('energyCt').textContent = e;
-  document.getElementById('energyTxt').textContent = e + '/' + mx;
-  var bar = document.getElementById('energyBar');
-  bar.style.width = pct + '%';
-  if (pct < 20) bar.classList.add('low'); else bar.classList.remove('low');
-}
-
-function fmtN(n) {
-  if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
-  if (n >= 1000) return (n/1000).toFixed(1)+'K';
-  return n;
-}
-
-// === Тапалка ===
-function initTapper() {
-  var ta = document.getElementById('tapArea');
-  ta.addEventListener('touchstart', function(ev) {
-    if (ev.target.closest('.energy-wrap') || ev.target.closest('.bottom-nav')) return;
-    ev.preventDefault();
-    for (var i=0; i<ev.changedTouches.length; i++) doTap(ev.changedTouches[i]);
-  }, {passive:false});
-  ta.addEventListener('mousedown', function(ev) {
-    if (ev.target.closest('.energy-wrap') || ev.target.closest('.bottom-nav')) return;
-    doTap(ev);
-  });
-}
-
-function doTap(ev) {
-  if (!S.user || S.user.energy < 1) return;
-  var now = Date.now();
-  if (now - S.lastTap < COMBO_MS) S.combo = Math.min(S.combo+1, MAX_COMBO);
-  else S.combo = 1;
-  S.lastTap = now;
-
-  var cd = document.getElementById('comboD');
-  cd.textContent = 'x'+S.combo;
-  if (S.combo > 1) cd.classList.add('on'); else cd.classList.remove('on');
-
-  var cw = document.getElementById('charWrap');
-  cw.classList.remove('shake');
-  void cw.offsetWidth;
-  cw.classList.add('shake');
-
-  api('/api/tap', 'POST', {
-    telegram_id: S.tgId, taps: 1, timestamp: now/1000, combo: S.combo
-  }).then(function(r) {
-    if (!r.success) return;
-    S.user.coins = r.total_coins;
-    S.user.xp = r.total_xp;
-    S.user.energy = r.energy;
-    S.user.level = r.level;
-    S.user.tokens = r.tokens;
-    S.user.xp_needed = r.xp_needed;
-    showTapNum(ev, r.coins_earned, r.crit);
-    updateUI();
-    if (r.leveled_up) {
-      cw.classList.add('lvl-up');
-      setTimeout(function(){cw.classList.remove('lvl-up');}, 800);
-      var msg = r.level === 2
-        ? 'Теперь ты можешь открывать профессии за токены! Зайди в ПРОФЕССИИ.'
-        : 'Уровень '+r.level+'! +1 токен профессии.';
-      setTimeout(function(){ showModal('Новый уровень!', msg, 'КРУТО!'); }, 500);
-    }
-  }).catch(function(){});
-}
-
-function showTapNum(ev, amt, crit) {
-  var el = document.createElement('div');
-  el.className = 'tap-num' + (crit ? ' crit' : '');
-  el.textContent = '+' + amt + (crit ? ' КРИТ!' : '');
-  var rect = document.getElementById('tapArea').getBoundingClientRect();
-  var x = (ev.clientX || ev.pageX || rect.left+rect.width/2) - rect.left;
-  var y = (ev.clientY || ev.pageY || rect.top+rect.height/2) - rect.top;
-  el.style.left = (x-20)+'px';
-  el.style.top = (y-20)+'px';
-  document.getElementById('tapArea').appendChild(el);
-  setTimeout(function(){el.remove();}, 800);
-}
-
-// === Энергия ===
-function startEnergy() {
-  if (S.eInt) clearInterval(S.eInt);
-  S.eInt = setInterval(function() {
-    if (!S.user) return;
-    var rg = S.user.energy_regen || 2;
-    S.user.energy = Math.min(S.user.max_energy, S.user.energy + rg * 0.5);
-    updateEnUI();
-  }, 500);
-}
-
-function startBreath() {
-  var ch = document.getElementById('charWrap');
-  var sc = 1, gr = true;
-  if (S.bAnim) cancelAnimationFrame(S.bAnim);
-  function anim() {
-    if (gr) { sc += 0.001; if (sc >= 1.03) gr = false; }
-    else { sc -= 0.001; if (sc <= 1.0) gr = true; }
-    ch.style.transform = 'scale('+sc+')';
-    S.bAnim = requestAnimationFrame(anim);
-  }
-  anim();
-}
-
-// === Профессии ===
-function renderProfs() {
-  api('/api/professions/'+S.tgId).then(function(up){ S.userProfs = up; }).catch(function(){});
-  var c = document.getElementById('profList');
-  var spheres = {};
-  for (var id in S.profs) {
-    var p = S.profs[id];
-    if (!spheres[p.sphere]) spheres[p.sphere] = [];
-    spheres[p.sphere].push({id:id, p:p});
-  }
-  var h = '';
-  for (var sp in spheres) {
-    h += '<div class="sphere-section"><div class="sphere-title">'+sp+'</div>';
-    spheres[sp].forEach(function(item) {
-      var up = S.userProfs[item.id];
-      var unlocked = up && up.unlocked;
-      var comp = (up && up.tasks_completed) || [];
-      var total = item.p.tasks.length;
-      h += '<div class="prof-card'+(unlocked?' unlocked':'')+'" onclick="openProf(\''+item.id+'\')">';
-      h += '<div class="pi">'+item.p.icon+'</div><div class="pinfo">';
-      h += '<div class="pn">'+item.p.name+'</div>';
-      h += '<div class="pd">'+item.p.description+'</div>';
-      if (unlocked) h += '<div class="pp">'+comp.length+'/'+total+' заданий</div>';
-      h += '</div>';
-      if (!unlocked) h += '<div class="pc">&#x1F39F;&#xFE0F;'+item.p.cost+'</div>';
-      h += '</div>';
-    });
-    h += '</div>';
-  }
-  c.innerHTML = h;
-}
-
-function openProf(id) {
-  var prof = S.profs[id];
-  if (!prof) return;
-  S.curProf = id;
-  var up = S.userProfs[id];
-  var unlocked = up && up.unlocked;
-
-  document.getElementById('pdI').textContent = prof.icon;
-  document.getElementById('pdN').textContent = prof.name;
-  document.getElementById('pdD').textContent = prof.description;
-
-  var th = '';
-  prof.tools.forEach(function(t){ th += '<span class="pd-tool">'+t+'</span>'; });
-  document.getElementById('pdT').innerHTML = th;
-
-  var te = document.getElementById('pdTasks');
-  if (!unlocked) {
-    te.innerHTML = '<div style="padding:40px 20px;text-align:center">' +
-      '<div style="font-size:28px;margin-bottom:12px">&#x1F512;</div>' +
-      '<p style="font-size:8px;color:#aaa;margin-bottom:16px">Открой за '+prof.cost+' токен(ов)</p>' +
-      '<button class="btn btn-gold" onclick="unlockProf(\''+id+'\')">ОТКРЫТЬ ЗА &#x1F39F;&#xFE0F;'+prof.cost+'</button></div>';
-  } else {
-    var comp = (up && up.tasks_completed) || [];
-    var h = '<div class="task-list">';
-    prof.tasks.forEach(function(task, i) {
-      var done = comp.indexOf(i) !== -1;
-      var locked = i > 0 && comp.indexOf(i-1) === -1;
-      h += '<div class="task-card'+(done?' done':'')+(locked?' locked':'')+'" '
-        + (!locked && !done ? 'onclick="startTask(\''+id+'\','+i+')"' : '') + '>'
-        + '<h3>'+(done?'&#x2705;':(locked?'&#x1F512;':'&#x1F4DD;'))+' '+task.title+'</h3>'
-        + '<p>'+task.description+'</p>'
-        + '<div class="tr">'+(done?'Выполнено':'&#x1FA99;'+task.coins+' &middot; &#x2B50;'+task.xp+'XP')+'</div></div>';
-    });
-    h += '</div>';
-    te.innerHTML = h;
-  }
-  go('profDetail');
-}
-
-function unlockProf(id) {
-  api('/api/professions/unlock', 'POST', {
-    telegram_id: S.tgId, profession_id: id
-  }).then(function(r) {
-    if (r.success) {
-      S.user.tokens = r.tokens;
-      S.userProfs[id] = {unlocked:true, tasks_completed:[]};
-      updateUI(); openProf(id);
-      showModal('Открыто!', 'Профессия разблокирована! Выполняй задания.', 'НАЧАТЬ');
-    }
-  }).catch(function(e){ showModal('Ошибка', e.message); });
-}
-
-// === Задания ===
-function startTask(profId, idx) {
-  var prof = S.profs[profId];
-  var task = prof.tasks[idx];
-  S.curProf = profId; S.curTask = idx;
-  document.getElementById('tsT').textContent = task.title;
-  document.getElementById('tsD').textContent = task.description;
-  genGame(document.getElementById('tsG'), task, profId, idx);
-  go('taskScreen');
-}
-
-function backTask() {
-  if (S.curProf) openProf(S.curProf); else go('professions');
-}
-
-function completeTask(score) {
-  if (!S.curProf || S.curTask === null) return;
-  score = Math.min(100, Math.max(0, score));
-  api('/api/professions/complete-task', 'POST', {
-    telegram_id: S.tgId, profession_id: S.curProf,
-    task_index: S.curTask, score: score
-  }).then(function(r) {
-    if (r.success) {
-      S.userProfs[S.curProf] = {unlocked:true, tasks_completed:r.tasks_completed};
-      S.user.level = r.level;
-      showModal('Задание выполнено!',
-        'Оценка: '+Math.round(score)+'%<br>&#x1FA99; +'+r.coins_earned+' монет<br>&#x2B50; +'+r.xp_earned+' XP'
-        +(r.leveled_up?'<br><br>&#x1F389; Новый уровень: '+r.level+'!':''),
-        'ОТЛИЧНО!', function(){ openProf(S.curProf); });
-      api('/api/user/'+S.tgId).then(function(u){ S.user=u; updateUI(); });
-    }
-  }).catch(function(e){
-    showModal('Инфо', e.message || 'Ошибка', 'ОК', function(){ openProf(S.curProf); });
-  });
-}
-
-// === Мини-игры ===
-function genGame(el, task, profId, idx) {
-  var t = task.type;
-  var G = {
-    // IT Frontend
-    css_builder: function(){ choiceGame(el,'Клиент просит адаптивную кнопку для сайта. Какой CSS-подход лучший?',[
-      {t:'Inline-стили width:200px',ok:false,f:'Фиксированная ширина не адаптивна'},
-      {t:'Flexbox + padding + em-единицы',ok:true,f:'Верно! Гибкий и масштабируемый подход'},
-      {t:'Таблица с одной ячейкой',ok:false,f:'Таблицы не для кнопок'},
-      {t:'position:absolute с координатами',ok:false,f:'Абсолютное позиционирование ломает поток'}
-    ]); },
-    color_match: function(){ colorGame(el); },
-    layout_puzzle: function(){ choiceGame(el,'Нужно расположить 3 карточки в ряд с равными отступами. Какой CSS?',[
-      {t:'display:flex; justify-content:space-between',ok:true,f:'Верно! Flexbox идеально распределит карточки'},
-      {t:'float:left для каждой карточки',ok:false,f:'Float — устаревший подход'},
-      {t:'position:absolute для каждой',ok:false,f:'Не адаптивно'},
-      {t:'margin:auto для каждой',ok:false,f:'Не создаст ряд'}
-    ]); },
-    responsive: function(){ choiceGame(el,'Какой подход для мобильной адаптации?',[
-      {t:'Скрыть всё через display:none',ok:false,f:'Контент всё равно загружается'},
-      {t:'Mobile-first: media queries от min-width',ok:true,f:'Верно! Стандарт индустрии'},
-      {t:'Отдельный сайт m.site.ru',ok:false,f:'Устаревший подход'},
-      {t:'Фиксированная ширина 375px',ok:false,f:'Не работает для планшетов'}
-    ]); },
-    animation_builder: function(){ sliderGame(el,'Настрой CSS-анимацию для карточки:',[
-      {n:'duration (мс)',min:100,max:2000,ok:[300,600],u:'мс'},
-      {n:'delay (мс)',min:0,max:1000,ok:[0,200],u:'мс'},
-      {n:'translateY (px)',min:-50,max:50,ok:[10,30],u:'px'}
-    ]); },
-    // IT Backend
-    sql_builder: function(){ choiceGame(el,'Выбрать пользователей старше 18, зарегистрированных в 2025. Верный запрос?',[
-      {t:'SELECT * FROM users WHERE age>18 AND year(created_at)=2025 ORDER BY created_at',ok:true,f:'Верно!'},
-      {t:'GET users WHERE age>18 AND created_at=2025',ok:false,f:'GET — не SQL-команда'},
-      {t:'SELECT * FROM users WHERE age>18 OR year=2025',ok:false,f:'OR даст неправильную выборку'},
-      {t:'SELECT users FROM * WHERE age>18',ok:false,f:'Неверный синтаксис'}
-    ]); },
-    api_design: function(){ sortGame(el,'REST endpoints магазина (от получения до удаления):',
-      ['GET /products','GET /products/{id}','POST /products','PUT /products/{id}','DELETE /products/{id}']); },
-    debug_code: function(){ choiceGame(el,'Код: db.query(f"SELECT * FROM users WHERE id={id}"). Что не так?',[
-      {t:'SQL-инъекция! Нужен параметризованный запрос',ok:true,f:'Верно! Классическая уязвимость'},
-      {t:'Ошибка синтаксиса',ok:false,f:'Синтаксис верный, проблема в безопасности'},
-      {t:'Не закрыто соединение с БД',ok:false,f:'Проблема серьёзнее'},
-      {t:'Не импортирован модуль',ok:false,f:'Импорты в норме'}
-    ]); },
-    optimize: function(){ choiceGame(el,'SELECT * FROM users WHERE email LIKE "%@gmail.com" работает 5 сек на 1 млн записей. Что делать?',[
-      {t:'Индекс на email',ok:false,f:'LIKE с % в начале не использует индекс'},
-      {t:'Полнотекстовый поиск или колонка domain',ok:true,f:'Верно! Выделение домена решит проблему'},
-      {t:'Больше оперативной памяти',ok:false,f:'Не решит проблему паттерна'},
-      {t:'Перезапустить базу',ok:false,f:'Это не оптимизация'}
-    ]); },
-    architecture: function(){ sortGame(el,'Этапы проектирования микросервисов:',
-      ['Определить бизнес-домены','Выделить bounded contexts','Определить API контракты','Настроить коммуникацию','Мониторинг и логирование']); },
-    // IT Data Science
-    data_analysis: function(){ choiceGame(el,'Среднее продаж — 5000₽, медиана — 2000₽. Что это значит?',[
-      {t:'Данные распределены нормально',ok:false,f:'При нормальном среднее ≈ медиана'},
-      {t:'Есть выбросы с высокими значениями',ok:true,f:'Верно! Правосторонний перекос'},
-      {t:'Данные содержат ошибки',ok:false,f:'Такое распределение реально для продаж'},
-      {t:'Нужно удалить половину данных',ok:false,f:'Нельзя без анализа'}
-    ]); },
-    data_viz: function(){ choiceGame(el,'Температура по месяцам за 3 года. Какой график?',[
-      {t:'Круговая диаграмма',ok:false,f:'Для долей целого, не для временных рядов'},
-      {t:'Линейный график',ok:true,f:'Верно! Идеален для временных рядов'},
-      {t:'Гистограмма',ok:false,f:'Для распределения'},
-      {t:'Точечная диаграмма',ok:false,f:'Для корреляции двух переменных'}
-    ]); },
-    data_clean: function(){ sliderGame(el,'Параметры очистки датасета (1000 записей, 15% пропусков):',[
-      {n:'Порог пропусков для удаления (%)',min:10,max:90,ok:[40,60],u:'%'},
-      {n:'Порог Z-score для выбросов',min:1,max:5,ok:[2,3],u:'σ'},
-      {n:'Окно скользящего среднего',min:3,max:30,ok:[5,15],u:''}
-    ]); },
-    ml_model: function(){ choiceGame(el,'Предсказать цену квартиры по 15 признакам, 50K записей. Модель?',[
-      {t:'Линейная регрессия',ok:false,f:'Слишком простая для нелинейных зависимостей'},
-      {t:'Gradient Boosting (XGBoost)',ok:true,f:'Верно! Отлично для табличных данных'},
-      {t:'Нейросеть 100 слоёв',ok:false,f:'Избыточно для 50K записей'},
-      {t:'k-ближайших соседей',ok:false,f:'Плохо масштабируется на 15 признаков'}
-    ]); },
-    ab_test: function(){ sliderGame(el,'A/B тест: A (3.2%, 5K), B (3.8%, 5K). Настрой:',[
-      {n:'Уровень значимости (%)',min:1,max:20,ok:[3,7],u:'%'},
-      {n:'Мин. эффект для решения (%)',min:0.5,max:5,ok:[0.5,1.5],u:'%'}
-    ]); },
-    // Кибербезопасность
-    password_check: function(){ pwGame(el); },
-    phishing: function(){ phishGame(el); },
-    traffic_analysis: function(){ choiceGame(el,'10,000 GET к /api/login за минуту с одного IP. Что это?',[
-      {t:'Обычный трафик',ok:false,f:'10K запросов — не человек'},
-      {t:'Brute-force атака',ok:true,f:'Верно! Массовые запросы к /login'},
-      {t:'DDoS',ok:false,f:'DDoS обычно с множества IP'},
-      {t:'Сбой мониторинга',ok:false,f:'Не создаёт реальных запросов'}
-    ]); },
-    vulnerability: function(){ choiceGame(el,'Ввод: admin@test.com\' OR \'1\'=\'1. Уязвимость?',[
-      {t:'XSS',ok:false,f:'XSS — JS-инъекции'},
-      {t:'SQL Injection',ok:true,f:'Верно! Классическая SQL-инъекция'},
-      {t:'CSRF',ok:false,f:'CSRF — подделка запросов'},
-      {t:'Брутфорс',ok:false,f:'Брутфорс — перебор паролей'}
-    ]); },
-    incident: function(){ sortGame(el,'Утечка данных. Порядок реагирования:',
-      ['Изолировать системы','Оценить масштаб','Уведомить руководство','Устранить уязвимость','Уведомить пользователей']); },
-    // Инженерия
-    robot_schema: function(){ sortGame(el,'Цепь робота от питания к мотору:',
-      ['Батарея 12V','Предохранитель','Контроллер Arduino','Драйвер мотора L298N','DC-мотор']); },
-    robot_move: function(){ mazeGame(el); },
-    sensors: function(){ choiceGame(el,'Робот в тёмном помещении. Оптимальные датчики?',[
-      {t:'Только камера',ok:false,f:'Плохо работает в темноте'},
-      {t:'Ультразвуковой + ИК-датчик',ok:true,f:'Верно! Работают в темноте'},
-      {t:'Только GPS',ok:false,f:'Не определяет препятствия'},
-      {t:'Микрофон + гироскоп',ok:false,f:'Не определяют препятствия'}
-    ]); },
-    gripper: function(){ sliderGame(el,'Калибровка манипулятора для стеклянного стакана (100г):',[
-      {n:'Сила захвата (Н)',min:0.5,max:20,ok:[2,5],u:'Н'},
-      {n:'Скорость сжатия (%)',min:5,max:100,ok:[10,30],u:'%'},
-      {n:'Угол раскрытия',min:30,max:180,ok:[80,120],u:'°'}
-    ]); },
-    auto_nav: function(){ choiceGame(el,'Алгоритм навигации робота-доставщика в офисе?',[
-      {t:'A* по карте здания',ok:true,f:'Верно! Оптимален для известной карты'},
-      {t:'Случайное блуждание',ok:false,f:'Неэффективно'},
-      {t:'Всегда прямо',ok:false,f:'Застрянет'},
-      {t:'GPS',ok:false,f:'Не работает внутри'}
-    ]); },
-    // Энергетика
-    load_calc: function(){ sliderGame(el,'Параметры электросети дома (100м²):',[
-      {n:'Автомат (А)',min:10,max:63,ok:[25,40],u:'А'},
-      {n:'Сечение кабеля (мм²)',min:1.5,max:10,ok:[4,6],u:'мм²'},
-      {n:'Число групп',min:2,max:12,ok:[4,8],u:'шт'}
-    ]); },
-    solar: function(){ choiceGame(el,'Дом: 300 кВт·ч/мес. Панель 400Вт даёт ~40 кВт·ч/мес. Сколько панелей?',[
-      {t:'4 панели',ok:false,f:'160 кВт·ч — мало'},
-      {t:'8 панелей',ok:true,f:'Верно! 320 кВт·ч с запасом'},
-      {t:'15 панелей',ok:false,f:'Избыточно'},
-      {t:'2 панели',ok:false,f:'80 кВт·ч — мало'}
-    ]); },
-    fault_find: function(){ choiceGame(el,'КЗ на линии 10кВ. Как найти точку аварии?',[
-      {t:'Ждать',ok:false,f:'Затянет аварию'},
-      {t:'Метод деления пополам',ok:true,f:'Верно! Бинарный поиск — стандарт'},
-      {t:'Показания счётчиков',ok:false,f:'Не показывают место'},
-      {t:'Заменить все провода',ok:false,f:'Нереально'}
-    ]); },
-    efficiency: function(){ sliderGame(el,'Оптимизация энергопотребления офиса:',[
-      {n:'Температура кондиционирования (°C)',min:18,max:28,ok:[22,24],u:'°C'},
-      {n:'Выключение освещения (час)',min:18,max:23,ok:[19,21],u:'ч'}
-    ]); },
-    substation: function(){ sortGame(el,'Этапы проектирования подстанции:',
-      ['Расчёт нагрузки','Выбор трансформатора','Проект заземления','Защитная аппаратура','Согласование']); },
-    // Медицина
-    anatomy: function(){ choiceGame(el,'Образование в правом верхнем квадранте живота. Какой орган?',[
-      {t:'Селезёнка',ok:false,f:'Левый верхний квадрант'},
-      {t:'Печень',ok:true,f:'Верно!'},
-      {t:'Желудок',ok:false,f:'Левый/центральный'},
-      {t:'Аппендикс',ok:false,f:'Правый нижний'}
-    ]); },
-    stitching: function(){ sortGame(el,'Этапы наложения шва:',
-      ['Обработка антисептиком','Местная анестезия','Вкол иглы перпендикулярно','Нить через оба края','Хирургический узел']); },
-    diagnosis: function(){ choiceGame(el,'Боль справа внизу живота, тошнота, 37.8°C, точка Мак-Бёрни. Диагноз?',[
-      {t:'Гастрит',ok:false,f:'Боль в верхней части'},
-      {t:'Острый аппендицит',ok:true,f:'Верно! Классические симптомы'},
-      {t:'Пневмония',ok:false,f:'Заболевание лёгких'},
-      {t:'Мигрень',ok:false,f:'Головная боль'}
-    ]); },
-    surgery_plan: function(){ sortGame(el,'Лапароскопическая аппендэктомия:',
-      ['Общий наркоз','Пневмоперитонеум','Введение троакаров','Мобилизация аппендикса','Удаление и ушивание']); },
-    emergency: function(){ choiceGame(el,'Пациент без сознания, пульс 40, АД 80/50. Первое действие?',[
-      {t:'МРТ головного мозга',ok:false,f:'Не первоочередное'},
-      {t:'Венозный доступ и инфузия',ok:true,f:'Верно! Стабилизация — приоритет'},
-      {t:'Обезболивающее',ok:false,f:'Пациент без сознания'},
-      {t:'Выписать рецепт',ok:false,f:'Критическое состояние!'}
-    ]); },
-    // Биотех
-    dna_analysis: function(){ choiceGame(el,'Стоп-кодон TAA в позиции 150 из 900. Что делать?',[
-      {t:'Проигнорировать',ok:false,f:'Может быть мутация'},
-      {t:'Проверить рамку считывания и референс',ok:true,f:'Верно!'},
-      {t:'Удалить участок',ok:false,f:'Нельзя произвольно'},
-      {t:'Секвенирование заново',ok:false,f:'Сначала проверь данные'}
-    ]); },
-    cell_culture: function(){ sliderGame(el,'Условия для клеток HeLa:',[
-      {n:'Температура (°C)',min:30,max:42,ok:[36,38],u:'°C'},
-      {n:'CO2 (%)',min:0,max:15,ok:[4,6],u:'%'},
-      {n:'Сыворотка (%)',min:0,max:30,ok:[8,12],u:'%'}
-    ]); },
-    vaccine: function(){ choiceGame(el,'Вакцина нужна максимально быстро. Технология?',[
-      {t:'Живая аттенуированная',ok:false,f:'Годы на разработку'},
-      {t:'мРНК-вакцина',ok:true,f:'Верно! Недели на разработку'},
-      {t:'Инактивированная',ok:false,f:'Долго выращивать вирус'},
-      {t:'Гомеопатия',ok:false,f:'Нет доказательной базы'}
-    ]); },
-    pcr: function(){ sliderGame(el,'Параметры ПЦР-теста:',[
-      {n:'Денатурация (°C)',min:85,max:99,ok:[94,96],u:'°C'},
-      {n:'Отжиг праймеров (°C)',min:45,max:70,ok:[55,65],u:'°C'},
-      {n:'Число циклов',min:15,max:50,ok:[30,40],u:''}
-    ]); },
-    bioethics: function(){ choiceGame(el,'Генетическое редактирование эмбрионов при наследственном заболевании?',[
-      {t:'Без ограничений',ok:false,f:'Нужен контроль'},
-      {t:'При тяжёлых заболеваниях с этическим комитетом',ok:true,f:'Верно! Баланс'},
-      {t:'Запретить полностью',ok:false,f:'Лишает лечения'},
-      {t:'Только родители решают',ok:false,f:'Нужен экспертный контроль'}
-    ]); },
-    // Творчество
-    balance: function(){ sliderGame(el,'Баланс танка для PvP:',[
-      {n:'Здоровье',min:1,max:20,ok:[14,18],u:''},
-      {n:'Урон',min:1,max:20,ok:[5,9],u:''},
-      {n:'Скорость',min:1,max:20,ok:[3,7],u:''},
-      {n:'Защита',min:1,max:20,ok:[14,18],u:''}
-    ]); },
-    level_design: function(){ choiceGame(el,'Первый уровень платформера. Главный принцип?',[
-      {t:'Максимальная сложность',ok:false,f:'Игрок уйдёт'},
-      {t:'Обучение через геймплей',ok:true,f:'Верно! Принцип Nintendo'},
-      {t:'Много текста-инструкций',ok:false,f:'Не читают'},
-      {t:'Скопировать из другой игры',ok:false,f:'Плагиат'}
-    ]); },
-    game_economy: function(){ sliderGame(el,'Экономика мобильной RPG:',[
-      {n:'Золото за квест',min:10,max:500,ok:[50,150],u:''},
-      {n:'Цена зелья',min:5,max:200,ok:[20,50],u:''},
-      {n:'Цена легенд. меча',min:100,max:10000,ok:[800,2000],u:''}
-    ]); },
-    narrative: function(){ choiceGame(el,'NPC-кузнец просит руду. Игрок отказывается. Реакция NPC?',[
-      {t:'Замолкает навсегда',ok:false,f:'Блокирует контент'},
-      {t:'Предлагает альтернативу: купить руду',ok:true,f:'Верно! Свобода + сюжет'},
-      {t:'Принудительный квест',ok:false,f:'Нарушает свободу'},
-      {t:'Game over',ok:false,f:'Слишком жёстко'}
-    ]); },
-    mechanic_proto: function(){ choiceGame(el,'Прототип механики "перемотка времени". Первый шаг?',[
-      {t:'Полная 3D-сцена',ok:false,f:'Слишком долго'},
-      {t:'Документ на 50 страниц',ok:false,f:'Не покажет ощущения'},
-      {t:'Простая 2D-сцена с кнопкой перемотки',ok:true,f:'Верно! Greybox-прототип'},
-      {t:'Концепт-арт',ok:false,f:'Не проверяет механику'}
-    ]); },
-    color_theory: function(){ colorGame(el); },
-    typography: function(){ choiceGame(el,'Шрифт для банковского приложения?',[
-      {t:'Comic Sans',ok:false,f:'Несерьёзный'},
-      {t:'Inter или SF Pro',ok:true,f:'Верно! Чистый, профессиональный'},
-      {t:'Lobster (декоративный курсив)',ok:false,f:'Плохо читается'},
-      {t:'Impact',ok:false,f:'Слишком агрессивный'}
-    ]); },
-    wireframe: function(){ sortGame(el,'Экран приложения доставки еды (сверху вниз):',
-      ['Строка поиска','Категории','Баннер акции','Список ресторанов','Таб-бар']); },
-    usability: function(){ choiceGame(el,'Кнопка "Оплатить" серая на сером фоне. Проблема?',[
-      {t:'Серый — модно',ok:false,f:'Контраст важнее'},
-      {t:'Недостаточный контраст CTA',ok:true,f:'Верно! CTA должна выделяться'},
-      {t:'Нужно больше текста',ok:false,f:'Проблема в контрасте'},
-      {t:'Кнопка слишком большая',ok:false,f:'Размер не проблема'}
-    ]); },
-    design_system: function(){ sortGame(el,'Этапы создания дизайн-системы:',
-      ['Аудит компонентов','Определить токены','Атомарные компоненты','Составные компоненты','Документация']); },
-    // Бизнес
-    target_audience: function(){ choiceGame(el,'Подписка на органические снеки. Первичная ЦА?',[
-      {t:'Все от 0 до 100 лет',ok:false,f:'Слишком широко'},
-      {t:'Женщины 25-40, средний+ доход, ЗОЖ',ok:true,f:'Верно! Узкий сегмент для MVP'},
-      {t:'Пенсионеры',ok:false,f:'Не основная аудитория подписок'},
-      {t:'Только веганы',ok:false,f:'Слишком узко'}
-    ]); },
-    ad_copy: function(){ choiceGame(el,'Заголовок рекламы курсов английского?',[
-      {t:'Курсы английского. Записывайтесь.',ok:false,f:'Скучно'},
-      {t:'Заговори за 30 дней — или вернём деньги',ok:true,f:'Верно! Результат + гарантия'},
-      {t:'Мы лучшие учителя',ok:false,f:'Нет конкретики'},
-      {t:'Английский очень важен',ok:false,f:'Банально'}
-    ]); },
-    analytics: function(){ sliderGame(el,'Кампания: 100K₽, 50K кликов, 500 покупок:',[
-      {n:'CPC (₽)',min:0.5,max:10,ok:[1.5,2.5],u:'₽'},
-      {n:'Конверсия (%)',min:0.1,max:5,ok:[0.8,1.2],u:'%'}
-    ]); },
-    strategy: function(){ sortGame(el,'Маркетинговая стратегия:',
-      ['Анализ рынка','Целевая аудитория','Позиционирование','Каналы продвижения','Запуск и A/B тест']); },
-    crisis_pr: function(){ choiceGame(el,'Насекомое в продукте, 10K репостов за час. Действие?',[
-      {t:'Игнорировать',ok:false,f:'Молчание = вина'},
-      {t:'Извинение + расследование + компенсация',ok:true,f:'Верно! Скорость + прозрачность'},
-      {t:'Удалить упоминания',ok:false,f:'Эффект Стрейзанд'},
-      {t:'Суд на автора',ok:false,f:'Усилит негатив'}
-    ]); },
-    // Финансы
-    budget: function(){ sliderGame(el,'Бюджет стартапа 500K₽/мес:',[
-      {n:'Зарплаты (%)',min:20,max:80,ok:[50,65],u:'%'},
-      {n:'Маркетинг (%)',min:5,max:40,ok:[15,25],u:'%'},
-      {n:'Инфраструктура (%)',min:5,max:30,ok:[10,20],u:'%'}
-    ]); },
-    fin_report: function(){ choiceGame(el,'Выручка +30%, прибыль -10%. Причина?',[
-      {t:'Всё отлично',ok:false,f:'Падение прибыли — тревога'},
-      {t:'Резко выросли расходы',ok:true,f:'Верно!'},
-      {t:'Ошибка в отчёте',ok:false,f:'Реальная ситуация'},
-      {t:'Уволить всех',ok:false,f:'Нужен анализ'}
-    ]); },
-    portfolio: function(){ choiceGame(el,'Клиент 25 лет, горизонт 20+ лет. Портфель?',[
-      {t:'100% депозит',ok:false,f:'Слишком консервативно'},
-      {t:'70% акции, 20% облигации, 10% золото',ok:true,f:'Верно! Классическая диверсификация'},
-      {t:'100% крипто',ok:false,f:'Слишком рисковано'},
-      {t:'100% облигации',ok:false,f:'Упущенная доходность'}
-    ]); },
-    risk: function(){ sliderGame(el,'Риски IT-стартапа (1-10):',[
-      {n:'Рыночный',min:1,max:10,ok:[6,8],u:''},
-      {n:'Технический',min:1,max:10,ok:[4,6],u:''},
-      {n:'Финансовый',min:1,max:10,ok:[7,9],u:''}
-    ]); },
-    business_plan: function(){ sortGame(el,'Разделы бизнес-плана:',
-      ['Резюме проекта','Анализ рынка','Бизнес-модель','Финансовый план','Оценка рисков']); },
-    // Наука
-    reaction_eq: function(){ choiceGame(el,'Fe + O2 -> Fe2O3. Верные коэффициенты?',[
-      {t:'4Fe + 3O2 -> 2Fe2O3',ok:true,f:'Верно!'},
-      {t:'2Fe + 3O2 -> Fe2O3',ok:false,f:'Не сбалансировано'},
-      {t:'Fe + O2 -> Fe2O3',ok:false,f:'Не сбалансировано'},
-      {t:'3Fe + 2O2 -> Fe3O4',ok:false,f:'Другой оксид'}
-    ]); },
-    identify_substance: function(){ choiceGame(el,'Бесцветный газ, тяжелее воздуха, тушит горение, pH<7 в воде?',[
-      {t:'Кислород',ok:false,f:'Поддерживает горение'},
-      {t:'Углекислый газ (CO2)',ok:true,f:'Верно!'},
-      {t:'Водород',ok:false,f:'Легче воздуха, горит'},
-      {t:'Азот',ok:false,f:'Не даёт кислую реакцию'}
-    ]); },
-    lab_work: function(){ sortGame(el,'Титрование:',
-      ['Стандартный раствор','Заполнить бюретку','Аликвота аналита','Добавить индикатор','Титровать до изменения цвета']); },
-    molecular: function(){ choiceGame(el,'Геометрия молекулы воды H2O?',[
-      {t:'Линейная (180°)',ok:false,f:'Это CO2'},
-      {t:'Угловая (~104.5°)',ok:true,f:'Верно!'},
-      {t:'Тетраэдрическая',ok:false,f:'Это CH4'},
-      {t:'Плоская',ok:false,f:'Вода не плоская'}
-    ]); },
-    synthesis: function(){ sortGame(el,'Синтез аспирина:',
-      ['Салициловая кислота','Уксусный ангидрид','Водяная баня','Кристаллизация','Фильтрация и сушка']); },
-    trajectory: function(){ sliderGame(el,'Мяч под 45°, g=10 м/с²:',[
-      {n:'Скорость (м/с)',min:5,max:50,ok:[15,25],u:'м/с'},
-      {n:'Макс. высота (м)',min:1,max:50,ok:[5,15],u:'м'}
-    ]); },
-    circuit: function(){ choiceGame(el,'R1=100 Ом и R2=100 Ом параллельно. Общее R?',[
-      {t:'200 Ом',ok:false,f:'Это последовательное'},
-      {t:'50 Ом',ok:true,f:'Верно! R=R1*R2/(R1+R2)'},
-      {t:'100 Ом',ok:false,f:'Параллельное уменьшает'},
-      {t:'10 Ом',ok:false,f:'Неверно'}
-    ]); },
-    optics: function(){ choiceGame(el,'Свет из воздуха (n=1) в стекло (n=1.5), угол 45°?',[
-      {t:'Не изменит направления',ok:false,f:'Преломляется'},
-      {t:'Преломится к нормали',ok:true,f:'Верно! Закон Снеллиуса'},
-      {t:'Полное внутреннее отражение',ok:false,f:'Только из плотной среды'},
-      {t:'Отразится назад',ok:false,f:'Часть пройдёт'}
-    ]); },
-    thermo: function(){ sliderGame(el,'1 кг воды с 20°C, c=4200 Дж/(кг·°C):',[
-      {n:'Энергия до 100°C (кДж)',min:100,max:600,ok:[320,340],u:'кДж'},
-      {n:'Время чайником 2кВт (сек)',min:50,max:300,ok:[160,170],u:'сек'}
-    ]); },
-    quantum: function(){ choiceGame(el,'Кубит в суперпозиции (|0>+|1>)/sqrt(2). При измерении?',[
-      {t:'Всегда |0>',ok:false,f:'Вероятностный результат'},
-      {t:'|0> или |1> с вероятностью 50%',ok:true,f:'Верно!'},
-      {t:'Оба одновременно',ok:false,f:'Суперпозиция коллапсирует'},
-      {t:'Ничего',ok:false,f:'Измерение даёт результат'}
-    ]); }
-  };
-
-  if (G[t]) G[t](); else defGame(el, task);
-}
-
-// === Типы мини-игр ===
-function choiceGame(el, q, opts) {
-  var done = false;
-  var h = '<p style="font-size:8px;color:#e0e0e0;margin-bottom:12px;line-height:1.8">'+q+'</p>';
-  h += '<div class="mg-grid" style="grid-template-columns:1fr">';
-  opts.forEach(function(o,i){
-    h += '<div class="mg-item" id="ch-'+i+'" style="text-align:left;line-height:1.6">'+o.t+'</div>';
-  });
-  h += '</div><div id="chFb"></div>';
-  el.innerHTML = h;
-  opts.forEach(function(o,i){
-    document.getElementById('ch-'+i).onclick = function(){
-      if (done) return; done = true;
-      opts.forEach(function(oo,j){
-        var e2 = document.getElementById('ch-'+j);
-        if (j===i) e2.classList.add(oo.ok?'ok':'no');
-        if (oo.ok) e2.classList.add('ok');
-      });
-      var fb = document.getElementById('chFb');
-      fb.className = 'gfb '+(o.ok?'good':'bad');
-      fb.textContent = o.f;
-      setTimeout(function(){ completeTask(o.ok?100:25); }, 1500);
-    };
-  });
-}
-
-function sortGame(el, q, correct) {
-  var items = correct.slice().sort(function(){return Math.random()-0.5;});
-  function render() {
-    var h = '<p style="font-size:8px;color:#e0e0e0;margin-bottom:12px;line-height:1.8">'+q+'</p><div id="sItems">';
-    items.forEach(function(it,i){
-      h += '<div class="mg-item" data-i="'+i+'" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;cursor:pointer">'
-        +'<span style="color:#ffcc00;min-width:16px">'+(i+1)+'.</span>'
-        +'<span style="flex:1;text-align:left;line-height:1.6">'+it+'</span>'
-        +'<span style="color:#6c6c8e">&#x2195;</span></div>';
-    });
-    h += '</div><button class="btn btn-primary btn-sm" id="sChk" style="margin:12px auto;display:block;width:200px">ПРОВЕРИТЬ</button><div id="sFb"></div>';
-    el.innerHTML = h;
-    var sels = document.querySelectorAll('#sItems .mg-item');
-    for (var k=0;k<sels.length;k++) {
-      (function(idx){
-        sels[idx].onclick = function(){
-          if (idx>0){var tmp=items[idx];items[idx]=items[idx-1];items[idx-1]=tmp;render();}
-        };
-      })(parseInt(sels[k].getAttribute('data-i')));
-    }
-    document.getElementById('sChk').onclick = function(){
-      var c=0;
-      items.forEach(function(it,i){if(it===correct[i])c++;});
-      var sc=Math.round((c/correct.length)*100);
-      var fb=document.getElementById('sFb');
-      if(sc===100){fb.className='gfb good';fb.textContent='Идеально!';}
-      else{fb.className='gfb bad';fb.textContent=c+'/'+correct.length+' верно. Кликай чтобы двигать вверх.';}
-      if(sc>=60) setTimeout(function(){completeTask(sc);},1500);
-    };
-  }
-  render();
-}
-
-function sliderGame(el, q, sliders) {
-  var h = '<p style="font-size:8px;color:#e0e0e0;margin-bottom:12px;line-height:1.8">'+q+'</p>';
-  sliders.forEach(function(s,i){
-    var mid = Math.round((s.min+s.max)/2);
-    var step = (s.max-s.min)>100?10:(s.max-s.min)>10?1:0.5;
-    h += '<div class="mg-slider"><div style="font-size:7px;color:#aaa;margin-bottom:2px">'+s.n+'</div>'
-      +'<input type="range" min="'+s.min+'" max="'+s.max+'" value="'+mid+'" step="'+step+'" id="sl-'+i+'" '
-      +'oninput="document.getElementById(\'slv-'+i+'\').textContent=this.value+\' '+s.u+'\'">'
-      +'<div class="sl-labels"><span>'+s.min+s.u+'</span><span class="sl-val" id="slv-'+i+'">'+mid+' '+s.u+'</span><span>'+s.max+s.u+'</span></div></div>';
-  });
-  h += '<button class="btn btn-primary btn-sm" id="slChk" style="margin:12px auto;display:block;width:200px">ПРОВЕРИТЬ</button><div id="slFb"></div>';
-  el.innerHTML = h;
-  document.getElementById('slChk').onclick = function(){
-    var ts=0,fb='';
-    sliders.forEach(function(s,i){
-      var v=parseFloat(document.getElementById('sl-'+i).value);
-      if(v>=s.ok[0]&&v<=s.ok[1]){ts+=100/sliders.length;fb+='&#x2705; '+s.n+': '+v+s.u+'<br>';}
-      else{var d=Math.min(Math.abs(v-s.ok[0]),Math.abs(v-s.ok[1]));var r=s.max-s.min;var cl=Math.max(0,1-(d/(r*0.3)));ts+=(cl*100)/sliders.length;fb+=(cl>0.5?'&#x1F7E1;':'&#x274C;')+' '+s.n+': '+v+s.u+' (норма: '+s.ok[0]+'-'+s.ok[1]+s.u+')<br>';}
-    });
-    var sc=Math.round(ts);
-    var f=document.getElementById('slFb');
-    f.className='gfb '+(sc>=60?'good':'bad');
-    f.innerHTML=fb+'<br>Результат: '+sc+'%';
-    setTimeout(function(){completeTask(sc);},2000);
-  };
-}
-
-function colorGame(el) {
-  var palettes=[
-    {theme:'Спокойный медицинский сайт',ok:['#2196F3','#E3F2FD','#1565C0','#FFFFFF'],no:[['#FF0000','#00FF00','#0000FF','#FFFF00'],['#000000','#FF00FF','#FF6600','#00FFFF']]},
-    {theme:'Энергичный фитнес-аппп',ok:['#FF5722','#FF9800','#212121','#FFFFFF'],no:[['#E8D5B7','#C9B99A','#A09077','#7B6B55'],['#2196F3','#90CAF9','#E3F2FD','#BBDEFB']]},
-    {theme:'Экологичный бренд',ok:['#4CAF50','#8BC34A','#F5F5DC','#2E7D32'],no:[['#E91E63','#F44336','#9C27B0','#FF5722'],['#607D8B','#455A64','#37474F','#263238']]}
-  ];
-  var p=palettes[Math.floor(Math.random()*palettes.length)];
-  var all=[p.ok].concat(p.no).sort(function(){return Math.random()-0.5;});
-  var done=false;
-  var h='<p style="font-size:8px;color:#e0e0e0;margin-bottom:12px;line-height:1.8">Тема: "'+p.theme+'". Какая палитра?</p>';
-  all.forEach(function(pal,i){
-    h+='<div class="mg-item" id="pal-'+i+'" style="display:flex;gap:4px;padding:10px;justify-content:center">';
-    pal.forEach(function(c){h+='<div style="width:40px;height:40px;background:'+c+';border-radius:2px;border:1px solid #2a2a4e"></div>';});
-    h+='</div>';
-  });
-  h+='<div id="clFb"></div>';
-  el.innerHTML=h;
-  all.forEach(function(pal,i){
-    document.getElementById('pal-'+i).onclick=function(){
-      if(done)return;done=true;
-      var ok=pal===p.ok;
-      all.forEach(function(_,j){var e2=document.getElementById('pal-'+j);if(all[j]===p.ok)e2.classList.add('ok');else if(j===i&&!ok)e2.classList.add('no');});
-      var fb=document.getElementById('clFb');
-      fb.className='gfb '+(ok?'good':'bad');
-      fb.textContent=ok?'Отлично!':'Не совсем подходит.';
-      completeTask(ok?100:30);
-    };
-  });
-}
-
-function pwGame(el) {
-  var pws=[
-    {p:'admin123',s:'weak',r:'Словарное + простая последовательность'},
-    {p:'P@ssw0rd!',s:'medium',r:'Популярная замена символов'},
-    {p:'jK8#mNp2$qLx',s:'strong',r:'Случайная комбинация, хорошая длина'},
-    {p:'qwerty',s:'weak',r:'Топ-10 паролей мира'},
-    {p:'CorrectHorseBatteryStaple',s:'strong',r:'Длинная парольная фраза'}
-  ];
-  var ci=0,ts=0;
-  function rnd(){
-    if(ci>=pws.length){var sc=Math.round((ts/pws.length)*100);el.innerHTML='<div class="gfb good">Результат: '+ts+'/'+pws.length+' ('+sc+'%)</div>';completeTask(sc);return;}
-    var pw=pws[ci];
-    var h='<p style="font-size:8px;color:#e0e0e0;margin-bottom:8px">Пароль '+(ci+1)+'/'+pws.length+':</p>';
-    h+='<div style="text-align:center;font-size:12px;color:#ffcc00;margin:12px 0;word-break:break-all;font-family:monospace">'+pw.p+'</div>';
-    h+='<div class="mg-grid" style="grid-template-columns:1fr 1fr 1fr">';
-    h+='<div class="mg-item" id="pw-weak">&#x1F534; Слабый</div>';
-    h+='<div class="mg-item" id="pw-medium">&#x1F7E1; Средний</div>';
-    h+='<div class="mg-item" id="pw-strong">&#x1F7E2; Сильный</div>';
-    h+='</div><div id="pwFb"></div>';
-    el.innerHTML=h;
-    ['weak','medium','strong'].forEach(function(s){
-      document.getElementById('pw-'+s).onclick=function(){
-        var ok=s===pw.s;if(ok)ts++;
-        document.getElementById('pw-'+s).classList.add(ok?'ok':'no');
-        document.getElementById('pw-'+pw.s).classList.add('ok');
-        var fb=document.getElementById('pwFb');fb.className='gfb '+(ok?'good':'bad');fb.textContent=pw.r;
-        setTimeout(function(){ci++;rnd();},1200);
-      };
-    });
-  }
-  rnd();
-}
-
-function phishGame(el) {
-  var emails=[
-    {from:'support@sberbank.ru',subj:'Подтверждение транзакции',ph:false,h:'Официальный домен'},
-    {from:'sberbank-support@mail.ru',subj:'СРОЧНО! Счёт заблокирован!!!',ph:true,h:'Фейк на mail.ru + давление'},
-    {from:'no-reply@gosuslugi.ru',subj:'Налоговое уведомление',ph:false,h:'Официальный домен'},
-    {from:'g0suslugi-online@yandex.ru',subj:'Выплата 10,000р',ph:true,h:'Подмена символов, левый домен'}
-  ];
-  var ci=0,ts=0;
-  function rnd(){
-    if(ci>=emails.length){var sc=Math.round((ts/emails.length)*100);el.innerHTML='<div class="gfb good">'+ts+'/'+emails.length+' ('+sc+'%)</div>';completeTask(sc);return;}
-    var em=emails[ci];
-    var h='<p style="font-size:8px;color:#e0e0e0;margin-bottom:8px">Письмо '+(ci+1)+'/'+emails.length+':</p>';
-    h+='<div style="background:#0a0a1a;border:1px solid #2a2a4e;border-radius:4px;padding:10px;margin:8px 0">';
-    h+='<div style="font-size:7px;color:#6c6c8e">От: <span style="color:#e0e0e0">'+em.from+'</span></div>';
-    h+='<div style="font-size:8px;color:#ffcc00;margin-top:4px">'+em.subj+'</div></div>';
-    h+='<div class="mg-grid" style="grid-template-columns:1fr 1fr">';
-    h+='<div class="mg-item" id="ph-ok" style="color:#27ae60">&#x2713; Настоящее</div>';
-    h+='<div class="mg-item" id="ph-no" style="color:#e74c3c">&#x26A0; Фишинг</div></div><div id="phFb"></div>';
-    el.innerHTML=h;
-    ['ok','no'].forEach(function(ch){
-      document.getElementById('ph-'+ch).onclick=function(){
-        var ok=(ch==='no')===em.ph;if(ok)ts++;
-        document.getElementById('ph-'+ch).classList.add(ok?'ok':'no');
-        var fb=document.getElementById('phFb');fb.className='gfb '+(ok?'good':'bad');fb.textContent=em.h;
-        setTimeout(function(){ci++;rnd();},1200);
-      };
-    });
-  }
-  rnd();
-}
-
-function mazeGame(el) {
-  var maze=[[0,0,1,0,0],[1,0,1,0,1],[0,0,0,0,0],[0,1,1,1,0],[0,0,0,0,0]];
-  var start={x:0,y:0},end={x:4,y:4};
-  var pos={x:0,y:0},cmds=[],maxC=10;
-  function rnd(){
-    var h='<p style="font-size:8px;color:#e0e0e0;margin-bottom:8px">Путь робота &#x1F916;&#x2192;&#x1F3C1;. Стены: &#x2B1B;</p>';
-    h+='<div style="display:grid;grid-template-columns:repeat(5,36px);gap:2px;justify-content:center;margin:8px 0">';
-    for(var y=0;y<5;y++)for(var x=0;x<5;x++){var c='',bg='#1a1a3e';if(maze[y][x]===1){bg='#2a2a4e';c='&#x2B1B;';}if(x===pos.x&&y===pos.y){c='&#x1F916;';bg='#1a3a2e';}if(x===end.x&&y===end.y&&!(x===pos.x&&y===pos.y))c='&#x1F3C1;';h+='<div style="width:36px;height:36px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:16px;border-radius:2px">'+c+'</div>';}
-    h+='</div><div style="font-size:7px;color:#aaa;text-align:center;margin:4px 0">Команды: '+cmds.length+'/'+maxC+'</div>';
-    h+='<div style="display:flex;gap:4px;justify-content:center;margin:4px 0;flex-wrap:wrap">';
-    cmds.forEach(function(c){var ar={up:'&#x2B06;',down:'&#x2B07;',left:'&#x2B05;',right:'&#x27A1;'};h+='<span style="font-size:14px">'+ar[c]+'</span>';});
-    h+='</div><div style="display:grid;grid-template-columns:repeat(3,40px);gap:4px;justify-content:center;margin:8px 0">';
-    h+='<div></div><div class="mg-item" style="font-size:14px;padding:6px" id="mu">&#x2B06;</div><div></div>';
-    h+='<div class="mg-item" style="font-size:14px;padding:6px" id="ml">&#x2B05;</div>';
-    h+='<div class="mg-item" style="font-size:14px;padding:6px;background:#27ae60;border-color:#2ecc71" id="mr">&#x25B6;</div>';
-    h+='<div class="mg-item" style="font-size:14px;padding:6px" id="mrt">&#x27A1;</div>';
-    h+='<div></div><div class="mg-item" style="font-size:14px;padding:6px" id="md">&#x2B07;</div><div></div>';
-    h+='</div><button class="btn btn-sm" id="mcl" style="margin:4px auto;display:block;font-size:7px;background:#2a1a4e;border-color:#6c3baa;color:#e0e0e0">СБРОС</button><div id="mFb"></div>';
-    el.innerHTML=h;
-    document.getElementById('mu').onclick=function(){if(cmds.length<maxC){cmds.push('up');rnd();}};
-    document.getElementById('md').onclick=function(){if(cmds.length<maxC){cmds.push('down');rnd();}};
-    document.getElementById('ml').onclick=function(){if(cmds.length<maxC){cmds.push('left');rnd();}};
-    document.getElementById('mrt').onclick=function(){if(cmds.length<maxC){cmds.push('right');rnd();}};
-    document.getElementById('mcl').onclick=function(){cmds=[];pos={x:0,y:0};rnd();};
-    document.getElementById('mr').onclick=runCmds;
-  }
-  function runCmds(){
-    pos={x:0,y:0};var step=0;
-    var iv=setInterval(function(){
-      if(step>=cmds.length){clearInterval(iv);var ok=pos.x===end.x&&pos.y===end.y;
-        var sc=ok?Math.max(100-(cmds.length-8)*10,60):20;
-        var fb=document.getElementById('mFb');fb.className='gfb '+(ok?'good':'bad');
-        fb.textContent=ok?'Робот дошёл за '+cmds.length+' шагов!':'Не дошёл. Попробуй ещё!';
-        if(ok)setTimeout(function(){completeTask(sc);},1500);return;}
-      var d=cmds[step];var mv={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};
-      var nx=pos.x+mv[d].x,ny=pos.y+mv[d].y;
-      if(nx>=0&&nx<5&&ny>=0&&ny<5&&maze[ny][nx]!==1){pos={x:nx,y:ny};}
-      step++;rnd();
-    },300);
-  }
-  rnd();
-}
-
-function defGame(el, task) {
-  choiceGame(el, task.description+'. Какой подход?',[
-    {t:'Изучить теорию и практику',ok:true,f:'Верно! Системный подход'},
-    {t:'Делать наугад',ok:false,f:'Без знаний непредсказуемо'},
-    {t:'Попросить сделать за тебя',ok:false,f:'Не научишься'},
-    {t:'Отложить на потом',ok:false,f:'Прокрастинация'}
-  ]);
-}
-
-// === Улучшения ===
-function renderUps() {
-  api('/api/upgrades/'+S.tgId).then(function(ups){
-    var list = document.getElementById('upList');
-    var h = '<div style="text-align:center;font-size:8px;color:#aaa;margin-bottom:12px">&#x1FA99; '+fmtN(S.user?S.user.coins:0)+'</div>';
-    for (var id in ups) {
-      var u = ups[id];
-      var afford = S.user && S.user.coins >= u.cost;
-      var mx = !u.can_upgrade;
-      h += '<div class="up-card"><div class="ui">'+u.icon+'</div><div class="uinfo">'
-        +'<div class="un">'+u.name+'</div><div class="udesc">'+u.description+'</div>'
-        +'<div class="ulvl">Ур. '+u.current_level+'/'+u.max_level+'</div></div><div class="ubuy">'
-        +(mx?'<span style="font-size:7px;color:#27ae60">МАКС</span>'
-          :'<button class="btn btn-sm '+(afford?'btn-gold':'btn-primary')+'" '
-          +(!afford?'disabled ':'')+' onclick="buyUp(\''+id+'\')">&#x1FA99;'+fmtN(u.cost)+'</button>')
-        +'</div></div>';
-    }
-    list.innerHTML = h;
-  }).catch(function(){});
-}
-
-function buyUp(id) {
-  api('/api/upgrades/buy', 'POST', {telegram_id:S.tgId, upgrade_id:id}).then(function(r){
-    if(r.success){
-      api('/api/user/'+S.tgId).then(function(u){S.user=u;updateUI();renderUps();});
-      showModal('Улучшено!','Уровень: '+r.new_level,'КРУТО!');
-    }
-  }).catch(function(e){showModal('Ошибка',e.message);});
-}
-
-// === Модалка ===
-function showModal(title, text, btn, cb) {
-  var ov = document.getElementById('modalOv');
-  var mc = document.getElementById('modalC');
-  mc.innerHTML = '<h2>'+title+'</h2><p>'+text+'</p><button class="btn btn-gold btn-sm" id="mBtn">'+(btn||'ОК')+'</button>';
-  ov.classList.add('active');
-  document.getElementById('mBtn').onclick = function(){ ov.classList.remove('active'); if(cb)cb(); };
-  ov.onclick = function(e){ if(e.target===ov){ov.classList.remove('active');if(cb)cb();} };
-}
-
-// === Старт ===
-document.addEventListener('DOMContentLoaded', function(){
+async function buyUpgrade(type) {
   try {
-    initTapper();
-    setTimeout(function() {
-      try { loadApp(); } catch(e) {
-        console.error('loadApp error:', e);
-        go('register'); initReg();
-      }
-    }, 800);
-  } catch(e) {
-    console.error('Init error:', e);
-    // Показать хоть что-то
-    go('register');
+    const data = await apiCall('/api/upgrade', { upgrade_type: type });
+    STATE.user = data.user;
+    STATE.xpNeeded = data.xp_needed;
+    renderUpgrades();
+    updateMainScreen();
+  } catch (e) {
+    showModal('Ошибка', e.message);
   }
-});
+}
+
+// ============ МИНИ-ИГРЫ / ЗАДАНИЯ ============
+
+// Банк вопросов и данных для заданий
+const TASK_DATA = {
+  // === FRONTEND ===
+  frontend: [
+    { // Задание 0: Верстка кнопки (code_match)
+      question: "Собери CSS-код для пиксельной кнопки с hover-эффектом:",
+      slots: [
+        ".pixel-btn {",
+        "  background: ____;",
+        "  border: ____;",
+        "  color: ____;",
+        "  cursor: ____;",
+        "}"
+      ],
+      pieces: ["#1a1a2e", "2px solid #00ff88", "#00ff88", "pointer", "#ffffff", "none", "auto", "1px dashed red"],
+      correct: ["#1a1a2e", "2px solid #00ff88", "#00ff88", "pointer"]
+    },
+    { // Задание 1: Исправь баг (find_bug)
+      lines: [
+        '<!DOCTYPE html>',
+        '<html lang="ru">',
+        '<head>',
+        '  <meta charset="UTF-8">',
+        '  <title>Мой сайт<title>',
+        '</head>',
+        '<body>',
+        '  <h1>Привет!</h1>',
+        '  <p>Текст страницы</p>',
+        '</body>',
+        '</html>'
+      ],
+      bugLine: 4,
+      explanation: 'Ошибка в строке 5: незакрытый тег — нужно </title> вместо <title>'
+    },
+    { // Задание 2: Цветовая палитра (color_pick)
+      brief: "Подбери палитру для детского образовательного приложения — яркие, тёплые тона:",
+      colors: [
+        "#FF6B6B", "#4ECDC4", "#2C3E50", "#FFE66D",
+        "#95E1D3", "#F38181", "#1A1A2E", "#AA96DA",
+        "#FF4757", "#2ED573", "#FFA502", "#3742FA"
+      ],
+      correct: [0, 3, 5, 7], // Правильные индексы
+      needSelect: 4
+    },
+    { // Задание 3: Адаптивность (drag_arrange)
+      instruction: "Расположи элементы для мобильной версии сайта сверху вниз:",
+      items: ["Логотип", "Меню-бургер", "Главный баннер", "Карточки товаров", "Кнопка CTA", "Футер"],
+      correct: ["Логотип", "Меню-бургер", "Главный баннер", "Карточки товаров", "Кнопка CTA", "Футер"]
+    },
+    { // Задание 4: Финальный квиз
+      question: "Какой CSS-свойство отвечает за адаптивное расположение элементов в строку/колонку?",
+      options: ["display: flex", "position: absolute", "float: left", "margin: auto"],
+      correct: 0
+    }
+  ],
+
+  // === BACKEND ===
+  backend: [
+    {
+      question: "Собери SQL-запрос для получения 10 самых дорогих товаров:",
+      slots: ["SELECT ____", "FROM ____", "ORDER BY ____", "LIMIT ____"],
+      pieces: ["name, price", "products", "price DESC", "10", "id ASC", "users", "*", "5"],
+      correct: ["name, price", "products", "price DESC", "10"]
+    },
+    {
+      instruction: "Расставь компоненты REST API для интернет-магазина:",
+      items: ["GET /products — список товаров", "POST /orders — создать заказ", "GET /orders/:id — детали заказа", "PUT /products/:id — обновить товар", "DELETE /cart/:id — удалить из корзины"],
+      correct: ["GET /products — список товаров", "POST /orders — создать заказ", "GET /orders/:id — детали заказа", "PUT /products/:id — обновить товар", "DELETE /cart/:id — удалить из корзины"]
+    },
+    {
+      lines: [
+        'from flask import Flask, request',
+        'app = Flask(__name__)',
+        '',
+        '@app.route("/login", methods=["POST"])',
+        'def login():',
+        '    password = request.form["password"]',
+        '    query = f"SELECT * FROM users WHERE pass=\'{password}\'"',
+        '    result = db.execute(query)',
+        '    if result:',
+        '        return "OK"',
+        '    return "Fail"'
+      ],
+      bugLine: 6,
+      explanation: 'SQL-инъекция! Строка 7: пароль подставляется прямо в запрос. Нужно использовать параметризованные запросы.'
+    },
+    {
+      question: "Сервис получает 10,000 запросов/сек. Что поможет больше всего?",
+      options: ["Кэширование (Redis)", "Больше CSS-анимаций", "Увеличить размер логов", "Добавить console.log"],
+      correct: 0
+    },
+    {
+      instruction: "Расположи слои архитектуры веб-приложения от клиента к БД:",
+      items: ["Браузер (клиент)", "Nginx (прокси)", "Приложение (Python/Node)", "ORM (SQLAlchemy)", "База данных (PostgreSQL)"],
+      correct: ["Браузер (клиент)", "Nginx (прокси)", "Приложение (Python/Node)", "ORM (SQLAlchemy)", "База данных (PostgreSQL)"]
+    }
+  ],
+
+  // === DATA SCIENCE ===
+  datasci: [
+    { question: "На графике продажи растут линейно 6 месяцев, потом резкий спад. Что скорее всего?", options: ["Сезонный фактор", "Ошибка в данных 100%", "Смена алгоритма сайта", "Рост конкуренции невозможен"], correct: 0 },
+    { lines: ['id,name,age,salary', '1,Анна,25,50000', '2,Борис,30,60000', '3,Вика,-5,55000', '4,Гриша,28,70000', '5,Даша,22,999999999', '6,Евгений,35,65000'], bugLine: 3, explanation: 'Строка 4: отрицательный возраст (-5) — явная аномалия в данных.' },
+    { question: "Нужно предсказать цену квартиры по площади, этажу, району. Какой алгоритм лучше?", options: ["Линейная регрессия", "Кластеризация K-means", "Классификация (да/нет)", "Генеративная сеть"], correct: 0 },
+    { brief: "Выбери лучший тип визуализации для показа изменения дохода по месяцам:", colors: ["#4CAF50", "#FF9800", "#2196F3", "#9C27B0", "#F44336", "#00BCD4", "#FFEB3B", "#607D8B", "#E91E63", "#795548", "#3F51B5", "#CDDC39"], correct: [2, 0, 5, 6], needSelect: 4 },
+    { question: "A/B тест: вариант A — конверсия 3.2% (1000 юзеров), вариант B — 3.8% (1000). Вывод?", options: ["Разница мала, нужно больше данных", "B однозначно лучше", "A лучше, т.к. стабильнее", "Тест провален"], correct: 0 }
+  ],
+
+  // === CYBERSECURITY ===
+  cybersec: [
+    { question: "Какой пароль самый надёжный?", options: ["Tr0ub4dor&3", "password123", "qwerty", "P@$$w0rd"], correct: 0 },
+    { lines: ['От: support@bankk.ru', 'Тема: Срочно подтвердите!', '', 'Уважаемый клиент!', 'Ваш аккаунт заблокирован.', 'Перейдите по ссылке для разблокировки:', 'http://bankk-verify.xyz/login', 'Введите логин и пароль.', '', 'С уважением, Банк'], bugLine: 6, explanation: 'Строка 7: фишинговая ссылка! Домен bankk-verify.xyz не принадлежит банку.' },
+    { question: "В логах: 500 запросов с одного IP за 10 секунд на /login. Что это?", options: ["Brute-force атака", "Обычный пользователь", "SEO-бот", "Тестирование CSS"], correct: 0 },
+    { question: "Собери команду для шифрования файла:", slots: ["openssl ____", "____", "-in secret.txt", "-out ____"], pieces: ["enc", "-aes-256-cbc", "secret.enc", "dec", "-des", "output.txt", "rm", "-rf"], correct: ["enc", "-aes-256-cbc", "secret.enc"] },
+    { instruction: "Расставь шаги реагирования на инцидент:", items: ["Обнаружение угрозы", "Изоляция системы", "Анализ масштаба", "Устранение уязвимости", "Восстановление", "Отчёт и выводы"], correct: ["Обнаружение угрозы", "Изоляция системы", "Анализ масштаба", "Устранение уязвимости", "Восстановление", "Отчёт и выводы"] }
+  ],
+
+  // === ROBOTICS ===
+  robotics: [
+    { instruction: "Собери электрическую цепь робота в правильном порядке:", items: ["Аккумулятор", "Контроллер (Arduino)", "Драйвер моторов", "Моторы", "Датчики → контроллер"], correct: ["Аккумулятор", "Контроллер (Arduino)", "Драйвер моторов", "Моторы", "Датчики → контроллер"] },
+    { question: "Собери код для движения робота вперёд на 2 секунды:", slots: ["void setup() {", "  pinMode(motorPin, ____);", "}", "void loop() {", "  digitalWrite(motorPin, ____);", "  delay(____);", "  digitalWrite(motorPin, LOW);", "}"], pieces: ["OUTPUT", "HIGH", "2000", "INPUT", "LOW", "500", "ANALOG", "1000"], correct: ["OUTPUT", "HIGH", "2000"] },
+    { question: "Робот-пылесос должен объезжать препятствия. Какой датчик основной?", options: ["Ультразвуковой дальномер", "Датчик температуры", "Акселерометр", "Датчик влажности"], correct: 0 },
+    { lines: ['// Робот едет и объезжает стены', 'while (true) {', '  distance = ultrasonic.read();', '  if (distance > 20) {', '    motors.forward(100);', '  } else {', '    motors.forward(100);', '    delay(500);', '  }', '}'], bugLine: 6, explanation: 'Строка 7: при обнаружении стены робот всё равно едет вперёд! Нужно motors.turn() или motors.backward().' },
+    { instruction: "Спроектируй робота-официанта — расставь компоненты:", items: ["Шасси с колёсами", "Лидар для навигации", "Платформа для подноса", "Камера для распознавания", "Микроконтроллер", "Аккумулятор"], correct: ["Шасси с колёсами", "Аккумулятор", "Микроконтроллер", "Лидар для навигации", "Камера для распознавания", "Платформа для подноса"] }
+  ],
+
+  // === ENERGY ===
+  energy: [
+    { question: "Офис 200 м², 50 компьютеров по 300Вт, свет 5000Вт. Общее потребление?", options: ["20 кВт", "15 кВт", "25 кВт", "10 кВт"], correct: 0 },
+    { instruction: "Расположи солнечные панели по приоритету установки:", items: ["Южная сторона крыши (угол 30°)", "Западная стена (вертикально)", "Северная сторона (тень)", "Плоская крыша (горизонтально)", "Юго-восток (угол 45°)"], correct: ["Южная сторона крыши (угол 30°)", "Юго-восток (угол 45°)", "Плоская крыша (горизонтально)", "Западная стена (вертикально)", "Северная сторона (тень)"] },
+    { lines: ['# Электросеть здания', 'Главный щит: 380В', 'Этаж 1: автомат 32А → розетки', 'Этаж 2: автомат 16А → розетки', 'Этаж 2: серверная 10кВт на 16А', 'Этаж 3: автомат 25А → розетки', 'Заземление: подключено'], bugLine: 4, explanation: 'Строка 5: серверная на 10кВт требует ~26А, а автомат только на 16А — будет выбивать! Нужен автомат минимум 32А.' },
+    { question: "Завод тратит 500МВт·ч/мес. Солнечные панели дают 150МВт·ч. Как оптимизировать?", options: ["Ночной тариф + аккумуляторы", "Убрать все панели", "Включать станки только днём", "Ничего не делать"], correct: 0 },
+    { instruction: "Спроектируй мини-электростанцию — порядок компонентов:", items: ["Источник энергии (турбина)", "Генератор", "Трансформатор", "Распредщит", "Потребители"], correct: ["Источник энергии (турбина)", "Генератор", "Трансформатор", "Распредщит", "Потребители"] }
+  ],
+
+  // === DIAGNOSTICS ===
+  diagnostics: [
+    { question: "Пациент: температура 38.5°, кашель 5 дней, слабость. Какой вопрос ПЕРВЫЙ?", options: ["Когда началось?", "Любимый цвет?", "Группа крови?", "Рост и вес?"], correct: 0 },
+    { lines: ['Анализ крови пациента:', 'Гемоглобин: 140 г/л (N)', 'Лейкоциты: 4.5 × 10⁹/л (N)', 'Тромбоциты: 250 × 10⁹/л (N)', 'Глюкоза: 15.8 ммоль/л (N: 3.3-5.5)', 'СОЭ: 12 мм/ч (N)', 'Холестерин: 4.2 ммоль/л (N)'], bugLine: 4, explanation: 'Строка 5: глюкоза 15.8 при норме 3.3-5.5 — подозрение на сахарный диабет!' },
+    { question: "Боль в животе справа внизу, температура 37.8°, тошнота. Наиболее вероятно?", options: ["Аппендицит", "Мигрень", "Перелом ноги", "Отит"], correct: 0 },
+    { instruction: "Составь план обследования при подозрении на пневмонию:", items: ["Осмотр и аускультация", "Общий анализ крови", "Рентген грудной клетки", "Анализ мокроты", "Назначение лечения"], correct: ["Осмотр и аускультация", "Общий анализ крови", "Рентген грудной клетки", "Анализ мокроты", "Назначение лечения"] },
+    { question: "У пациента 65 лет одышка, отёки ног, хрипы в лёгких. Какое обследование ключевое?", options: ["ЭхоКГ (УЗИ сердца)", "Рентген кисти", "МРТ головного мозга", "Анализ мочи"], correct: 0 }
+  ],
+
+  // === BIOTECH ===
+  biotech: [
+    { instruction: "Расставь этапы ПЦР в правильном порядке:", items: ["Денатурация (95°C)", "Отжиг праймеров (55°C)", "Элонгация (72°C)", "Повторить 30 циклов", "Финальная элонгация"], correct: ["Денатурация (95°C)", "Отжиг праймеров (55°C)", "Элонгация (72°C)", "Повторить 30 циклов", "Финальная элонгация"] },
+    { lines: ['Последовательность ДНК:', 'ATGCCTGAATTCGGA', 'TACGGACTAAAGCCT', '', 'Ожидаемый белок:', 'Met-Pro-Glu-Phe-Gly', '', 'Результат секвенирования:', 'ATGCCTGAATTCGGA', 'Мутация не обнаружена'], bugLine: 1, explanation: 'Строка 2-3: комплементарная цепь неверная! Для A→T, T→A, G→C, C→G. Правильно: TACGGACTTAAGCCT' },
+    { question: "Для выращивания бактерий E.coli, какая среда оптимальна?", options: ["LB (Лурия-Бертани)", "Дистиллированная вода", "Молоко", "Спирт 96%"], correct: 0 },
+    { question: "Биореактор: pH падает с 7.0 до 5.5. Что делать?", options: ["Добавить NaOH (щёлочь)", "Добавить HCl (кислоту)", "Увеличить температуру", "Выключить перемешивание"], correct: 0 },
+    { question: "Собери последовательность гидовой РНК для CRISPR:", slots: ["Цель: ATGC____", "Гид: ____CGTA", "PAM: ____"], pieces: ["GCAT", "TACG", "NGG", "NCC", "AAAA", "TTTT"], correct: ["GCAT", "TACG", "NGG"] }
+  ],
+
+  // === GAMEDEV ===
+  gamedev: [
+    { question: "Воин: 100 HP, 20 ATK. Маг: 60 HP, 35 ATK. Кто сильнее в долгом бою?", options: ["Воин (больше HP)", "Маг (больше урона)", "Одинаково", "Невозможно сравнить"], correct: 0 },
+    { instruction: "Расположи объекты на уровне платформера:", items: ["Точка спавна игрока", "Обучающие платформы", "Первые враги", "Бонусы и монеты", "Сложные препятствия", "Босс / выход"], correct: ["Точка спавна игрока", "Обучающие платформы", "Первые враги", "Бонусы и монеты", "Сложные препятствия", "Босс / выход"] },
+    { question: "Игрок зарабатывает 100 монет/мин. Меч стоит 1000. Когда покупка?", options: ["10 минут — нормально", "1 минута — слишком легко", "100 минут — слишком долго", "Бесплатно — зачем монеты"], correct: 0 },
+    { question: "NPC говорит: «Помоги!» Какой вариант диалога лучше для RPG?", options: ["3 варианта ответа с последствиями", "Только «ОК»", "Автоскип диалога", "Вырезать все диалоги"], correct: 0 },
+    { instruction: "Собери прототип игрового цикла:", items: ["Ввод игрока (Input)", "Обновление логики (Update)", "Проверка коллизий", "Отрисовка кадра (Render)", "Звук и эффекты"], correct: ["Ввод игрока (Input)", "Обновление логики (Update)", "Проверка коллизий", "Отрисовка кадра (Render)", "Звук и эффекты"] }
+  ],
+
+  // === DESIGN ===
+  design: [
+    { brief: "Подбери цвета для банковского приложения — надёжность и спокойствие:", colors: ["#1A3C6D", "#FFFFFF", "#E8F0FE", "#00BFA5", "#FF1744", "#FFEB3B", "#4A148C", "#2E7D32", "#F5F5F5", "#263238", "#FF6F00", "#B71C1C"], correct: [0, 1, 2, 9], needSelect: 4 },
+    { lines: ['Экран регистрации:', '[ Логотип ]', '[ Поле email ]', '[ Поле пароль ]', '[ Ссылка "Забыл пароль" размер 4px ]', '[ Кнопка "Войти" ]', '[ Текст: "Нет аккаунта? Регистрация" ]'], bugLine: 4, explanation: 'Строка 5: ссылка размером 4px невозможна для нажатия! Минимальный размер кликабельного элемента — 44px.' },
+    { instruction: "Собери UI-кит из компонентов (от простых к сложным):", items: ["Цветовые токены", "Типографика", "Иконки", "Кнопки и поля ввода", "Карточки и списки", "Целые экраны"], correct: ["Цветовые токены", "Типографика", "Иконки", "Кнопки и поля ввода", "Карточки и списки", "Целые экраны"] },
+    { question: "Пользователь ищет кнопку «Купить». Где её разместить?", options: ["Заметно, с контрастным цветом", "Спрятать в меню", "Мелким шрифтом внизу", "В настройках"], correct: 0 },
+    { brief: "Редизайн: выбери улучшенные цвета для устаревшего интерфейса:", colors: ["#6C63FF", "#F8F9FA", "#2D3436", "#00B894", "#E17055", "#FDCB6E", "#0984E3", "#DFE6E9", "#636E72", "#A29BFE", "#74B9FF", "#55A3A4"], correct: [0, 1, 2, 3], needSelect: 4 }
+  ],
+
+  // === MARKETING ===
+  marketing: [
+    { question: "Новый фитнес-браслет для студентов 18-25 лет. Где лучше рекламировать?", options: ["ВК + Telegram + TikTok", "Газеты и журналы", "Радио для пенсионеров", "Билборды в деревнях"], correct: 0 },
+    { question: "Бюджет 100К₽/мес. Что дороже, но эффективнее для нового бренда?", options: ["Блогеры (60К) + таргет (40К)", "Вся сумма на один баннер", "Раздача листовок", "Спам в чатах"], correct: 0 },
+    { lines: ['Баннер A: "СКИДКА 50%!!!"', 'Клики: 1200, покупки: 12', 'CTR: 2.4%, CR: 1%', '', 'Баннер B: "Попробуй бесплатно"', 'Клики: 800, покупки: 32', 'CTR: 1.6%, CR: 4%', '', 'Вывод: Баннер A лучше'], bugLine: 8, explanation: 'Вывод неверный! Баннер B имеет конверсию 4% против 1% у A. Важнее покупки (32 vs 12), а не клики.' },
+    { instruction: "Составь контент-план на неделю для кофейни:", items: ["Пн: Фото новинки меню", "Вт: Видео приготовления", "Ср: Опрос «Ваш любимый кофе?»", "Чт: Отзыв клиента", "Пт: Анонс акции выходных", "Сб: Сторис из кофейни", "Вс: Мем про понедельник"], correct: ["Пн: Фото новинки меню", "Вт: Видео приготовления", "Ср: Опрос «Ваш любимый кофе?»", "Чт: Отзыв клиента", "Пт: Анонс акции выходных", "Сб: Сторис из кофейни", "Вс: Мем про понедельник"] },
+    { question: "CPC=15₽, конверсия 2%, средний чек 3000₽. ROI рекламы?", options: ["Положительный (3000×0.02=60₽ > 15₽)", "Отрицательный", "Нулевой", "Невозможно определить"], correct: 0 }
+  ],
+
+  // === PROJECT MANAGEMENT ===
+  pm: [
+    { instruction: "Разбей проект «Мобильное приложение» на этапы:", items: ["Сбор требований", "Дизайн прототипа", "Разработка MVP", "Тестирование", "Релиз", "Поддержка"], correct: ["Сбор требований", "Дизайн прототипа", "Разработка MVP", "Тестирование", "Релиз", "Поддержка"] },
+    { question: "Дедлайн через 2 недели, готово 30%. Команда — 3 разработчика. Что делать?", options: ["Пересмотреть скоуп, убрать неважное", "Добавить 10 джунов", "Ничего не делать, авось успеем", "Отменить проект"], correct: 0 },
+    { question: "Главный риск проекта — уход ключевого разработчика. Стратегия?", options: ["Документация + обучение дублёра", "Игнорировать", "Не давать отпуск никогда", "Нанять 10 разработчиков на замену"], correct: 0 },
+    { question: "На стендапе разработчик говорит: «Застрял на баге 3 дня». Ваши действия?", options: ["Организовать парное решение с коллегой", "Уволить", "Проигнорировать", "Дать ещё 3 дня"], correct: 0 },
+    { instruction: "Проведи ретроспективу — порядок обсуждения:", items: ["Что прошло хорошо?", "Что пошло не так?", "Какие были блокеры?", "Что улучшить?", "Конкретные действия на следующий спринт"], correct: ["Что прошло хорошо?", "Что пошло не так?", "Какие были блокеры?", "Что улучшить?", "Конкретные действия на следующий спринт"] }
+  ],
+
+  // === CHEMISTRY ===
+  chemistry: [
+    { question: "Уравняй: Fe + O₂ → Fe₂O₃. Коэффициенты:", slots: ["____ Fe +", "____ O₂ →", "____ Fe₂O₃"], pieces: ["4", "3", "2", "1", "6", "5"], correct: ["4", "3", "2"] },
+    { lines: ['Протокол лаборатории:', 'Халат: надет ✓', 'Очки: надеты ✓', 'Перчатки: надеты ✓', 'Еда на столе рядом с реактивами', 'Вытяжка: включена ✓', 'Журнал: открыт ✓'], bugLine: 4, explanation: 'Строка 5: еда рядом с реактивами — грубое нарушение ТБ! Запрещено есть и пить в лаборатории.' },
+    { question: "Вещество: бесцветный газ, тяжелее воздуха, не горит, гасит пламя. Что это?", options: ["CO₂ (углекислый газ)", "H₂ (водород)", "O₂ (кислород)", "CH₄ (метан)"], correct: 0 },
+    { instruction: "Составь план синтеза аспирина:", items: ["Подготовить салициловую кислоту", "Добавить уксусный ангидрид", "Нагреть на водяной бане", "Охладить и отфильтровать", "Высушить и взвесить"], correct: ["Подготовить салициловую кислоту", "Добавить уксусный ангидрид", "Нагреть на водяной бане", "Охладить и отфильтровать", "Высушить и взвесить"] },
+    { question: "При смешивании NaOH и HCl образуется NaCl и H₂O. Тип реакции?", options: ["Нейтрализация", "Горение", "Разложение", "Замещение"], correct: 0 }
+  ],
+
+  // === PHYSICS ===
+  physics: [
+    { question: "Тело массой 5 кг ускоряется с a=2 м/с². Сила по 2-му закону Ньютона?", options: ["10 Н", "2.5 Н", "7 Н", "25 Н"], correct: 0 },
+    { question: "На графике v(t) — прямая с наклоном. Это значит:", options: ["Равноускоренное движение", "Покой", "Равномерное движение", "Свободное падение всегда"], correct: 0 },
+    { instruction: "Собери установку для измерения ускорения свободного падения:", items: ["Штатив с зажимом", "Шарик на нити (маятник)", "Линейка для длины нити", "Секундомер", "Формула T=2π√(L/g)"], correct: ["Штатив с зажимом", "Шарик на нити (маятник)", "Линейка для длины нити", "Секундомер", "Формула T=2π√(L/g)"] },
+    { lines: ['Эксперимент: измерение сопротивления', 'Амперметр: 0.5 А', 'Вольтметр: 10 В', 'R = U/I = 10/0.5 = 20 Ом', 'Но вольтметр подключён параллельно амперметру', 'Итого R = 20 Ом (точно)'], bugLine: 4, explanation: 'Строка 5: вольтметр подключён неправильно! Он должен быть параллелен резистору, а не амперметру. Это даёт погрешность.' },
+    { question: "Планета с массой 2M и радиусом 2R. Ускорение свободного падения?", options: ["g/2 (вдвое меньше)", "2g", "g (такое же)", "4g"], correct: 0 }
+  ]
+};
+
+function getTaskData(profId, taskIdx) {
+  const tasks = TASK_DATA[profId];
+  if (!tasks || !tasks[taskIdx]) return null;
+  return tasks[taskIdx];
+}
+
+function startTask(profId, taskIdx) {
+  // Найти профессию и задание
+  let prof = null;
+  for (const s of STATE.professions) {
+    prof = s.professions.find(p => p.id === profId);
+    if (prof) break;
+  }
+  if (!prof) return;
+
+  const taskMeta = prof.tasks[taskIdx];
+  const taskData = getTaskData(profId, taskIdx);
+  if (!taskData) {
+    showModal('Упс', 'Задание в разработке!');
+    return;
+  }
+
+  STATE.currentTask = { profId, taskIdx, meta: taskMeta, data: taskData };
+  showScreen('task');
+  document.getElementById('navbar').style.display = 'none';
+
+  renderTask();
+}
+
+function closeTask() {
+  const profId = STATE.currentTask?.profId;
+  STATE.currentTask = null;
+  showScreen('professions');
+  document.getElementById('navbar').style.display = 'flex';
+  if (profId) {
+    // Вернуться к профессии
+    setTimeout(() => {
+      if (STATE.currentSphere) openSphere(STATE.currentSphere.id);
+      setTimeout(() => openProfession(profId), 50);
+    }, 50);
+  }
+}
+
+function renderTask() {
+  const { meta, data } = STATE.currentTask;
+  const cont = document.getElementById('task-game-content');
+  const type = meta.type;
+
+  let html = `<h3>${meta.title}</h3><div class="task-desc">${meta.desc}</div><div class="task-content">`;
+
+  if (type === 'quiz') {
+    html += renderQuizTask(data);
+  } else if (type === 'find_bug') {
+    html += renderFindBugTask(data);
+  } else if (type === 'drag_arrange') {
+    html += renderDragTask(data);
+  } else if (type === 'color_pick') {
+    html += renderColorTask(data);
+  } else if (type === 'code_match') {
+    html += renderCodeMatchTask(data);
+  }
+
+  html += '</div>';
+  cont.innerHTML = html;
+}
+
+// === QUIZ ===
+function renderQuizTask(data) {
+  let html = `<div class="quiz-question">${data.question}</div><div class="quiz-options">`;
+  data.options.forEach((opt, i) => {
+    html += `<button class="quiz-opt" onclick="answerQuiz(${i}, ${data.correct})">${opt}</button>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function answerQuiz(selected, correct) {
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach((btn, i) => {
+    btn.onclick = null;
+    if (i === correct) btn.classList.add('correct');
+    if (i === selected && selected !== correct) btn.classList.add('wrong');
+  });
+  const score = selected === correct ? 100 : 20;
+  setTimeout(() => finishTask(score), 1000);
+}
+
+// === FIND BUG ===
+function renderFindBugTask(data) {
+  let html = '<div class="code-block">';
+  data.lines.forEach((line, i) => {
+    html += `<span class="code-line" onclick="selectBugLine(${i}, ${data.bugLine})">${i + 1}. ${escapeHtml(line)}</span>`;
+  });
+  html += '</div><div style="font-size:7px;color:var(--text2);text-align:center;margin-top:8px;">Нажми на строку с ошибкой</div>';
+  return html;
+}
+
+function selectBugLine(selected, correct) {
+  const lines = document.querySelectorAll('.code-line');
+  lines.forEach((el, i) => { el.onclick = null; });
+  if (selected === correct) {
+    lines[selected].classList.add('bug-found');
+    const data = STATE.currentTask.data;
+    showModal('✅ Верно!', data.explanation);
+    setTimeout(() => finishTask(100), 1500);
+  } else {
+    lines[selected].classList.add('bug-wrong');
+    lines[correct].classList.add('bug-found');
+    const data = STATE.currentTask.data;
+    showModal('❌ Не совсем', data.explanation);
+    setTimeout(() => finishTask(30), 1500);
+  }
+}
+
+// === DRAG & ARRANGE ===
+function renderDragTask(data) {
+  // Перемешиваем
+  const shuffled = [...data.items].sort(() => Math.random() - 0.5);
+  let html = `<div style="font-size:7px;color:var(--secondary);margin-bottom:8px;">${data.instruction || 'Расставь в правильном порядке:'}</div>`;
+  html += '<div class="drag-container" id="drag-container">';
+  shuffled.forEach((item, i) => {
+    html += `<div class="drag-item" data-index="${i}" draggable="false">
+      <span class="drag-handle">☰</span>
+      <span>${item}</span>
+    </div>`;
+  });
+  html += '</div>';
+  html += `<div style="margin-top:12px;"><button class="pixel-btn green" onclick="checkDragOrder()">✓ ПРОВЕРИТЬ</button></div>`;
+  return html;
+}
+
+// Простое перетаскивание через кнопки вверх/вниз (мобильно-дружелюбно)
+function checkDragOrder() {
+  const container = document.getElementById('drag-container');
+  const items = container.querySelectorAll('.drag-item');
+  const current = Array.from(items).map(el => el.querySelector('span:last-child').textContent);
+  const correct = STATE.currentTask.data.correct;
+
+  let score = 0;
+  for (let i = 0; i < current.length; i++) {
+    if (current[i] === correct[i]) score += Math.floor(100 / correct.length);
+  }
+  score = Math.min(100, score);
+  finishTask(score);
+}
+
+// Touch-based reorder
+(function() {
+  let dragEl = null;
+  let startY = 0;
+
+  document.addEventListener('touchstart', function(e) {
+    const handle = e.target.closest('.drag-item');
+    if (!handle) return;
+    dragEl = handle;
+    startY = e.touches[0].clientY;
+    dragEl.classList.add('dragging');
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function(e) {
+    if (!dragEl) return;
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - startY;
+    const container = dragEl.parentElement;
+    const items = Array.from(container.querySelectorAll('.drag-item'));
+    const idx = items.indexOf(dragEl);
+
+    if (diff > 40 && idx < items.length - 1) {
+      container.insertBefore(items[idx + 1], dragEl);
+      startY = currentY;
+    } else if (diff < -40 && idx > 0) {
+      container.insertBefore(dragEl, items[idx - 1]);
+      startY = currentY;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', function() {
+    if (dragEl) {
+      dragEl.classList.remove('dragging');
+      dragEl = null;
+    }
+  });
+})();
+
+// === COLOR PICK ===
+function renderColorTask(data) {
+  let html = `<div class="quiz-question">${data.brief}</div>`;
+  html += `<div style="font-size:7px;color:var(--text2);margin-bottom:8px;">Выбери ${data.needSelect} цвета:</div>`;
+  html += '<div class="color-palette">';
+  data.colors.forEach((color, i) => {
+    html += `<div class="color-swatch" style="background:${color}" data-idx="${i}" onclick="toggleColor(this, ${i})"></div>`;
+  });
+  html += '</div>';
+  html += `<div style="margin-top:12px;"><button class="pixel-btn green" onclick="checkColors()">✓ ПРОВЕРИТЬ</button></div>`;
+  return html;
+}
+
+let selectedColors = [];
+function toggleColor(el, idx) {
+  const data = STATE.currentTask.data;
+  if (el.classList.contains('selected')) {
+    el.classList.remove('selected');
+    selectedColors = selectedColors.filter(i => i !== idx);
+  } else {
+    if (selectedColors.length >= data.needSelect) return;
+    el.classList.add('selected');
+    selectedColors.push(idx);
+  }
+}
+
+function checkColors() {
+  const data = STATE.currentTask.data;
+  const correct = data.correct;
+  let matched = 0;
+  selectedColors.forEach(s => { if (correct.includes(s)) matched++; });
+  const score = Math.floor((matched / correct.length) * 100);
+
+  document.querySelectorAll('.color-swatch').forEach((el, i) => {
+    if (correct.includes(i)) el.classList.add('correct');
+    else if (selectedColors.includes(i)) el.classList.add('wrong');
+  });
+
+  setTimeout(() => finishTask(score), 1000);
+}
+
+// === CODE MATCH ===
+function renderCodeMatchTask(data) {
+  let html = `<div class="quiz-question">${data.question || 'Заполни пропуски:'}</div>`;
+  html += '<div class="code-slots" id="code-slots">';
+  let slotIdx = 0;
+  data.slots.forEach(slot => {
+    if (slot.includes('____')) {
+      html += `<div class="code-slot" data-slot="${slotIdx}" onclick="clearSlot(${slotIdx})">${slot.replace('____', '<span class="slot-val" id="slot-${slotIdx}">???</span>')}</div>`;
+      slotIdx++;
+    } else {
+      html += `<div class="code-slot filled" style="color:var(--text2)">${slot}</div>`;
+    }
+  });
+  html += '</div>';
+  html += '<div class="code-pieces" id="code-pieces">';
+  data.pieces.forEach((piece, i) => {
+    html += `<div class="code-piece" data-piece="${i}" onclick="placePiece(${i})">${piece}</div>`;
+  });
+  html += '</div>';
+  html += `<div style="margin-top:12px;"><button class="pixel-btn green" onclick="checkCodeMatch()">✓ ПРОВЕРИТЬ</button></div>`;
+  window._codeSlots = new Array(slotIdx).fill(null);
+  window._nextSlot = 0;
+  selectedColors = []; // Reset
+  return html;
+}
+
+function placePiece(pieceIdx) {
+  const data = STATE.currentTask.data;
+  const piece = document.querySelector(`.code-piece[data-piece="${pieceIdx}"]`);
+  if (piece.classList.contains('used')) return;
+  if (window._nextSlot >= window._codeSlots.length) return;
+
+  piece.classList.add('used');
+  window._codeSlots[window._nextSlot] = data.pieces[pieceIdx];
+  document.getElementById('slot-' + window._nextSlot).textContent = data.pieces[pieceIdx];
+  document.querySelector(`.code-slot[data-slot="${window._nextSlot}"]`).classList.add('filled');
+  window._nextSlot++;
+}
+
+function clearSlot(idx) {
+  // Упрощённый сброс всех слотов
+  window._codeSlots.fill(null);
+  window._nextSlot = 0;
+  document.querySelectorAll('.slot-val').forEach(el => el.textContent = '???');
+  document.querySelectorAll('.code-slot[data-slot]').forEach(el => el.classList.remove('filled'));
+  document.querySelectorAll('.code-piece').forEach(el => el.classList.remove('used'));
+}
+
+function checkCodeMatch() {
+  const data = STATE.currentTask.data;
+  const correct = data.correct;
+  let matched = 0;
+  window._codeSlots.forEach((val, i) => {
+    if (val === correct[i]) matched++;
+  });
+  const score = Math.floor((matched / correct.length) * 100);
+  finishTask(score);
+}
+
+// === РЕЗУЛЬТАТ ЗАДАНИЯ ===
+async function finishTask(score) {
+  const { profId, taskIdx } = STATE.currentTask;
+
+  try {
+    const data = await apiCall('/api/task/complete', {
+      profession_id: profId,
+      task_index: taskIdx,
+      score: score
+    });
+    STATE.user = data.user;
+    STATE.completed = data.completed_tasks || STATE.completed;
+    STATE.xpNeeded = data.xp_needed;
+
+    const cont = document.getElementById('task-game-content');
+    const icon = score >= 80 ? '🏆' : score >= 50 ? '⭐' : '📝';
+    const title = score >= 80 ? 'Отлично!' : score >= 50 ? 'Хорошо!' : 'Попробуй ещё!';
+
+    cont.innerHTML = `
+      <div class="task-result">
+        <div class="result-icon">${icon}</div>
+        <div class="result-title">${title}</div>
+        <div class="result-score">Результат: ${score}%</div>
+        <div class="result-rewards">+${data.coin_reward || 0} 🪙  +${data.xp_reward || 0} XP</div>
+        <button class="pixel-btn green" onclick="closeTask()">ПРОДОЛЖИТЬ</button>
+      </div>`;
+  } catch (e) {
+    showModal('Ошибка', e.message);
+  }
+}
+
+// ============ УТИЛИТЫ ============
+
+function showModal(title, text) {
+  const modal = document.getElementById('modal');
+  document.getElementById('modal-content').innerHTML = `
+    <h3>${title}</h3>
+    <p>${text}</p>
+    <button class="pixel-btn" onclick="closeModal()">ОК</button>
+  `;
+  modal.classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ============ СТАРТ ============
+init();
 </script>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 </body>
 </html>
