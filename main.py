@@ -19,6 +19,9 @@ from pydantic import BaseModel
 
 import database as db
 
+# Базовая директория — где лежит main.py
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 app = FastAPI(title="RE:ALITY Профессии")
 
 # CORS для Telegram
@@ -28,6 +31,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
+
 # ============ Константы ============
 
 XP_PER_LEVEL = [0, 100, 250, 500, 900, 1500, 2500, 4000, 6500, 10000]  # XP для уровней 1-10
@@ -168,21 +174,21 @@ def get_tg_id(req) -> int:
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
     """Отдать главную страницу"""
-    return FileResponse("index.html")
+    return FileResponse(os.path.join(BASE_DIR, "index.html"))
 
 
 # Отдача аватаров из корня
 @app.get("/hero1.png")
 async def hero1():
-    return FileResponse("hero1.png")
+    return FileResponse(os.path.join(BASE_DIR, "hero1.png"))
 
 @app.get("/hero2.png")
 async def hero2():
-    return FileResponse("hero2.png")
+    return FileResponse(os.path.join(BASE_DIR, "hero2.png"))
 
 @app.get("/hero3.png")
 async def hero3():
-    return FileResponse("hero3.png")
+    return FileResponse(os.path.join(BASE_DIR, "hero3.png"))
 
 
 @app.post("/api/auth")
