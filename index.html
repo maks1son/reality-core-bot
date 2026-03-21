@@ -132,6 +132,73 @@ body{display:flex;justify-content:center}
 }
 .modal h2{font-size:11px;color:var(--accent);margin-bottom:14px;line-height:1.6}
 .modal p{font-size:8px;line-height:1.8;margin-bottom:18px;color:#aaa}
+
+/* ─── Экран профессий ─── */
+.screen-title{font-size:12px;color:var(--accent);text-align:center;margin-bottom:12px;letter-spacing:2px}
+.sphere-accordion{margin-bottom:8px}
+.sphere-header{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;cursor:pointer;transition:.15s;width:100%;
+  font-family:'Press Start 2P',monospace;font-size:9px;color:var(--text);
+}
+.sphere-header:active{opacity:.8}
+.sphere-header .sphere-arrow{
+  margin-left:auto;transition:transform .2s;font-size:8px;color:#666;
+}
+.sphere-header.open .sphere-arrow{transform:rotate(90deg)}
+.sphere-list{
+  display:none;flex-direction:column;gap:8px;
+  padding:8px 4px 4px;
+}
+.sphere-list.open{display:flex}
+.prof-card{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:12px;display:flex;flex-direction:column;gap:8px;
+}
+.prof-top{display:flex;align-items:center;gap:8px}
+.prof-emoji{font-size:22px}
+.prof-name{font-size:8px;color:var(--text);line-height:1.5}
+.prof-desc{font-size:7px;color:#888;line-height:1.7}
+.prof-tools{display:flex;flex-wrap:wrap;gap:4px}
+.prof-tag{
+  background:var(--bg);border:1px solid var(--border);border-radius:6px;
+  padding:4px 7px;font-size:6px;color:var(--mint);
+  font-family:'Press Start 2P',monospace;
+}
+.prof-actions{display:flex;justify-content:flex-end;margin-top:4px}
+.btn-sm{
+  font-family:'Press Start 2P',monospace;font-size:7px;
+  padding:8px 12px;border:none;border-radius:8px;cursor:pointer;transition:.15s;
+}
+.btn-sm:active{transform:scale(.95)}
+.btn-sm:disabled{opacity:.4;cursor:default}
+.btn-sm.btn-accent{background:var(--accent);color:#fff}
+.btn-sm.btn-unlock{background:var(--mint);color:#0f0f1a}
+.btn-sm .tooltip{
+  display:none;position:absolute;bottom:110%;left:50%;transform:translateX(-50%);
+  background:#333;color:var(--danger);padding:4px 8px;border-radius:6px;
+  font-size:6px;white-space:nowrap;
+}
+.btn-sm:disabled .tooltip{display:block}
+.btn-sm{position:relative}
+.prof-loading{text-align:center;padding:16px;font-size:7px;color:#666}
+
+/* ─── Экран улучшений ─── */
+.upgrades-list{display:flex;flex-direction:column;gap:10px}
+.upg-card{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:14px;display:flex;flex-direction:column;gap:8px;
+}
+.upg-top{display:flex;align-items:center;gap:10px}
+.upg-icon{font-size:24px}
+.upg-info{flex:1;display:flex;flex-direction:column;gap:4px}
+.upg-name{font-size:8px;color:var(--text)}
+.upg-desc{font-size:6px;color:#888;line-height:1.6}
+.upg-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.upg-level{font-size:7px;color:var(--accent)}
+.upg-cost{font-size:7px;color:var(--mint)}
+.upg-cost.no-coins{color:var(--danger)}
 </style>
 </head>
 <body>
@@ -179,19 +246,83 @@ body{display:flex;justify-content:center}
     </div>
   </div>
 
-  <!-- ═══ Профессии (заглушка) ═══ -->
+  <!-- ═══ Профессии ═══ -->
   <div id="screen-professions" class="screen">
-    <div class="placeholder-screen">
-      <div class="emoji">🔬</div>
-      <p>Профессии<br>Скоро</p>
+    <div class="screen-title">ПРОФЕССИИ</div>
+    <div id="spheres-container">
+      <div class="sphere-accordion" data-sphere="IT">
+        <div class="sphere-header" data-sphere="IT">💻 IT<span class="sphere-arrow">▶</span></div>
+        <div class="sphere-list" data-sphere="IT"></div>
+      </div>
+      <div class="sphere-accordion" data-sphere="Engineering">
+        <div class="sphere-header" data-sphere="Engineering">⚙️ Инженерия<span class="sphere-arrow">▶</span></div>
+        <div class="sphere-list" data-sphere="Engineering"></div>
+      </div>
+      <div class="sphere-accordion" data-sphere="Medicine">
+        <div class="sphere-header" data-sphere="Medicine">🏥 Медицина<span class="sphere-arrow">▶</span></div>
+        <div class="sphere-list" data-sphere="Medicine"></div>
+      </div>
+      <div class="sphere-accordion" data-sphere="Creative">
+        <div class="sphere-header" data-sphere="Creative">🎨 Творчество<span class="sphere-arrow">▶</span></div>
+        <div class="sphere-list" data-sphere="Creative"></div>
+      </div>
+      <div class="sphere-accordion" data-sphere="Business">
+        <div class="sphere-header" data-sphere="Business">📈 Бизнес<span class="sphere-arrow">▶</span></div>
+        <div class="sphere-list" data-sphere="Business"></div>
+      </div>
+      <div class="sphere-accordion" data-sphere="Science">
+        <div class="sphere-header" data-sphere="Science">🔬 Наука<span class="sphere-arrow">▶</span></div>
+        <div class="sphere-list" data-sphere="Science"></div>
+      </div>
     </div>
   </div>
 
-  <!-- ═══ Улучшения (заглушка) ═══ -->
+  <!-- ═══ Улучшения ═══ -->
   <div id="screen-upgrades" class="screen">
-    <div class="placeholder-screen">
-      <div class="emoji">⚙️</div>
-      <p>Улучшения<br>Скоро</p>
+    <div class="screen-title">УЛУЧШЕНИЯ</div>
+    <div class="upgrades-list" id="upgrades-list">
+      <div class="upg-card" data-type="mpc">
+        <div class="upg-top">
+          <div class="upg-icon">⚔️</div>
+          <div class="upg-info">
+            <div class="upg-name">Удар сильнее</div>
+            <div class="upg-desc">+1 монета за тап</div>
+          </div>
+        </div>
+        <div class="upg-bottom">
+          <span class="upg-level" id="upg-level-mpc">Ур. 0</span>
+          <span class="upg-cost" id="upg-cost-mpc">🪙 10</span>
+          <button class="btn-sm btn-accent" id="upg-btn-mpc">Улучшить</button>
+        </div>
+      </div>
+      <div class="upg-card" data-type="stamina">
+        <div class="upg-top">
+          <div class="upg-icon">🛡️</div>
+          <div class="upg-info">
+            <div class="upg-name">Выносливость</div>
+            <div class="upg-desc">+20 макс. энергии</div>
+          </div>
+        </div>
+        <div class="upg-bottom">
+          <span class="upg-level" id="upg-level-stamina">Ур. 0</span>
+          <span class="upg-cost" id="upg-cost-stamina">🪙 15</span>
+          <button class="btn-sm btn-accent" id="upg-btn-stamina">Улучшить</button>
+        </div>
+      </div>
+      <div class="upg-card" data-type="regen">
+        <div class="upg-top">
+          <div class="upg-icon">💚</div>
+          <div class="upg-info">
+            <div class="upg-name">Регенерация</div>
+            <div class="upg-desc">×1.5 скорость восстановления</div>
+          </div>
+        </div>
+        <div class="upg-bottom">
+          <span class="upg-level" id="upg-level-regen">Ур. 0</span>
+          <span class="upg-cost" id="upg-cost-regen">🪙 20</span>
+          <button class="btn-sm btn-accent" id="upg-btn-regen">Улучшить</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -464,11 +595,163 @@ $("#btn-close-modal").addEventListener("click", () => {
   $("#modal-tokens").classList.remove("active");
 });
 
+// ─── Профессии ──────────────────────────────────────────────────────
+let allProfessions = [];
+let unlockedProfessions = [];
+let professionsLoaded = false;
+
+async function loadProfessions() {
+  try {
+    const [profData, userData] = await Promise.all([
+      api("GET", "/api/professions"),
+      api("GET", "/api/user/" + tgId)
+    ]);
+    allProfessions = profData.professions || [];
+    unlockedProfessions = userData.unlocked_professions || [];
+    user = userData.user;
+    updateUI();
+    professionsLoaded = true;
+    renderProfessions();
+  } catch(e) {}
+}
+
+function renderProfessions() {
+  const spheres = ["IT", "Engineering", "Medicine", "Creative", "Business", "Science"];
+  spheres.forEach(function(sphere) {
+    const list = document.querySelector('.sphere-list[data-sphere="' + sphere + '"]');
+    if (!list) return;
+    const profs = allProfessions.filter(function(p) { return p.sphere === sphere; });
+    if (profs.length === 0) {
+      list.innerHTML = '<div class="prof-loading">Пусто</div>';
+      return;
+    }
+    list.innerHTML = profs.map(function(p) {
+      var isUnlocked = unlockedProfessions.includes(p.id);
+      var hasTokens = user && user.tokens > 0;
+      var tools = (p.tools || []).map(function(t) { return '<span class="prof-tag">' + t + '</span>'; }).join("");
+      var btnHtml;
+      if (isUnlocked) {
+        btnHtml = '<button class="btn-sm btn-accent" data-action="simulate" data-pid="' + p.id + '">Симуляция</button>';
+      } else {
+        btnHtml = '<button class="btn-sm btn-unlock" data-action="unlock" data-pid="' + p.id + '"' +
+          (!hasTokens ? ' disabled' : '') + '>Открыть 1 ⚡' +
+          (!hasTokens ? '<span class="tooltip">Нет токенов</span>' : '') + '</button>';
+      }
+      return '<div class="prof-card">' +
+        '<div class="prof-top"><span class="prof-emoji">' + (p.icon_emoji || "") + '</span>' +
+        '<span class="prof-name">' + p.name + '</span></div>' +
+        '<div class="prof-desc">' + (p.description || "") + '</div>' +
+        '<div class="prof-tools">' + tools + '</div>' +
+        '<div class="prof-actions">' + btnHtml + '</div></div>';
+    }).join("");
+  });
+}
+
+// Аккордеон сфер
+$$(".sphere-header").forEach(function(hdr) {
+  hdr.addEventListener("click", function() {
+    var sphere = hdr.dataset.sphere;
+    var list = document.querySelector('.sphere-list[data-sphere="' + sphere + '"]');
+    var isOpen = hdr.classList.contains("open");
+    $$(".sphere-header").forEach(function(h) { h.classList.remove("open"); });
+    $$(".sphere-list").forEach(function(l) { l.classList.remove("open"); });
+    if (!isOpen) {
+      hdr.classList.add("open");
+      list.classList.add("open");
+      if (!professionsLoaded) loadProfessions();
+    }
+  });
+});
+
+// Делегирование кликов по кнопкам профессий
+document.getElementById("spheres-container").addEventListener("click", async function(e) {
+  var btn = e.target.closest("[data-action]");
+  if (!btn || btn.disabled) return;
+  var action = btn.dataset.action;
+  var pid = btn.dataset.pid;
+
+  if (action === "unlock") {
+    btn.disabled = true;
+    btn.textContent = "...";
+    try {
+      var data = await api("POST", "/api/unlock", { tg_id: tgId, profession_id: pid });
+      unlockedProfessions = data.unlocked;
+      user.tokens = data.tokens;
+      updateUI();
+      renderProfessions();
+    } catch(err) {
+      alert(err.message);
+      btn.disabled = false;
+      btn.textContent = "Открыть 1 ⚡";
+    }
+  }
+  if (action === "simulate") {
+    alert("Симуляция " + pid + " — скоро!");
+  }
+});
+
+// ─── Улучшения ──────────────────────────────────────────────────────
+var UPGRADE_BASE = { mpc: 10, stamina: 15, regen: 20 };
+var currentUpgrades = { mpc: 0, stamina: 0, regen: 0 };
+
+async function loadUpgrades() {
+  try {
+    var data = await api("GET", "/api/user/" + tgId);
+    user = data.user;
+    currentUpgrades = data.upgrades || { mpc: 0, stamina: 0, regen: 0 };
+    updateUI();
+    renderUpgrades();
+  } catch(e) {}
+}
+
+function renderUpgrades() {
+  ["mpc", "stamina", "regen"].forEach(function(type) {
+    var lvl = currentUpgrades[type] || 0;
+    var cost = UPGRADE_BASE[type] * Math.pow(2, lvl);
+    var coins = user ? (user.coins || 0) : 0;
+    var canAfford = coins >= cost;
+
+    var elLevel = document.getElementById("upg-level-" + type);
+    var elCost = document.getElementById("upg-cost-" + type);
+    var elBtn = document.getElementById("upg-btn-" + type);
+
+    if (elLevel) elLevel.textContent = "Ур. " + lvl;
+    if (elCost) {
+      elCost.textContent = "🪙 " + formatNum(cost);
+      elCost.classList.toggle("no-coins", !canAfford);
+    }
+    if (elBtn) elBtn.disabled = !canAfford;
+  });
+}
+
+["mpc", "stamina", "regen"].forEach(function(type) {
+  var btn = document.getElementById("upg-btn-" + type);
+  if (!btn) return;
+  btn.addEventListener("click", async function() {
+    btn.disabled = true;
+    btn.textContent = "...";
+    try {
+      var data = await api("POST", "/api/upgrade", { tg_id: tgId, type: type });
+      user = data.user;
+      currentUpgrades[type] = data.new_level;
+      updateUI();
+      renderUpgrades();
+    } catch(err) {
+      alert(err.message);
+    }
+    btn.textContent = "Улучшить";
+  });
+});
+
 // ─── Навигация ───────────────────────────────────────────────────────
-$$(".nav-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const target = btn.dataset.screen;
-    if (target) showScreen(target);
+$$(".nav-btn").forEach(function(btn) {
+  btn.addEventListener("click", function() {
+    var target = btn.dataset.screen;
+    if (target) {
+      showScreen(target);
+      if (target === "screen-professions") loadProfessions();
+      if (target === "screen-upgrades") loadUpgrades();
+    }
   });
 });
 
