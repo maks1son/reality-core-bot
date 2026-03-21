@@ -467,6 +467,112 @@ body{display:flex;justify-content:center}
     <div class="sim-log" id="sim-med-log"></div>
   </div>
 
+  <!-- ═══ Симулятор Инженерия ═══ -->
+  <div id="sim-engineering" class="sim-screen">
+    <div class="sim-header">
+      <button class="sim-back" id="sim-eng-back">← Назад</button>
+      <div class="sim-title">⚡ Энергосеть</div>
+      <div class="sim-round" id="sim-eng-round">Раунд 1/12</div>
+    </div>
+    <div class="sim-status stable" id="sim-eng-status">🟢 Стабильно</div>
+    <div class="sim-gauges">
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>Стабильность сети</span><span id="sim-eng-stab-val">100%</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-fill fill-green" id="sim-eng-stab" style="width:100%"></div>
+        </div>
+      </div>
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>Мощность</span><span id="sim-eng-power-val">100 МВт</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-fill fill-blue" id="sim-eng-power" style="width:100%"></div>
+        </div>
+      </div>
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>Бюджет</span><span id="sim-eng-budget-val">500</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-fill fill-orange" id="sim-eng-budget" style="width:100%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sim-controls">
+      <div class="sim-slider-wrap">
+        <span class="sim-slider-label">🏥 Больница</span>
+        <input type="range" class="sim-slider" id="sim-eng-s-hosp" min="0" max="60" value="30">
+        <span class="sim-slider-val" id="sim-eng-s-hosp-val">30</span>
+      </div>
+      <div class="sim-slider-wrap">
+        <span class="sim-slider-label">🏭 Завод</span>
+        <input type="range" class="sim-slider" id="sim-eng-s-fact" min="0" max="60" value="40">
+        <span class="sim-slider-val" id="sim-eng-s-fact-val">40</span>
+      </div>
+      <div class="sim-slider-wrap">
+        <span class="sim-slider-label">🏠 Жильё</span>
+        <input type="range" class="sim-slider" id="sim-eng-s-res" min="0" max="60" value="30">
+        <span class="sim-slider-val" id="sim-eng-s-res-val">30</span>
+      </div>
+      <div class="sim-btn-row" style="margin-top:4px">
+        <button class="sim-btn" id="sim-eng-cool">❄️ Охлаждение<br><span style="font-size:5px;color:#888">-100💰 +20МВт (1р)</span></button>
+      </div>
+    </div>
+    <div id="sim-eng-event" class="sim-event" style="display:none"></div>
+    <div class="sim-log" id="sim-eng-log"></div>
+  </div>
+
+  <!-- ═══ Симулятор Наука ═══ -->
+  <div id="sim-science" class="sim-screen">
+    <div class="sim-header">
+      <button class="sim-back" id="sim-sci-back">← Назад</button>
+      <div class="sim-title">🧪 Ректификация</div>
+      <div class="sim-round" id="sim-sci-round">Раунд 1/15</div>
+    </div>
+    <div class="sim-status stable" id="sim-sci-status">🟢 Стабильно</div>
+    <div class="sim-gauges">
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>Температура</span><span id="sim-sci-temp-val">200°C</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-zone" style="left:60%;width:13.3%"></div>
+          <div class="sim-gauge-fill fill-red" id="sim-sci-temp" style="width:66.7%"></div>
+        </div>
+      </div>
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>Давление</span><span id="sim-sci-pres-val">1.0 атм</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-zone" style="left:0;width:50%;background:rgba(78,205,196,.08)"></div>
+          <div class="sim-gauge-fill fill-orange" id="sim-sci-pres" style="width:25%"></div>
+        </div>
+      </div>
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>Чистота</span><span id="sim-sci-pur-val">0%</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-zone" style="left:95%;right:0;background:rgba(78,205,196,.15)"></div>
+          <div class="sim-gauge-fill fill-green" id="sim-sci-pur" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>Reflux Ratio</span><span id="sim-sci-ref-val">30%</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-zone" style="left:40%;width:30%"></div>
+          <div class="sim-gauge-fill fill-purple" id="sim-sci-ref" style="width:30%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sim-controls">
+      <div class="sim-slider-wrap">
+        <span class="sim-slider-label">🔥 Нагрев</span>
+        <input type="range" class="sim-slider" id="sim-sci-heat" min="-30" max="30" value="0">
+        <span class="sim-slider-val" id="sim-sci-heat-val">0°C</span>
+      </div>
+      <div id="sim-sci-queue" style="font-size:6px;color:#f9ca24;text-align:center;min-height:14px;margin-bottom:2px"></div>
+      <div class="sim-btn-row">
+        <button class="sim-btn" id="sim-sci-reflux">🔄 Возврат<br><span style="font-size:5px;color:#888">Reflux+20 Pur+5</span></button>
+        <button class="sim-btn" id="sim-sci-vent">💨 Сброс давл.<br><span style="font-size:5px;color:#888">P-0.5 -50💰</span></button>
+      </div>
+    </div>
+    <div id="sim-sci-event" class="sim-event" style="display:none"></div>
+    <div class="sim-log" id="sim-sci-log"></div>
+  </div>
+
   <!-- ═══ Модалка результата симулятора ═══ -->
   <div class="modal-overlay" id="modal-sim-result">
     <div class="modal modal-sim">
@@ -917,8 +1023,11 @@ function openSimulator(pid) {
     startSimIT();
   } else if (sphere === "Medicine") {
     startSimMedicine();
+  } else if (sphere === "Engineering") {
+    startSimEngineering();
+  } else if (sphere === "Science") {
+    startSimScience();
   } else {
-    // Для остальных сфер — заглушка, открываем IT
     startSimIT();
   }
 }
@@ -1273,6 +1382,346 @@ function startSimMedicine() {
 }
 
 document.getElementById("sim-med-back").onclick = function() {
+  if (simInterval) clearInterval(simInterval); simInterval = null;
+  exitSimulator();
+};
+
+// ─── Инженерия: Диспетчер энергосети ────────────────────────────────
+function startSimEngineering() {
+  var el = document.getElementById("sim-engineering");
+  el.classList.add("active");
+
+  var round = 0;
+  var totalRounds = 12;
+  var totalPower = 100;
+  var basePower = 100;
+  var stability = 100;
+  var budget = 500;
+  var coolBonus = 0;
+  var logLines = [];
+
+  var sHosp = document.getElementById("sim-eng-s-hosp");
+  var sFact = document.getElementById("sim-eng-s-fact");
+  var sRes = document.getElementById("sim-eng-s-res");
+
+  // Reset
+  sHosp.value = 30; sFact.value = 40; sRes.value = 30;
+  document.getElementById("sim-eng-s-hosp-val").textContent = "30";
+  document.getElementById("sim-eng-s-fact-val").textContent = "40";
+  document.getElementById("sim-eng-s-res-val").textContent = "30";
+  document.getElementById("sim-eng-round").textContent = "Раунд 1/" + totalRounds;
+  document.getElementById("sim-eng-log").innerHTML = "";
+  document.getElementById("sim-eng-event").style.display = "none";
+  setSimStatus("sim-eng-status", "stable");
+  updateEngGauges();
+
+  sHosp.oninput = function() { document.getElementById("sim-eng-s-hosp-val").textContent = sHosp.value; };
+  sFact.oninput = function() { document.getElementById("sim-eng-s-fact-val").textContent = sFact.value; };
+  sRes.oninput = function() { document.getElementById("sim-eng-s-res-val").textContent = sRes.value; };
+
+  var coolBtn = document.getElementById("sim-eng-cool");
+  coolBtn.onclick = function() {
+    if (budget < 100) return;
+    budget -= 100;
+    coolBonus = 20;
+    addLog("❄️ Охлаждение! -100💰, +20МВт на раунд", "good");
+    updateEngGauges();
+  };
+
+  function updateEngGauges() {
+    var effPower = totalPower + coolBonus;
+    document.getElementById("sim-eng-stab").style.width = Math.max(0, stability) + "%";
+    document.getElementById("sim-eng-stab-val").textContent = Math.round(stability) + "%";
+    document.getElementById("sim-eng-power").style.width = Math.min(100, effPower) + "%";
+    document.getElementById("sim-eng-power-val").textContent = Math.round(effPower) + " МВт";
+    var budgetPct = Math.max(0, Math.min(100, budget / 500 * 100));
+    document.getElementById("sim-eng-budget").style.width = budgetPct + "%";
+    document.getElementById("sim-eng-budget-val").textContent = Math.round(budget) + "💰";
+    coolBtn.disabled = budget < 100;
+  }
+
+  function addLog(text, cls) {
+    logLines.push({ text: text, cls: cls || "" });
+    if (logLines.length > 5) logLines.shift();
+    document.getElementById("sim-eng-log").innerHTML = logLines.map(function(l) {
+      return '<div class="sim-log-line ' + l.cls + '">' + l.text + '</div>';
+    }).join("");
+  }
+
+  simInterval = setInterval(function() {
+    round++;
+    if (round > totalRounds) {
+      clearInterval(simInterval); simInterval = null;
+      var sc = Math.round(stability * 0.6 + Math.min(100, budget / 5) * 0.4);
+      showSimResult("🎉 Сеть выстояла!", sc, "12 раундов пройдено! Стабильность: " + Math.round(stability) + "%", true);
+      return;
+    }
+
+    document.getElementById("sim-eng-round").textContent = "Раунд " + round + "/" + totalRounds;
+
+    // Износ: каждые 3 раунда -5 МВт
+    if (round % 3 === 0 && round > 0) {
+      basePower -= 5;
+      addLog("⚠️ Износ оборудования: -5 МВт", "warn");
+    }
+    totalPower = basePower;
+
+    // Эффективная мощность с учётом охлаждения
+    var effPower = totalPower + coolBonus;
+    coolBonus = 0; // бонус на 1 раунд
+
+    // Рандомные скачки потребления ±20%
+    var demandShift = 0.8 + Math.random() * 0.4; // 0.8 - 1.2
+
+    var hosp = parseInt(sHosp.value);
+    var fact = parseInt(sFact.value);
+    var res = parseInt(sRes.value);
+    var totalDemand = Math.round((hosp + fact + res) * demandShift);
+
+    document.getElementById("sim-eng-event").style.display = "none";
+    if (demandShift > 1.1) {
+      document.getElementById("sim-eng-event").textContent = "📈 Скачок потребления! ×" + demandShift.toFixed(2);
+      document.getElementById("sim-eng-event").style.display = "block";
+    } else if (demandShift < 0.9) {
+      document.getElementById("sim-eng-event").textContent = "📉 Спад потребления ×" + demandShift.toFixed(2);
+      document.getElementById("sim-eng-event").style.display = "block";
+    }
+
+    // Перегрузка
+    if (totalDemand > effPower) {
+      stability -= 20;
+      budget -= 50;
+      addLog("R" + round + ": ⚡ ПЕРЕГРУЗКА! " + totalDemand + "/" + effPower + "МВт. Stab-20, 💰-50", "danger");
+    } else {
+      addLog("R" + round + ": " + totalDemand + "/" + effPower + "МВт. Баланс OK", "good");
+    }
+
+    // Жильё < 15 → -10 stability
+    var actualRes = Math.round(res * demandShift);
+    if (res < 15) {
+      stability -= 10;
+      addLog("   🏠 Жильё без света! Stab-10", "warn");
+    }
+
+    // Завод вне нормы (30-50)
+    if (fact < 30 || fact > 50) {
+      stability -= 5;
+    }
+
+    stability = Math.max(0, Math.min(100, stability));
+    budget = Math.round(budget);
+
+    updateEngGauges();
+
+    // Status
+    if (stability > 60) setSimStatus("sim-eng-status", "stable");
+    else if (stability > 30) setSimStatus("sim-eng-status", "unstable");
+    else setSimStatus("sim-eng-status", "critical");
+
+    // Game Over: больница < 20
+    if (hosp < 20) {
+      clearInterval(simInterval); simInterval = null;
+      showSimResult("💀 Больница обесточена!", 0, "Мощность больницы упала ниже 20 МВт. Критический сбой.", false);
+      return;
+    }
+    if (stability <= 0) {
+      clearInterval(simInterval); simInterval = null;
+      showSimResult("💥 Сеть рухнула!", 0, "Стабильность сети достигла 0%.", false);
+      return;
+    }
+    if (budget < 0) {
+      clearInterval(simInterval); simInterval = null;
+      showSimResult("📉 Банкрот!", 0, "Бюджет ушёл в минус. Ремонт невозможен.", false);
+      return;
+    }
+  }, 3000);
+}
+
+document.getElementById("sim-eng-back").onclick = function() {
+  if (simInterval) clearInterval(simInterval); simInterval = null;
+  exitSimulator();
+};
+
+// ─── Наука: Ректификация нефти ──────────────────────────────────────
+function startSimScience() {
+  var el = document.getElementById("sim-science");
+  el.classList.add("active");
+
+  var round = 0;
+  var totalRounds = 15;
+  var temp = 200;
+  var pressure = 1.0;
+  var purity = 0;
+  var reflux = 30;
+  var budget = 300;
+  var purityStreak = 0;
+  var heatQueue = []; // [{delta, appliesAt}]
+  var logLines = [];
+
+  // Reset UI
+  document.getElementById("sim-sci-round").textContent = "Раунд 1/" + totalRounds;
+  document.getElementById("sim-sci-log").innerHTML = "";
+  document.getElementById("sim-sci-event").style.display = "none";
+  document.getElementById("sim-sci-queue").textContent = "";
+  document.getElementById("sim-sci-heat").value = 0;
+  document.getElementById("sim-sci-heat-val").textContent = "0°C";
+  setSimStatus("sim-sci-status", "stable");
+  updateSciGauges();
+
+  var heatSlider = document.getElementById("sim-sci-heat");
+  heatSlider.oninput = function() {
+    document.getElementById("sim-sci-heat-val").textContent = heatSlider.value + "°C";
+  };
+
+  var refluxBtn = document.getElementById("sim-sci-reflux");
+  refluxBtn.onclick = function() {
+    reflux = Math.min(100, reflux + 20);
+    purity = Math.min(100, purity + 5);
+    temp = Math.max(100, temp - 5);
+    addLog("🔄 Возврат жидкости: Reflux+20, Pur+5, T-5", "good");
+    updateSciGauges();
+  };
+
+  var ventBtn = document.getElementById("sim-sci-vent");
+  ventBtn.onclick = function() {
+    if (budget < 50) return;
+    pressure = Math.max(0.5, pressure - 0.5);
+    budget -= 50;
+    addLog("💨 Сброс давления: P-0.5, -50💰", "good");
+    updateSciGauges();
+    ventBtn.disabled = budget < 50;
+  };
+
+  function updateSciGauges() {
+    // Temp: 100-300 range for display
+    var tempPct = Math.max(0, Math.min(100, (temp - 100) / 200 * 100));
+    document.getElementById("sim-sci-temp").style.width = tempPct + "%";
+    document.getElementById("sim-sci-temp-val").textContent = Math.round(temp) + "°C";
+
+    // Pressure: 0-4 atm range
+    var presPct = Math.max(0, Math.min(100, pressure / 4 * 100));
+    document.getElementById("sim-sci-pres").style.width = presPct + "%";
+    document.getElementById("sim-sci-pres-val").textContent = pressure.toFixed(1) + " атм";
+
+    document.getElementById("sim-sci-pur").style.width = Math.max(0, Math.min(100, purity)) + "%";
+    document.getElementById("sim-sci-pur-val").textContent = Math.round(purity) + "%";
+
+    document.getElementById("sim-sci-ref").style.width = Math.max(0, Math.min(100, reflux)) + "%";
+    document.getElementById("sim-sci-ref-val").textContent = Math.round(reflux) + "%";
+
+    ventBtn.disabled = budget < 50;
+  }
+
+  function renderQueue() {
+    var parts = [];
+    heatQueue.forEach(function(q) {
+      var left = q.appliesAt - round;
+      if (left > 0) {
+        parts.push("через " + left + "р: " + (q.delta > 0 ? "+" : "") + q.delta + "°C");
+      }
+    });
+    document.getElementById("sim-sci-queue").textContent = parts.length > 0 ? "🔥 " + parts.join(", ") : "";
+  }
+
+  function addLog(text, cls) {
+    logLines.push({ text: text, cls: cls || "" });
+    if (logLines.length > 5) logLines.shift();
+    document.getElementById("sim-sci-log").innerHTML = logLines.map(function(l) {
+      return '<div class="sim-log-line ' + l.cls + '">' + l.text + '</div>';
+    }).join("");
+  }
+
+  simInterval = setInterval(function() {
+    round++;
+
+    // Проверка победы по стрику ПЕРЕД превышением maxRounds
+    if (round > totalRounds) {
+      clearInterval(simInterval); simInterval = null;
+      var sc = Math.round(purity * 0.7 + (4 - pressure) * 10);
+      showSimResult("⏱️ Время вышло", sc, "Не удалось достичь 95% чистоты за " + totalRounds + " раундов.", false);
+      return;
+    }
+
+    document.getElementById("sim-sci-round").textContent = "Раунд " + round + "/" + totalRounds;
+
+    // Ставим нагрев в очередь (инерция 2 раунда)
+    var heatDelta = parseInt(heatSlider.value);
+    if (heatDelta !== 0) {
+      heatQueue.push({ delta: heatDelta, appliesAt: round + 2 });
+    }
+
+    // Применяем отложенные нагревы
+    heatQueue = heatQueue.filter(function(q) {
+      if (q.appliesAt === round) {
+        temp += q.delta;
+        addLog("🔥 Нагрев применён: " + (q.delta > 0 ? "+" : "") + q.delta + "°C → " + Math.round(temp) + "°C", q.delta > 15 ? "warn" : "good");
+        return false;
+      }
+      return true;
+    });
+
+    // Давление растёт
+    pressure += 0.1;
+    pressure = Math.round(pressure * 10) / 10;
+
+    // Reflux естественно падает на 5/раунд
+    reflux = Math.max(0, reflux - 5);
+
+    // Расчёт чистоты
+    // Оптимум: Temp 190-210, Pressure <2, Reflux 40-70
+    var tempScore = 0;
+    if (temp >= 190 && temp <= 210) tempScore = 1;
+    else if (temp >= 180 && temp <= 220) tempScore = 0.7;
+    else if (temp > 230) { purity -= 20; addLog("🔥 Перегрев! Purity-20", "danger"); tempScore = 0; }
+    else tempScore = 0.3;
+
+    var presScore = pressure < 2 ? 1 : (pressure < 2.5 ? 0.5 : 0.2);
+    var refScore = (reflux >= 40 && reflux <= 70) ? 1 : (reflux >= 20 ? 0.5 : 0.2);
+
+    var purGain = Math.round(15 * tempScore * presScore * refScore);
+    purity = Math.min(100, purity + purGain);
+    purity = Math.max(0, purity);
+
+    document.getElementById("sim-sci-event").style.display = "none";
+    if (pressure > 2.5) {
+      document.getElementById("sim-sci-event").textContent = "⚠️ Давление критическое! " + pressure.toFixed(1) + " атм";
+      document.getElementById("sim-sci-event").style.display = "block";
+    }
+
+    addLog("R" + round + ": T=" + Math.round(temp) + "°C P=" + pressure.toFixed(1) + " Ref=" + Math.round(reflux) + "% → Pur+" + purGain + "=" + Math.round(purity) + "%",
+      purity >= 95 ? "good" : (purity >= 70 ? "" : "warn"));
+
+    updateSciGauges();
+    renderQueue();
+
+    // Status
+    if (temp >= 190 && temp <= 210 && pressure < 2) setSimStatus("sim-sci-status", "stable");
+    else if (temp > 230 || pressure > 2.5) setSimStatus("sim-sci-status", "critical");
+    else setSimStatus("sim-sci-status", "unstable");
+
+    // Game Over: взрыв при P > 3
+    if (pressure > 3) {
+      clearInterval(simInterval); simInterval = null;
+      showSimResult("💥 Взрыв колонны!", 0, "Давление превысило 3 атм. Колонна разрушена.", false);
+      return;
+    }
+
+    // Победа: purity >= 95 три раунда подряд
+    if (purity >= 95) {
+      purityStreak++;
+      if (purityStreak >= 3) {
+        clearInterval(simInterval); simInterval = null;
+        var finalScore = Math.round(purity * 0.6 + Math.max(0, (4 - pressure) * 15) + Math.max(0, budget / 3));
+        showSimResult("🎉 Дистилляция завершена!", finalScore, "Чистота 95%+ удержана 3 раунда! Purity: " + Math.round(purity) + "%", true);
+        return;
+      }
+    } else {
+      purityStreak = 0;
+    }
+  }, 3000);
+}
+
+document.getElementById("sim-sci-back").onclick = function() {
   if (simInterval) clearInterval(simInterval); simInterval = null;
   exitSimulator();
 };
