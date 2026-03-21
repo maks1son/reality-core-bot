@@ -1,4 +1,6 @@
-fastapi==0.115.0
-uvicorn[standard]==0.30.0
-python-telegram-bot==21.5
-pydantic==2.9.0
+fastapi
+uvicorn
+aiosqlite
+python-telegram-bot
+python-dotenv
+httpx
