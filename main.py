@@ -1,399 +1,533 @@
-"""
-RE:ALITY: Профессии — FastAPI бэкенд v2
-Безлимитные уровни, мгновенные монеты/XP, прогресс заданий
-"""
-import os, time, json, hashlib, hmac, urllib.parse, random
-from typing import Optional
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import FileResponse
-from fastapi.middleware.cors import CORSMiddleware
+import os
+import time
+import math
+import hashlib
+import hmac
+import json
+from urllib.parse import unquote, parse_qs
+from pathlib import Path
+from collections import defaultdict
+
+import uvicorn
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from dotenv import load_dotenv
+
 import database as db
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-app = FastAPI(title="RE:ALITY Профессии")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+load_dotenv()
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "")
+DEV_MODE = os.getenv("DEV_MODE", "false").lower() == "true"
 
-# Формула XP для уровня: 80 * level^1.4
-def xp_for_level(level):
-    return int(80 * (level ** 1.4))
+BASE_DIR = Path(__file__).resolve().parent
 
-UPGRADES = {
-    "tap": {"base_cost": 50, "mult": 2.0, "max_level": 20},
-    "energy": {"base_cost": 80, "mult": 2.2, "max_level": 20},
-    "multi": {"base_cost": 200, "mult": 2.5, "max_level": 5},
-    "regen": {"base_cost": 100, "mult": 2.0, "max_level": 20},
+app = FastAPI(title="REALITY: Профессии")
+
+# ─── Каталог профессий ───────────────────────────────────────────────
+
+PROFESSIONS = {
+    # IT
+    "it_frontend": {
+        "id": "it_frontend",
+        "sphere": "IT",
+        "name": "Frontend-разработчик",
+        "description": "Создание интерфейсов веб-приложений",
+        "tools": ["React", "TypeScript", "CSS"],
+        "icon_emoji": "🖥️",
+    },
+    "it_backend": {
+        "id": "it_backend",
+        "sphere": "IT",
+        "name": "Backend-разработчик",
+        "description": "Серверная логика и API",
+        "tools": ["Python", "FastAPI", "PostgreSQL"],
+        "icon_emoji": "⚙️",
+    },
+    "it_data": {
+        "id": "it_data",
+        "sphere": "IT",
+        "name": "Data Scientist",
+        "description": "Анализ данных и машинное обучение",
+        "tools": ["Python", "Pandas", "TensorFlow"],
+        "icon_emoji": "📊",
+    },
+    "it_security": {
+        "id": "it_security",
+        "sphere": "IT",
+        "name": "Специалист по кибербезопасности",
+        "description": "Защита систем и данных от угроз",
+        "tools": ["Kali Linux", "Wireshark", "Burp Suite"],
+        "icon_emoji": "🔒",
+    },
+    # Engineering
+    "eng_mechanical": {
+        "id": "eng_mechanical",
+        "sphere": "Engineering",
+        "name": "Инженер-механик",
+        "description": "Проектирование механизмов и машин",
+        "tools": ["SolidWorks", "AutoCAD", "MATLAB"],
+        "icon_emoji": "🔧",
+    },
+    "eng_electrical": {
+        "id": "eng_electrical",
+        "sphere": "Engineering",
+        "name": "Инженер-электрик",
+        "description": "Проектирование электрических систем",
+        "tools": ["Altium", "SPICE", "LabVIEW"],
+        "icon_emoji": "⚡",
+    },
+    "eng_civil": {
+        "id": "eng_civil",
+        "sphere": "Engineering",
+        "name": "Инженер-строитель",
+        "description": "Проектирование зданий и сооружений",
+        "tools": ["Revit", "AutoCAD", "SAP2000"],
+        "icon_emoji": "🏗️",
+    },
+    "eng_robotics": {
+        "id": "eng_robotics",
+        "sphere": "Engineering",
+        "name": "Робототехник",
+        "description": "Разработка и программирование роботов",
+        "tools": ["ROS", "Arduino", "C++"],
+        "icon_emoji": "🤖",
+    },
+    # Medicine
+    "med_surgeon": {
+        "id": "med_surgeon",
+        "sphere": "Medicine",
+        "name": "Хирург",
+        "description": "Проведение операций и лечение",
+        "tools": ["Скальпель", "Эндоскоп", "МРТ"],
+        "icon_emoji": "🏥",
+    },
+    "med_pharma": {
+        "id": "med_pharma",
+        "sphere": "Medicine",
+        "name": "Фармацевт",
+        "description": "Разработка и тестирование лекарств",
+        "tools": ["HPLC", "Спектрометр", "Биореактор"],
+        "icon_emoji": "💊",
+    },
+    "med_neuro": {
+        "id": "med_neuro",
+        "sphere": "Medicine",
+        "name": "Нейрохирург",
+        "description": "Операции на головном и спинном мозге",
+        "tools": ["Нейронавигация", "МРТ", "Микроскоп"],
+        "icon_emoji": "🧠",
+    },
+    "med_genetics": {
+        "id": "med_genetics",
+        "sphere": "Medicine",
+        "name": "Генетик",
+        "description": "Исследование генома и генная терапия",
+        "tools": ["ПЦР", "Секвенатор", "CRISPR"],
+        "icon_emoji": "🧬",
+    },
+    # Science
+    "sci_physics": {
+        "id": "sci_physics",
+        "sphere": "Science",
+        "name": "Физик",
+        "description": "Исследование фундаментальных законов природы",
+        "tools": ["Коллайдер", "Лазер", "Python"],
+        "icon_emoji": "⚛️",
+    },
+    "sci_chemistry": {
+        "id": "sci_chemistry",
+        "sphere": "Science",
+        "name": "Химик",
+        "description": "Синтез и анализ веществ",
+        "tools": ["Спектрометр", "Хроматограф", "Реактор"],
+        "icon_emoji": "🧪",
+    },
+    "sci_biology": {
+        "id": "sci_biology",
+        "sphere": "Science",
+        "name": "Биолог",
+        "description": "Изучение живых организмов",
+        "tools": ["Микроскоп", "ПЦР", "Биоинформатика"],
+        "icon_emoji": "🔬",
+    },
+    "sci_astro": {
+        "id": "sci_astro",
+        "sphere": "Science",
+        "name": "Астрофизик",
+        "description": "Исследование космоса и звёзд",
+        "tools": ["Телескоп", "Python", "Спектроскоп"],
+        "icon_emoji": "🌌",
+    },
 }
 
-def regenerate_energy(user):
+# ─── Античит: трекинг тапов ──────────────────────────────────────────
+
+# tg_id → список timestamp'ов тапов
+tap_history: dict[int, list[float]] = defaultdict(list)
+
+MAX_TAPS_PER_SEC = 15
+COMBO_WINDOW = 2.0  # секунд
+
+
+def compute_combo(tg_id: int) -> int:
+    """Комбо: кол-во тапов за последние 2 сек → множитель x1..x5."""
     now = time.time()
-    elapsed = now - user["last_energy_update"]
-    new_e = min(user["max_energy"], user["energy"] + elapsed * user["energy_regen"])
-    user["energy"] = int(new_e)
-    user["last_energy_update"] = now
-    return user
+    history = tap_history[tg_id]
+    recent = [t for t in history if now - t <= COMBO_WINDOW]
+    tap_history[tg_id] = recent
+    count = len(recent)
+    if count >= 40:
+        return 5
+    if count >= 30:
+        return 4
+    if count >= 20:
+        return 3
+    if count >= 10:
+        return 2
+    return 1
 
-def process_level_ups(user):
-    """Обработка повышений уровня, возвращает кол-во новых уровней"""
-    leveled = 0
-    while True:
-        needed = xp_for_level(user["level"])
-        if user["xp"] >= needed:
-            user["xp"] -= needed
-            user["level"] += 1
-            user["tokens"] += 1
-            leveled += 1
-        else:
-            break
-    return leveled
 
-def validate_tg(init_data):
+# ─── Telegram initData верификация ───────────────────────────────────
+
+def verify_telegram_init_data(init_data: str) -> dict | None:
+    """Проверяет подпись initData от Telegram WebApp."""
     if not BOT_TOKEN:
-        try:
-            parsed = urllib.parse.parse_qs(init_data)
-            return json.loads(parsed.get("user",["{}"])[0]).get("id")
-        except: return None
+        return None
     try:
-        parsed = urllib.parse.parse_qs(init_data)
-        ch = parsed.get("hash",[None])[0]
-        if not ch: return None
-        pairs = sorted(f"{k}={v[0]}" for k,v in parsed.items() if k!="hash")
-        secret = hmac.new(b"WebAppData", BOT_TOKEN.encode(), hashlib.sha256).digest()
-        comp = hmac.new(secret, "\n".join(pairs).encode(), hashlib.sha256).hexdigest()
-        if comp == ch:
-            return json.loads(parsed.get("user",["{}"])[0]).get("id")
-    except: pass
-    return None
+        parsed = parse_qs(init_data)
+        received_hash = parsed.get("hash", [None])[0]
+        if not received_hash:
+            return None
+        data_pairs = []
+        for key, values in parsed.items():
+            if key == "hash":
+                continue
+            data_pairs.append(f"{key}={unquote(values[0])}")
+        data_pairs.sort()
+        data_check_string = "\n".join(data_pairs)
+        secret_key = hmac.new(b"WebAppData", BOT_TOKEN.encode(), hashlib.sha256).digest()
+        computed_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
+        if computed_hash != received_hash:
+            return None
+        user_str = parsed.get("user", [None])[0]
+        if user_str:
+            return json.loads(unquote(user_str))
+        return {}
+    except Exception:
+        return None
 
-# === Модели ===
-class AuthReq(BaseModel):
-    init_data: str = ""; tg_id: int = 0
-class RegReq(BaseModel):
-    init_data: str = ""; tg_id: int = 0
-    name: str; avatar: int; stats: dict
-class TapReq(BaseModel):
-    init_data: str = ""; tg_id: int = 0
-    taps: int = 1; coins_earned: int = 0; xp_earned: int = 0
-class UnlockReq(BaseModel):
-    init_data: str = ""; tg_id: int = 0; profession_id: str
-class UpgReq(BaseModel):
-    init_data: str = ""; tg_id: int = 0; upgrade_type: str
-class TaskReq(BaseModel):
-    init_data: str = ""; tg_id: int = 0
-    profession_id: str; task_index: int; score: int = 100
-class ProgressReq(BaseModel):
-    init_data: str = ""; tg_id: int = 0
-    profession_id: str; task_index: int; data: dict = {}
 
-def get_id(req):
-    if req.init_data:
-        t = validate_tg(req.init_data)
-        if t: return t
-    if req.tg_id: return req.tg_id
-    raise HTTPException(400, "Auth error")
+# ─── Pydantic модели ─────────────────────────────────────────────────
 
-def user_resp(user):
-    return {"user": user, "xp_needed": xp_for_level(user["level"])}
+class AuthRequest(BaseModel):
+    initData: str = ""
+    tg_id: int | None = None
 
-# === Роуты ===
+
+class RegisterRequest(BaseModel):
+    tg_id: int
+    avatar: int
+    name: str
+
+
+class TapRequest(BaseModel):
+    tg_id: int
+    count: int
+    timestamp: float
+
+
+class UnlockRequest(BaseModel):
+    tg_id: int
+    profession_id: str
+
+
+class UpgradeRequest(BaseModel):
+    tg_id: int
+    type: str
+
+
+class TaskCompleteRequest(BaseModel):
+    tg_id: int
+    profession_id: str
+    score: int
+
+
+# ─── Events ──────────────────────────────────────────────────────────
+
+@app.on_event("startup")
+async def startup():
+    await db.init_db()
+
+
+# ─── Статика ─────────────────────────────────────────────────────────
+
 @app.get("/")
-async def index():
-    return FileResponse(os.path.join(BASE_DIR, "index.html"))
+async def serve_index():
+    index_path = BASE_DIR / "index.html"
+    if not index_path.exists():
+        raise HTTPException(404, "index.html not found")
+    return FileResponse(str(index_path))
 
-@app.get("/hero{n}.png")
-async def hero(n: int):
-    if n not in (1,2,3): raise HTTPException(404)
-    return FileResponse(os.path.join(BASE_DIR, f"hero{n}.png"))
+
+@app.get("/hero1.png")
+async def serve_hero1():
+    return FileResponse(str(BASE_DIR / "hero1.png"))
+
+
+@app.get("/hero2.png")
+async def serve_hero2():
+    return FileResponse(str(BASE_DIR / "hero2.png"))
+
+
+@app.get("/hero3.png")
+async def serve_hero3():
+    return FileResponse(str(BASE_DIR / "hero3.png"))
+
+
+# ─── API эндпоинты ───────────────────────────────────────────────────
 
 @app.post("/api/auth")
-async def auth(req: AuthReq):
-    tg_id = get_id(req)
-    user = db.get_user(tg_id)
-    if not user:
-        db.create_user(tg_id)
-        user = db.get_user(tg_id)
-    user = regenerate_energy(user)
-    db.update_user_fields(tg_id, {"energy": user["energy"], "last_energy_update": user["last_energy_update"]})
+async def auth(req: AuthRequest):
+    """Авторизация через Telegram initData (или tg_id в dev-режиме)."""
+    tg_id = None
+    username = ""
+
+    if DEV_MODE and req.tg_id:
+        tg_id = req.tg_id
+        username = f"dev_{tg_id}"
+    elif req.initData:
+        tg_user = verify_telegram_init_data(req.initData)
+        if tg_user is None:
+            raise HTTPException(401, "Invalid initData")
+        tg_id = tg_user.get("id")
+        username = tg_user.get("username", "")
+    else:
+        raise HTTPException(400, "initData or tg_id (dev) required")
+
+    if not tg_id:
+        raise HTTPException(400, "Could not extract tg_id")
+
+    user = await db.get_user(tg_id)
+    # Простой токен для сессии (не JWT, достаточно для MVP)
+    token = hashlib.sha256(f"{tg_id}:{BOT_TOKEN}:{int(time.time() // 3600)}".encode()).hexdigest()
+
     return {
-        **user_resp(user),
-        "unlocked": db.get_unlocked(tg_id),
-        "completed": db.get_completed(tg_id),
-        "progress": db.get_progress(tg_id)
+        "user": user,
+        "token": token,
     }
 
+
 @app.post("/api/register")
-async def register(req: RegReq):
-    tg_id = get_id(req)
-    name = req.name.strip()[:8]
-    if not name: raise HTTPException(400, "Введите имя")
-    if req.avatar not in (1,2,3): raise HTTPException(400, "Неверный аватар")
-    total = sum(req.stats.get(k,0) for k in ("str","int","cha","luck"))
-    if total != 20: raise HTTPException(400, f"Сумма должна быть 20 ({total})")
-    db.create_user(tg_id)
-    db.register_user(tg_id, name, req.avatar, req.stats)
-    return user_resp(db.get_user(tg_id))
+async def register(req: RegisterRequest):
+    """Регистрация нового пользователя."""
+    existing = await db.get_user(req.tg_id)
+    if existing:
+        raise HTTPException(409, "User already exists")
+    if req.avatar not in (1, 2, 3):
+        raise HTTPException(400, "Avatar must be 1, 2, or 3")
+    user = await db.create_user(req.tg_id, req.name, req.avatar)
+    return {"user": user}
+
 
 @app.post("/api/tap")
-async def tap(req: TapReq, request: Request):
-    """Синхронизация тапов — клиент отправляет заработанное, сервер валидирует"""
-    tg_id = get_id(req)
-    user = db.get_user(tg_id)
-    if not user or not user["registered"]: raise HTTPException(400, "Не зарегистрирован")
+async def tap(req: TapRequest):
+    """Батч тапов с античитом: макс 15 тапов/сек."""
+    user = await db.get_user(req.tg_id)
+    if not user:
+        raise HTTPException(404, "User not found")
 
-    taps = min(req.taps, 50)
-    ip = request.client.host if request.client else ""
-    db.log_taps(tg_id, taps, ip)
-    if not db.check_tap_rate(tg_id): raise HTTPException(429, "Слишком быстро")
+    # Античит: ограничение тапов
+    now = time.time()
+    history = tap_history[req.tg_id]
+    # Чистим старые записи (старше 2 секунд)
+    history = [t for t in history if now - t > -0.1 and now - t <= 2.0]
+    tap_history[req.tg_id] = history
 
-    user = regenerate_energy(user)
-    actual = min(taps, user["energy"])
-    if actual <= 0:
-        db.update_user_fields(tg_id, {"energy": user["energy"], "last_energy_update": user["last_energy_update"]})
-        return {**user_resp(user), "earned": 0, "leveled": 0}
+    recent_count = len(history)
+    allowed = min(req.count, max(0, MAX_TAPS_PER_SEC * 2 - recent_count))
 
-    # Валидируем монеты от клиента (максимум coins_per_tap * taps * 5 для множителя)
-    max_coins = user["coins_per_tap"] * actual * 6
-    coins = min(req.coins_earned, max_coins) if req.coins_earned > 0 else user["coins_per_tap"] * actual
-    max_xp = actual * 3 * 2
-    xp = min(req.xp_earned, max_xp) if req.xp_earned > 0 else actual * 2
+    if allowed <= 0:
+        return {
+            "coins": user["coins"],
+            "xp": user["xp"],
+            "energy": user["energy"],
+            "level": user["level"],
+            "combo": compute_combo(req.tg_id),
+            "rejected": req.count,
+        }
 
-    user["coins"] += coins
-    user["xp"] += xp
-    user["energy"] -= actual
-    leveled = process_level_ups(user)
+    # Регистрируем тапы
+    for i in range(allowed):
+        tap_history[req.tg_id].append(now + i * 0.01)
 
-    db.update_user_fields(tg_id, {
-        "coins": user["coins"], "xp": user["xp"], "level": user["level"],
-        "tokens": user["tokens"], "energy": user["energy"],
-        "last_energy_update": user["last_energy_update"]
-    })
-    user = db.get_user(tg_id)
-    return {**user_resp(user), "earned": coins, "leveled": leveled}
+    # Расход энергии
+    energy = user["energy"]
+    actual_taps = min(allowed, energy)
+    if actual_taps <= 0:
+        return {
+            "coins": user["coins"],
+            "xp": user["xp"],
+            "energy": energy,
+            "level": user["level"],
+            "combo": compute_combo(req.tg_id),
+            "rejected": req.count,
+        }
+
+    combo = compute_combo(req.tg_id)
+    mpc = user["mpc"]
+    coins_earned = actual_taps * mpc * combo
+    xp_earned = actual_taps * combo
+    new_coins = user["coins"] + coins_earned
+    new_xp = user["xp"] + xp_earned
+    new_energy = energy - actual_taps
+    new_level = math.floor(new_xp / 100)
+    old_level = user["level"]
+
+    # Токены за уровень
+    new_tokens = user["tokens"]
+    if new_level > old_level:
+        new_tokens += new_level - old_level
+
+    updated = await db.update_user(
+        req.tg_id,
+        coins=new_coins,
+        xp=new_xp,
+        energy=new_energy,
+        level=new_level,
+        tokens=new_tokens,
+        last_energy_update=time.time(),
+    )
+
+    return {
+        "coins": updated["coins"],
+        "xp": updated["xp"],
+        "energy": updated["energy"],
+        "level": updated["level"],
+        "combo": combo,
+        "coins_earned": coins_earned,
+        "xp_earned": xp_earned,
+    }
+
+
+@app.get("/api/user/{tg_id}")
+async def get_user(tg_id: int):
+    """Полный стейт пользователя."""
+    user = await db.get_user(tg_id)
+    if not user:
+        raise HTTPException(404, "User not found")
+    upgrades = await db.get_upgrades(tg_id)
+    unlocked = await db.get_unlocked_professions(tg_id)
+    simulations = await db.get_completed_simulations(tg_id)
+    return {
+        "user": user,
+        "upgrades": upgrades,
+        "unlocked_professions": unlocked,
+        "completed_simulations": simulations,
+    }
+
 
 @app.post("/api/unlock")
-async def unlock(req: UnlockReq):
-    tg_id = get_id(req)
-    user = db.get_user(tg_id)
-    if not user: raise HTTPException(400, "Нет юзера")
-    if user["tokens"] < 1: raise HTTPException(400, "Нет токенов")
-    if req.profession_id in db.get_unlocked(tg_id): raise HTTPException(400, "Уже открыто")
-    db.update_user_fields(tg_id, {"tokens": user["tokens"] - 1})
-    db.unlock_profession(tg_id, req.profession_id)
-    return {**user_resp(db.get_user(tg_id)), "unlocked": db.get_unlocked(tg_id)}
+async def unlock(req: UnlockRequest):
+    """Разблокировать профессию за 1 токен."""
+    if req.profession_id not in PROFESSIONS:
+        raise HTTPException(400, "Unknown profession")
+
+    user = await db.get_user(req.tg_id)
+    if not user:
+        raise HTTPException(404, "User not found")
+    if user["tokens"] < 1:
+        raise HTTPException(400, "Not enough tokens")
+
+    success = await db.unlock_profession(req.tg_id, req.profession_id)
+    if not success:
+        raise HTTPException(409, "Profession already unlocked")
+
+    await db.update_user(req.tg_id, tokens=user["tokens"] - 1)
+    unlocked = await db.get_unlocked_professions(req.tg_id)
+
+    return {
+        "unlocked": unlocked,
+        "tokens": user["tokens"] - 1,
+    }
+
 
 @app.post("/api/upgrade")
-async def upgrade(req: UpgReq):
-    tg_id = get_id(req)
-    user = db.get_user(tg_id)
-    if not user: raise HTTPException(400, "Нет юзера")
-    ut = req.upgrade_type
-    if ut not in UPGRADES: raise HTTPException(400, "Неверный тип")
-    cfg = UPGRADES[ut]
-    lvl = user[f"upg_{ut}_level"]
-    if lvl >= cfg["max_level"]: raise HTTPException(400, "Макс!")
-    cost = int(cfg["base_cost"] * (cfg["mult"] ** lvl))
-    if user["coins"] < cost: raise HTTPException(400, f"Нужно {cost}")
-    upd = {"coins": user["coins"] - cost, f"upg_{ut}_level": lvl + 1}
-    if ut == "tap": upd["coins_per_tap"] = user["coins_per_tap"] + 1
-    elif ut == "energy":
-        upd["max_energy"] = user["max_energy"] + 20
-        upd["energy"] = min(user["energy"] + 20, user["max_energy"] + 20)
-    elif ut == "multi": upd["multi_tap"] = user["multi_tap"] + 1
-    elif ut == "regen": upd["energy_regen"] = round(user["energy_regen"] + 0.15, 2)
-    db.update_user_fields(tg_id, upd)
-    return user_resp(db.get_user(tg_id))
+async def upgrade(req: UpgradeRequest):
+    """Улучшение: mpc / stamina / regen. Стоимость растёт экспоненциально."""
+    if req.type not in ("mpc", "stamina", "regen"):
+        raise HTTPException(400, "Type must be mpc, stamina, or regen")
+
+    user = await db.get_user(req.tg_id)
+    if not user:
+        raise HTTPException(404, "User not found")
+
+    upgrades = await db.get_upgrades(req.tg_id)
+    current_level = upgrades.get(req.type, 0)
+
+    # Стоимость
+    cost_map = {"mpc": 10, "stamina": 15, "regen": 20}
+    cost = cost_map[req.type] * (2 ** current_level)
+
+    if user["coins"] < cost:
+        raise HTTPException(400, f"Not enough coins. Need {cost}")
+
+    # Списываем монеты
+    await db.update_user(req.tg_id, coins=user["coins"] - cost)
+    new_level = await db.upgrade_level(req.tg_id, req.type)
+
+    # Применяем эффект
+    if req.type == "mpc":
+        await db.update_user(req.tg_id, mpc=user["mpc"] + 1)
+    elif req.type == "stamina":
+        new_max = user["max_energy"] + 10
+        await db.update_user(req.tg_id, max_energy=new_max)
+    elif req.type == "regen":
+        new_regen = user["auto_regen"] + 0.5
+        await db.update_user(req.tg_id, auto_regen=new_regen)
+
+    updated_user = await db.get_user(req.tg_id)
+    return {
+        "upgrade_type": req.type,
+        "new_level": new_level,
+        "cost": cost,
+        "user": updated_user,
+    }
+
 
 @app.post("/api/task/complete")
-async def task_complete(req: TaskReq):
-    tg_id = get_id(req)
-    user = db.get_user(tg_id)
-    if not user: raise HTTPException(400, "Нет юзера")
-    if req.profession_id not in db.get_unlocked(tg_id): raise HTTPException(400, "Не открыто")
-    for c in db.get_completed(tg_id, req.profession_id):
-        if c["task_index"] == req.task_index:
-            return {**user_resp(user), "already": True}
-    score = min(max(req.score, 0), 100)
-    coin_r = 30 + int(score * 0.7)
-    xp_r = 50 + int(score * 0.5)
-    if random.random() < user["stat_luck"] * 0.02: coin_r *= 2
-    db.complete_task(tg_id, req.profession_id, req.task_index, score)
-    user["coins"] += coin_r
-    user["xp"] += xp_r
-    leveled = process_level_ups(user)
-    db.update_user_fields(tg_id, {"coins": user["coins"], "xp": user["xp"],
-                                   "level": user["level"], "tokens": user["tokens"]})
-    user = db.get_user(tg_id)
-    return {**user_resp(user), "coin_r": coin_r, "xp_r": xp_r, "leveled": leveled,
-            "completed": db.get_completed(tg_id, req.profession_id)}
+async def task_complete(req: TaskCompleteRequest):
+    """Завершение симуляции профессии."""
+    if req.profession_id not in PROFESSIONS:
+        raise HTTPException(400, "Unknown profession")
 
-@app.post("/api/task/progress")
-async def save_task_progress(req: ProgressReq):
-    tg_id = get_id(req)
-    db.save_progress(tg_id, req.profession_id, req.task_index, req.data)
-    return {"ok": True}
+    user = await db.get_user(req.tg_id)
+    if not user:
+        raise HTTPException(404, "User not found")
+
+    unlocked = await db.get_unlocked_professions(req.tg_id)
+    if req.profession_id not in unlocked:
+        raise HTTPException(403, "Profession not unlocked")
+
+    await db.complete_simulation(req.tg_id, req.profession_id, req.score)
+
+    return {
+        "profession_id": req.profession_id,
+        "score": req.score,
+        "message": "Simulation completed",
+    }
+
 
 @app.get("/api/professions")
-async def professions():
-    return {"spheres": PROFESSIONS}
+async def get_professions():
+    """Список всех профессий."""
+    return {"professions": list(PROFESSIONS.values())}
 
-# === Данные профессий ===
-PROFESSIONS = [
-    {"id":"it","name":"IT-сфера","icon":"💻","professions":[
-        {"id":"frontend","name":"Frontend-разработчик","icon":"🌐",
-         "desc":"Создаёт интерфейсы сайтов и приложений",
-         "tools":["HTML/CSS","JavaScript","React","Figma"],"cost":1,
-         "tasks":[
-             {"title":"Конструктор сайта","type":"site_builder","desc":"Собери лендинг из блоков"},
-             {"title":"CSS-мастер","type":"css_challenge","desc":"Стилизуй элементы под макет"},
-             {"title":"Исправь вёрстку","type":"debug_html","desc":"Найди и почини баги в коде"},
-             {"title":"Адаптивный дизайн","type":"responsive","desc":"Адаптируй сайт под мобильный"},
-             {"title":"Финальный проект","type":"site_builder_pro","desc":"Собери полный сайт-портфолио"}
-         ]},
-        {"id":"backend","name":"Backend-разработчик","icon":"⚙️",
-         "desc":"Программирует серверную логику и API",
-         "tools":["Python","SQL","Docker","Linux"],"cost":1,
-         "tasks":[
-             {"title":"SQL-детектив","type":"sql_detective","desc":"Напиши запросы к базе данных"},
-             {"title":"API-архитектор","type":"api_builder","desc":"Спроектируй REST API"},
-             {"title":"Серверный баг","type":"server_debug","desc":"Найди уязвимость в коде"},
-             {"title":"Нагрузка","type":"load_balance","desc":"Оптимизируй сервер под нагрузку"},
-             {"title":"Микросервисы","type":"architecture","desc":"Спроектируй архитектуру"}
-         ]},
-        {"id":"datasci","name":"Data Scientist","icon":"📊",
-         "desc":"Анализирует данные и строит ML-модели",
-         "tools":["Python","Pandas","TensorFlow","Jupyter"],"cost":1,
-         "tasks":[
-             {"title":"Анализ данных","type":"data_explorer","desc":"Исследуй датасет и найди инсайты"},
-             {"title":"Чистка данных","type":"data_clean","desc":"Очисти данные от аномалий"},
-             {"title":"Модель ML","type":"ml_model","desc":"Выбери и настрой модель"},
-             {"title":"Визуализация","type":"data_viz","desc":"Построй информативные графики"},
-             {"title":"A/B эксперимент","type":"ab_test","desc":"Проведи и проанализируй тест"}
-         ]},
-        {"id":"cybersec","name":"Кибербезопасность","icon":"🛡️",
-         "desc":"Защищает системы от взломов",
-         "tools":["Kali Linux","Wireshark","Burp Suite"],"cost":1,
-         "tasks":[
-             {"title":"Сканер сети","type":"network_scan","desc":"Просканируй сеть на уязвимости"},
-             {"title":"Фишинг-детектор","type":"phishing","desc":"Распознай поддельные письма"},
-             {"title":"Криптография","type":"crypto_challenge","desc":"Расшифруй перехваченное сообщение"},
-             {"title":"Лог-анализ","type":"log_analysis","desc":"Найди следы взлома в логах"},
-             {"title":"Инцидент","type":"incident","desc":"Отреагируй на кибератаку"}
-         ]}
-    ]},
-    {"id":"engineering","name":"Инженерия","icon":"🔧","professions":[
-        {"id":"robotics","name":"Робототехник","icon":"🤖",
-         "desc":"Проектирует и программирует роботов",
-         "tools":["Arduino","ROS","C++","3D-печать"],"cost":1,
-         "tasks":[
-             {"title":"Схема робота","type":"circuit_builder","desc":"Собери электрическую схему"},
-             {"title":"Программа движения","type":"robot_code","desc":"Запрограммируй маршрут робота"},
-             {"title":"Датчики","type":"sensor_setup","desc":"Настрой систему датчиков"},
-             {"title":"Отладка","type":"robot_debug","desc":"Найди ошибку в поведении"},
-             {"title":"Робот-проект","type":"robot_project","desc":"Спроектируй робота-помощника"}
-         ]},
-        {"id":"energy","name":"Энергетик","icon":"⚡",
-         "desc":"Работает с энергосистемами",
-         "tools":["AutoCAD","MATLAB","SCADA"],"cost":1,
-         "tasks":[
-             {"title":"Энергобаланс","type":"power_balance","desc":"Рассчитай потребление здания"},
-             {"title":"Солнечная станция","type":"solar_setup","desc":"Расположи панели оптимально"},
-             {"title":"Авария в сети","type":"grid_emergency","desc":"Устрани неисправность"},
-             {"title":"Оптимизация","type":"energy_optimize","desc":"Снизи потребление завода"},
-             {"title":"Проект станции","type":"power_plant","desc":"Спроектируй электростанцию"}
-         ]}
-    ]},
-    {"id":"medicine","name":"Медицина","icon":"🏥","professions":[
-        {"id":"diagnostics","name":"Врач-диагност","icon":"🔬",
-         "desc":"Ставит диагнозы по симптомам и анализам",
-         "tools":["МРТ","УЗИ","Анализы","ЭКГ"],"cost":1,
-         "tasks":[
-             {"title":"Приём пациента","type":"patient_sim","desc":"Проведи приём и поставь диагноз"},
-             {"title":"Анализы","type":"lab_results","desc":"Расшифруй результаты анализов"},
-             {"title":"Дифдиагноз","type":"diff_diagnosis","desc":"Отличи похожие болезни"},
-             {"title":"Неотложка","type":"emergency","desc":"Прими решение в экстренной ситуации"},
-             {"title":"Сложный случай","type":"complex_case","desc":"Разбери нетипичный кейс"}
-         ]},
-        {"id":"biotech","name":"Биотехнолог","icon":"🧬",
-         "desc":"Разрабатывает биопрепараты",
-         "tools":["ПЦР","CRISPR","Биореакторы"],"cost":1,
-         "tasks":[
-             {"title":"ПЦР-протокол","type":"pcr_lab","desc":"Проведи ПЦР-анализ"},
-             {"title":"Анализ генома","type":"genome","desc":"Найди мутацию в ДНК"},
-             {"title":"Культивирование","type":"cell_culture","desc":"Вырасти клеточную культуру"},
-             {"title":"Биореактор","type":"bioreactor","desc":"Настрой параметры реактора"},
-             {"title":"CRISPR-дизайн","type":"crispr","desc":"Спроектируй генное редактирование"}
-         ]}
-    ]},
-    {"id":"creative","name":"Творчество","icon":"🎨","professions":[
-        {"id":"gamedev","name":"Геймдизайнер","icon":"🎮",
-         "desc":"Придумывает механики и уровни игр",
-         "tools":["Unity","Unreal","Figma"],"cost":1,
-         "tasks":[
-             {"title":"Левел-дизайн","type":"level_editor","desc":"Построй игровой уровень"},
-             {"title":"Баланс","type":"game_balance","desc":"Сбалансируй персонажей"},
-             {"title":"Экономика","type":"game_economy","desc":"Настрой внутриигровую экономику"},
-             {"title":"Нарратив","type":"narrative","desc":"Напиши диалоговое дерево"},
-             {"title":"Прототип","type":"game_prototype","desc":"Создай игровой прототип"}
-         ]},
-        {"id":"design","name":"UX/UI Дизайнер","icon":"✏️",
-         "desc":"Создаёт удобные интерфейсы",
-         "tools":["Figma","Sketch","Adobe XD"],"cost":1,
-         "tasks":[
-             {"title":"Палитра бренда","type":"color_system","desc":"Создай цветовую систему"},
-             {"title":"UX-аудит","type":"ux_audit","desc":"Найди проблемы юзабилити"},
-             {"title":"Компоненты","type":"ui_kit","desc":"Собери UI-кит"},
-             {"title":"Пользовательский путь","type":"user_flow","desc":"Спроектируй UX-флоу"},
-             {"title":"Редизайн","type":"redesign","desc":"Улучши существующий интерфейс"}
-         ]}
-    ]},
-    {"id":"business","name":"Бизнес","icon":"💼","professions":[
-        {"id":"marketing","name":"Маркетолог","icon":"📢",
-         "desc":"Продвигает продукты и бренды",
-         "tools":["Analytics","Canva","Метрика","CRM"],"cost":1,
-         "tasks":[
-             {"title":"Целевая аудитория","type":"target_audience","desc":"Определи и сегментируй ЦА"},
-             {"title":"Рекламная кампания","type":"ad_campaign","desc":"Запусти и оптимизируй рекламу"},
-             {"title":"Контент-стратегия","type":"content_plan","desc":"Разработай контент-план"},
-             {"title":"Аналитика","type":"marketing_analytics","desc":"Проанализируй метрики"},
-             {"title":"Запуск продукта","type":"product_launch","desc":"Выведи продукт на рынок"}
-         ]},
-        {"id":"pm","name":"Менеджер проектов","icon":"📋",
-         "desc":"Управляет командой и проектами",
-         "tools":["Jira","Trello","Agile/Scrum"],"cost":1,
-         "tasks":[
-             {"title":"Планирование спринта","type":"sprint_plan","desc":"Спланируй двухнедельный спринт"},
-             {"title":"Управление рисками","type":"risk_mgmt","desc":"Оцени и минимизируй риски"},
-             {"title":"Стендап","type":"standup","desc":"Проведи утреннюю встречу"},
-             {"title":"Конфликт в команде","type":"team_conflict","desc":"Разреши конфликт"},
-             {"title":"Ретроспектива","type":"retro","desc":"Проведи ретро и улучши процесс"}
-         ]}
-    ]},
-    {"id":"science","name":"Наука","icon":"🔬","professions":[
-        {"id":"chemistry","name":"Химик","icon":"⚗️",
-         "desc":"Исследует вещества и создаёт новые",
-         "tools":["Спектрометр","Хроматограф","Реактор"],"cost":1,
-         "tasks":[
-             {"title":"Лабораторный опыт","type":"chem_lab","desc":"Проведи химический эксперимент"},
-             {"title":"Анализ вещества","type":"substance_analysis","desc":"Определи неизвестное вещество"},
-             {"title":"Техника безопасности","type":"lab_safety","desc":"Проверь соблюдение ТБ"},
-             {"title":"Синтез","type":"synthesis","desc":"Проведи многостадийный синтез"},
-             {"title":"Исследование","type":"chem_research","desc":"Спланируй эксперимент"}
-         ]},
-        {"id":"physics","name":"Физик","icon":"⚛️",
-         "desc":"Изучает фундаментальные законы природы",
-         "tools":["MATLAB","Осциллограф","Ускоритель"],"cost":1,
-         "tasks":[
-             {"title":"Механика","type":"physics_sim","desc":"Реши задачу по механике"},
-             {"title":"Электричество","type":"circuit_sim","desc":"Собери электрическую цепь"},
-             {"title":"Волны","type":"wave_sim","desc":"Исследуй волновые процессы"},
-             {"title":"Эксперимент","type":"physics_experiment","desc":"Проведи измерения"},
-             {"title":"Моделирование","type":"physics_model","desc":"Построй физическую модель"}
-         ]}
-    ]}
-]
+
+# ─── Запуск ──────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run(app, host="0.0.0.0", port=port)

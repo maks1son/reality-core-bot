@@ -1,140 +1,200 @@
-"""
-RE:ALITY — База данных v2
-Безлимитные уровни, прогресс заданий, медленная регенерация
-"""
-import sqlite3, os, json, time
+import aiosqlite
+import time
+import os
 
-DB_PATH = os.environ.get("DB_PATH", "reality.db")
+DB_PATH = os.getenv("DB_PATH", "reality.db")
 
-def get_conn():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    return conn
 
-def init_db():
-    conn = get_conn()
-    c = conn.cursor()
-    c.execute("""CREATE TABLE IF NOT EXISTS users (
-        tg_id INTEGER PRIMARY KEY, name TEXT DEFAULT '', avatar INTEGER DEFAULT 1,
-        stat_str INTEGER DEFAULT 5, stat_int INTEGER DEFAULT 5,
-        stat_cha INTEGER DEFAULT 5, stat_luck INTEGER DEFAULT 5,
-        coins INTEGER DEFAULT 0, xp INTEGER DEFAULT 0, level INTEGER DEFAULT 1,
-        tokens INTEGER DEFAULT 0, energy INTEGER DEFAULT 100, max_energy INTEGER DEFAULT 100,
-        coins_per_tap INTEGER DEFAULT 1, multi_tap INTEGER DEFAULT 1,
-        energy_regen REAL DEFAULT 0.4, last_energy_update REAL DEFAULT 0,
-        registered INTEGER DEFAULT 0,
-        upg_tap_level INTEGER DEFAULT 0, upg_energy_level INTEGER DEFAULT 0,
-        upg_multi_level INTEGER DEFAULT 0, upg_regen_level INTEGER DEFAULT 0,
-        created_at REAL DEFAULT 0)""")
-    c.execute("""CREATE TABLE IF NOT EXISTS unlocked_professions (
-        tg_id INTEGER, profession_id TEXT, unlocked_at REAL DEFAULT 0,
-        PRIMARY KEY (tg_id, profession_id))""")
-    c.execute("""CREATE TABLE IF NOT EXISTS completed_tasks (
-        tg_id INTEGER, profession_id TEXT, task_index INTEGER,
-        score INTEGER DEFAULT 0, completed_at REAL DEFAULT 0,
-        PRIMARY KEY (tg_id, profession_id, task_index))""")
-    c.execute("""CREATE TABLE IF NOT EXISTS task_progress (
-        tg_id INTEGER, profession_id TEXT, task_index INTEGER,
-        progress_data TEXT DEFAULT '{}', updated_at REAL DEFAULT 0,
-        PRIMARY KEY (tg_id, profession_id, task_index))""")
-    c.execute("""CREATE TABLE IF NOT EXISTS tap_log (
-        id INTEGER PRIMARY KEY AUTOINCREMENT, tg_id INTEGER,
-        tap_count INTEGER, timestamp REAL, ip TEXT DEFAULT '')""")
-    conn.commit()
-    conn.close()
+async def init_db():
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                tg_id INTEGER UNIQUE NOT NULL,
+                username TEXT NOT NULL DEFAULT '',
+                avatar INTEGER NOT NULL DEFAULT 1,
+                coins INTEGER NOT NULL DEFAULT 0,
+                tokens INTEGER NOT NULL DEFAULT 0,
+                xp INTEGER NOT NULL DEFAULT 0,
+                level INTEGER NOT NULL DEFAULT 0,
+                energy INTEGER NOT NULL DEFAULT 100,
+                max_energy INTEGER NOT NULL DEFAULT 100,
+                last_energy_update REAL NOT NULL DEFAULT 0,
+                mpc INTEGER NOT NULL DEFAULT 1,
+                auto_regen REAL NOT NULL DEFAULT 2.0
+            )
+        """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS upgrades (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                type TEXT NOT NULL CHECK(type IN ('mpc', 'stamina', 'regen')),
+                level INTEGER NOT NULL DEFAULT 0,
+                UNIQUE(user_id, type),
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS unlocked_professions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                profession_id TEXT NOT NULL,
+                unlocked_at REAL NOT NULL,
+                UNIQUE(user_id, profession_id),
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS completed_simulations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                profession_id TEXT NOT NULL,
+                score INTEGER NOT NULL DEFAULT 0,
+                completed_at REAL NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
+        await db.commit()
 
-def get_user(tg_id):
-    conn = get_conn()
-    row = conn.execute("SELECT * FROM users WHERE tg_id=?", (tg_id,)).fetchone()
-    conn.close()
-    return dict(row) if row else None
 
-def create_user(tg_id):
-    conn = get_conn()
+async def get_user(tg_id: int) -> dict | None:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute("SELECT * FROM users WHERE tg_id = ?", (tg_id,))
+        row = await cursor.fetchone()
+        if not row:
+            return None
+        user = dict(row)
+        # Пересчитываем энергию по времени
+        now = time.time()
+        elapsed = now - user["last_energy_update"]
+        regen = user["auto_regen"]
+        regenerated = int(elapsed * regen)
+        if regenerated > 0:
+            new_energy = min(user["energy"] + regenerated, user["max_energy"])
+            await db.execute(
+                "UPDATE users SET energy = ?, last_energy_update = ? WHERE tg_id = ?",
+                (new_energy, now, tg_id),
+            )
+            await db.commit()
+            user["energy"] = new_energy
+            user["last_energy_update"] = now
+        return user
+
+
+async def create_user(tg_id: int, username: str, avatar: int) -> dict:
     now = time.time()
-    conn.execute("INSERT OR IGNORE INTO users (tg_id, last_energy_update, created_at) VALUES (?,?,?)",
-                 (tg_id, now, now))
-    conn.commit(); conn.close()
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """INSERT INTO users (tg_id, username, avatar, last_energy_update)
+               VALUES (?, ?, ?, ?)""",
+            (tg_id, username, avatar, now),
+        )
+        user_id_cursor = await db.execute(
+            "SELECT id FROM users WHERE tg_id = ?", (tg_id,)
+        )
+        row = await user_id_cursor.fetchone()
+        user_id = row[0]
+        for upgrade_type in ("mpc", "stamina", "regen"):
+            await db.execute(
+                "INSERT INTO upgrades (user_id, type, level) VALUES (?, ?, 0)",
+                (user_id, upgrade_type),
+            )
+        await db.commit()
+    return await get_user(tg_id)
 
-def register_user(tg_id, name, avatar, stats):
-    conn = get_conn()
-    conn.execute("""UPDATE users SET name=?, avatar=?, stat_str=?, stat_int=?,
-        stat_cha=?, stat_luck=?, registered=1, last_energy_update=? WHERE tg_id=?""",
-        (name, avatar, stats.get("str",5), stats.get("int",5),
-         stats.get("cha",5), stats.get("luck",5), time.time(), tg_id))
-    conn.commit(); conn.close()
 
-def update_user_fields(tg_id, fields):
-    allowed = {"coins","xp","level","tokens","energy","max_energy","coins_per_tap",
-               "multi_tap","energy_regen","last_energy_update",
-               "upg_tap_level","upg_energy_level","upg_multi_level","upg_regen_level"}
-    fields = {k:v for k,v in fields.items() if k in allowed}
-    if not fields: return
-    sets = ", ".join(f"{k}=?" for k in fields)
-    conn = get_conn()
-    conn.execute(f"UPDATE users SET {sets} WHERE tg_id=?", list(fields.values())+[tg_id])
-    conn.commit(); conn.close()
+async def update_user(tg_id: int, **fields) -> dict | None:
+    if not fields:
+        return await get_user(tg_id)
+    set_clause = ", ".join(f"{k} = ?" for k in fields)
+    values = list(fields.values()) + [tg_id]
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            f"UPDATE users SET {set_clause} WHERE tg_id = ?", values
+        )
+        await db.commit()
+    return await get_user(tg_id)
 
-def unlock_profession(tg_id, pid):
-    conn = get_conn()
-    conn.execute("INSERT OR IGNORE INTO unlocked_professions VALUES (?,?,?)",
-                 (tg_id, pid, time.time()))
-    conn.commit(); conn.close()
 
-def get_unlocked(tg_id):
-    conn = get_conn()
-    rows = conn.execute("SELECT profession_id FROM unlocked_professions WHERE tg_id=?",
-                        (tg_id,)).fetchall()
-    conn.close()
-    return [r["profession_id"] for r in rows]
+async def get_upgrades(tg_id: int) -> dict:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute(
+            """SELECT u.type, u.level FROM upgrades u
+               JOIN users usr ON usr.id = u.user_id
+               WHERE usr.tg_id = ?""",
+            (tg_id,),
+        )
+        rows = await cursor.fetchall()
+        return {row["type"]: row["level"] for row in rows}
 
-def complete_task(tg_id, pid, tidx, score):
-    conn = get_conn()
-    conn.execute("INSERT OR REPLACE INTO completed_tasks VALUES (?,?,?,?,?)",
-                 (tg_id, pid, tidx, score, time.time()))
-    conn.execute("DELETE FROM task_progress WHERE tg_id=? AND profession_id=? AND task_index=?",
-                 (tg_id, pid, tidx))
-    conn.commit(); conn.close()
 
-def get_completed(tg_id, pid=None):
-    conn = get_conn()
-    if pid:
-        rows = conn.execute("SELECT * FROM completed_tasks WHERE tg_id=? AND profession_id=?",
-                            (tg_id, pid)).fetchall()
-    else:
-        rows = conn.execute("SELECT * FROM completed_tasks WHERE tg_id=?", (tg_id,)).fetchall()
-    conn.close()
-    return [dict(r) for r in rows]
+async def upgrade_level(tg_id: int, upgrade_type: str) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """UPDATE upgrades SET level = level + 1
+               WHERE user_id = (SELECT id FROM users WHERE tg_id = ?)
+               AND type = ?""",
+            (tg_id, upgrade_type),
+        )
+        await db.commit()
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute(
+            """SELECT level FROM upgrades
+               WHERE user_id = (SELECT id FROM users WHERE tg_id = ?)
+               AND type = ?""",
+            (tg_id, upgrade_type),
+        )
+        row = await cursor.fetchone()
+        return row["level"] if row else 0
 
-def save_progress(tg_id, pid, tidx, data):
-    conn = get_conn()
-    conn.execute("INSERT OR REPLACE INTO task_progress VALUES (?,?,?,?,?)",
-                 (tg_id, pid, tidx, json.dumps(data), time.time()))
-    conn.commit(); conn.close()
 
-def get_progress(tg_id):
-    conn = get_conn()
-    rows = conn.execute("SELECT * FROM task_progress WHERE tg_id=?", (tg_id,)).fetchall()
-    conn.close()
-    result = []
-    for r in rows:
-        d = dict(r)
-        d["progress_data"] = json.loads(d["progress_data"])
-        result.append(d)
-    return result
+async def unlock_profession(tg_id: int, profession_id: str) -> bool:
+    now = time.time()
+    async with aiosqlite.connect(DB_PATH) as db:
+        try:
+            await db.execute(
+                """INSERT INTO unlocked_professions (user_id, profession_id, unlocked_at)
+                   VALUES ((SELECT id FROM users WHERE tg_id = ?), ?, ?)""",
+                (tg_id, profession_id, now),
+            )
+            await db.commit()
+            return True
+        except aiosqlite.IntegrityError:
+            return False
 
-def log_taps(tg_id, count, ip=""):
-    conn = get_conn()
-    conn.execute("INSERT INTO tap_log (tg_id,tap_count,timestamp,ip) VALUES (?,?,?,?)",
-                 (tg_id, count, time.time(), ip))
-    conn.commit(); conn.close()
 
-def check_tap_rate(tg_id, window=10, mx=200):
-    conn = get_conn()
-    row = conn.execute("SELECT COALESCE(SUM(tap_count),0) as t FROM tap_log WHERE tg_id=? AND timestamp>?",
-                       (tg_id, time.time()-window)).fetchone()
-    conn.close()
-    return row["t"] <= mx
+async def get_unlocked_professions(tg_id: int) -> list[str]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute(
+            """SELECT profession_id FROM unlocked_professions
+               WHERE user_id = (SELECT id FROM users WHERE tg_id = ?)""",
+            (tg_id,),
+        )
+        rows = await cursor.fetchall()
+        return [row[0] for row in rows]
 
-init_db()
+
+async def complete_simulation(tg_id: int, profession_id: str, score: int):
+    now = time.time()
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """INSERT INTO completed_simulations (user_id, profession_id, score, completed_at)
+               VALUES ((SELECT id FROM users WHERE tg_id = ?), ?, ?, ?)""",
+            (tg_id, profession_id, score, now),
+        )
+        await db.commit()
+
+
+async def get_completed_simulations(tg_id: int) -> list[dict]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute(
+            """SELECT profession_id, score, completed_at FROM completed_simulations
+               WHERE user_id = (SELECT id FROM users WHERE tg_id = ?)
+               ORDER BY completed_at DESC""",
+            (tg_id,),
+        )
+        rows = await cursor.fetchall()
+        return [dict(row) for row in rows]
