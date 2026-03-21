@@ -199,6 +199,58 @@ body{display:flex;justify-content:center}
 .upg-level{font-size:7px;color:var(--accent)}
 .upg-cost{font-size:7px;color:var(--mint)}
 .upg-cost.no-coins{color:var(--danger)}
+
+/* ─── Симуляторы ─── */
+.sim-screen{display:none;flex:1;flex-direction:column;overflow-y:auto;overflow-x:hidden;padding:12px;padding-bottom:16px}
+.sim-screen.active{display:flex}
+.sim-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sim-back{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Press Start 2P',monospace;font-size:8px;padding:6px 10px;cursor:pointer}
+.sim-back:active{opacity:.7}
+.sim-title{font-size:10px;color:var(--accent);flex:1;text-align:center}
+.sim-round{font-size:7px;color:var(--mint)}
+.sim-status{text-align:center;font-size:8px;padding:6px;border-radius:8px;margin-bottom:8px;border:1px solid var(--border);background:var(--card)}
+.sim-status.stable{color:#4ecdc4;border-color:#4ecdc455}
+.sim-status.unstable{color:#f9ca24;border-color:#f9ca2455}
+.sim-status.critical{color:var(--danger);border-color:#ff6b6b55;animation:simPulse 1s infinite}
+@keyframes simPulse{0%,100%{opacity:1}50%{opacity:.5}}
+.sim-gauges{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.sim-gauge{display:flex;flex-direction:column;gap:2px}
+.sim-gauge-label{font-size:6px;color:#888;display:flex;justify-content:space-between}
+.sim-gauge-bar{height:14px;background:var(--card);border-radius:7px;border:1px solid var(--border);overflow:hidden;position:relative}
+.sim-gauge-fill{height:100%;border-radius:7px;transition:width .5s ease}
+.sim-gauge-zone{position:absolute;top:0;height:100%;border-left:2px dashed rgba(255,255,255,.2);border-right:2px dashed rgba(255,255,255,.2);background:rgba(78,205,196,.08)}
+.fill-green{background:linear-gradient(90deg,#2ecc71,#4ecdc4)}
+.fill-red{background:linear-gradient(90deg,#e74c3c,#ff6b6b)}
+.fill-blue{background:linear-gradient(90deg,#3498db,#7c6cf0)}
+.fill-orange{background:linear-gradient(90deg,#f39c12,#f9ca24)}
+.fill-purple{background:linear-gradient(90deg,#9b59b6,#7c6cf0)}
+.sim-controls{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.sim-btn-row{display:flex;gap:6px;flex-wrap:wrap}
+.sim-btn{
+  flex:1;min-width:80px;padding:10px 6px;border:2px solid var(--border);border-radius:10px;
+  background:var(--card);color:var(--text);font-family:'Press Start 2P',monospace;
+  font-size:7px;cursor:pointer;text-align:center;transition:.15s;line-height:1.5;
+}
+.sim-btn:active{transform:scale(.96)}
+.sim-btn.selected{border-color:var(--accent);background:#1e1e3a;box-shadow:0 0 10px rgba(124,108,240,.3)}
+.sim-btn:disabled{opacity:.4;cursor:default}
+.sim-slider-wrap{display:flex;align-items:center;gap:8px}
+.sim-slider-label{font-size:7px;color:#888;min-width:80px}
+.sim-slider{flex:1;-webkit-appearance:none;height:8px;background:var(--card);border-radius:4px;border:1px solid var(--border);outline:none}
+.sim-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--accent);border-radius:50%;cursor:pointer}
+.sim-slider-val{font-size:8px;color:var(--accent);min-width:30px;text-align:right}
+.sim-log{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px;margin-bottom:8px;min-height:80px;max-height:120px;overflow-y:auto}
+.sim-log-line{font-size:6px;color:#999;line-height:1.8;border-bottom:1px solid var(--border);padding:2px 0}
+.sim-log-line:last-child{border-bottom:none}
+.sim-log-line.warn{color:#f9ca24}
+.sim-log-line.danger{color:var(--danger)}
+.sim-log-line.good{color:var(--mint)}
+.sim-event{text-align:center;font-size:7px;color:#f9ca24;padding:6px;background:rgba(249,202,36,.08);border:1px solid #f9ca2433;border-radius:8px;margin-bottom:8px;animation:simPulse 1.5s 2}
+
+/* Модалка результата симулятора */
+.modal-sim{max-width:340px}
+.modal-sim .sim-score{font-size:20px;color:var(--mint);margin:12px 0}
+.modal-sim .sim-reward{font-size:8px;color:var(--accent);margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -326,8 +378,108 @@ body{display:flex;justify-content:center}
     </div>
   </div>
 
+  <!-- ═══ Симулятор IT ═══ -->
+  <div id="sim-it" class="sim-screen">
+    <div class="sim-header">
+      <button class="sim-back" id="sim-it-back">← Назад</button>
+      <div class="sim-title">🛡️ Спектр-анализ</div>
+      <div class="sim-round" id="sim-it-round">Раунд 1/10</div>
+    </div>
+    <div class="sim-status stable" id="sim-it-status">🟢 Стабильно</div>
+    <div class="sim-gauges">
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>ServerLoad</span><span id="sim-it-load-val">0%</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-zone" style="left:80%;right:0;background:rgba(231,76,60,.12)"></div>
+          <div class="sim-gauge-fill fill-red" id="sim-it-load" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>LegitRate</span><span id="sim-it-legit-val">100%</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-zone" style="left:0;width:80%;background:rgba(78,205,196,.08)"></div>
+          <div class="sim-gauge-fill fill-green" id="sim-it-legit" style="width:100%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sim-controls">
+      <div class="sim-btn-row">
+        <button class="sim-btn selected" id="sim-it-f-l3" data-filter="L3">L3<br>Сеть</button>
+        <button class="sim-btn" id="sim-it-f-l4" data-filter="L4">L4<br>Транспорт</button>
+        <button class="sim-btn" id="sim-it-f-l7" data-filter="L7">L7<br>Приложение</button>
+      </div>
+      <div class="sim-slider-wrap">
+        <span class="sim-slider-label">Rate Limit</span>
+        <input type="range" class="sim-slider" id="sim-it-rate" min="1" max="100" value="50">
+        <span class="sim-slider-val" id="sim-it-rate-val">50</span>
+      </div>
+    </div>
+    <div id="sim-it-event" class="sim-event" style="display:none"></div>
+    <div class="sim-log" id="sim-it-log"></div>
+  </div>
+
+  <!-- ═══ Симулятор Медицина ═══ -->
+  <div id="sim-medicine" class="sim-screen">
+    <div class="sim-header">
+      <button class="sim-back" id="sim-med-back">← Назад</button>
+      <div class="sim-title">💉 Титрование</div>
+      <div class="sim-round" id="sim-med-round">Раунд 1/8</div>
+    </div>
+    <div class="sim-status stable" id="sim-med-status">🟢 Стабильно</div>
+    <div class="sim-gauges">
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>Седация</span><span id="sim-med-sed-val">50%</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-zone" style="left:70%;width:15%"></div>
+          <div class="sim-gauge-fill fill-blue" id="sim-med-sed" style="width:50%"></div>
+        </div>
+      </div>
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>Пульс</span><span id="sim-med-hr-val">80 уд/м</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-zone" style="left:40%;width:26.7%"></div>
+          <div class="sim-gauge-fill fill-green" id="sim-med-hr" style="width:53%"></div>
+        </div>
+      </div>
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>Давление</span><span id="sim-med-bp-val">100</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-zone" style="left:40%;width:26.7%"></div>
+          <div class="sim-gauge-fill fill-orange" id="sim-med-bp" style="width:50%"></div>
+        </div>
+      </div>
+      <div class="sim-gauge">
+        <div class="sim-gauge-label"><span>Токсичность</span><span id="sim-med-tox-val">0%</span></div>
+        <div class="sim-gauge-bar">
+          <div class="sim-gauge-zone" style="left:80%;right:0;background:rgba(231,76,60,.12)"></div>
+          <div class="sim-gauge-fill fill-purple" id="sim-med-tox" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sim-controls">
+      <div class="sim-btn-row">
+        <button class="sim-btn" id="sim-med-drug-a">💧<br>Анестетик</button>
+        <button class="sim-btn" id="sim-med-drug-b">💊<br>Анальгетик</button>
+        <button class="sim-btn" id="sim-med-drug-c">⚡<br>Эпинефрин</button>
+      </div>
+    </div>
+    <div id="sim-med-event" class="sim-event" style="display:none"></div>
+    <div class="sim-log" id="sim-med-log"></div>
+  </div>
+
+  <!-- ═══ Модалка результата симулятора ═══ -->
+  <div class="modal-overlay" id="modal-sim-result">
+    <div class="modal modal-sim">
+      <h2 id="sim-result-title">Результат</h2>
+      <div class="sim-score" id="sim-result-score">85</div>
+      <div class="sim-reward" id="sim-result-reward"></div>
+      <p id="sim-result-msg"></p>
+      <button class="btn" id="sim-result-btn">OK</button>
+    </div>
+  </div>
+
   <!-- ═══ Навигация ═══ -->
-  <div class="nav">
+  <div class="nav" id="main-nav">
     <button class="nav-btn" data-screen="screen-professions"><span class="nav-icon">🔬</span>Профессии</button>
     <button class="nav-btn active" data-screen="screen-main"><span class="nav-icon">🏠</span>Главная</button>
     <button class="nav-btn" data-screen="screen-upgrades"><span class="nav-icon">⚙️</span>Улучшения</button>
@@ -686,7 +838,7 @@ document.getElementById("spheres-container").addEventListener("click", async fun
     }
   }
   if (action === "simulate") {
-    alert("Симуляция " + pid + " — скоро!");
+    openSimulator(pid);
   }
 });
 
@@ -742,6 +894,396 @@ function renderUpgrades() {
     btn.textContent = "Улучшить";
   });
 });
+
+// ─── Симуляторы ─────────────────────────────────────────────────────
+var simActive = false;
+var simInterval = null;
+var simCurrentPid = null;
+
+function openSimulator(pid) {
+  simCurrentPid = pid;
+  // Определяем тип симулятора по sphere
+  var prof = allProfessions.find(function(p) { return p.id === pid; });
+  if (!prof) return;
+  var sphere = prof.sphere;
+
+  // Скрываем всё
+  $$(".screen").forEach(function(s) { s.classList.remove("active"); });
+  $$(".sim-screen").forEach(function(s) { s.classList.remove("active"); });
+  document.getElementById("main-nav").style.display = "none";
+  simActive = true;
+
+  if (sphere === "IT") {
+    startSimIT();
+  } else if (sphere === "Medicine") {
+    startSimMedicine();
+  } else {
+    // Для остальных сфер — заглушка, открываем IT
+    startSimIT();
+  }
+}
+
+function exitSimulator() {
+  if (simInterval) { clearInterval(simInterval); simInterval = null; }
+  simActive = false;
+  $$(".sim-screen").forEach(function(s) { s.classList.remove("active"); });
+  document.getElementById("main-nav").style.display = "flex";
+  showScreen("screen-professions");
+  loadProfessions();
+}
+
+function showSimResult(title, score, msg, isWin) {
+  if (simInterval) { clearInterval(simInterval); simInterval = null; }
+  document.getElementById("sim-result-title").textContent = title;
+  document.getElementById("sim-result-score").textContent = score;
+  document.getElementById("sim-result-msg").textContent = msg;
+  var reward = isWin ? "+50 🪙" : "";
+  document.getElementById("sim-result-reward").textContent = reward;
+  var btn = document.getElementById("sim-result-btn");
+  btn.textContent = isWin ? "Забрать" : "Попробовать снова";
+  btn.onclick = async function() {
+    document.getElementById("modal-sim-result").classList.remove("active");
+    if (isWin && simCurrentPid) {
+      try {
+        await api("POST", "/api/task/complete", { tg_id: tgId, profession_id: simCurrentPid, score: score });
+      } catch(e) {}
+    }
+    exitSimulator();
+  };
+  document.getElementById("modal-sim-result").classList.add("active");
+}
+
+// ─── IT Симулятор: Спектр-анализ трафика ────────────────────────────
+function startSimIT() {
+  var el = document.getElementById("sim-it");
+  el.classList.add("active");
+
+  var round = 0;
+  var totalRounds = 10;
+  var serverLoad = 0;
+  var totalLegitServed = 0;
+  var totalBotBlocked = 0;
+  var filter = "L3";
+  var rateLimit = 50;
+  var lowLegitStreak = 0;
+  var logLines = [];
+
+  // Reset UI
+  document.getElementById("sim-it-round").textContent = "Раунд 1/" + totalRounds;
+  document.getElementById("sim-it-load").style.width = "0%";
+  document.getElementById("sim-it-load-val").textContent = "0%";
+  document.getElementById("sim-it-legit").style.width = "100%";
+  document.getElementById("sim-it-legit-val").textContent = "100%";
+  document.getElementById("sim-it-log").innerHTML = "";
+  document.getElementById("sim-it-event").style.display = "none";
+  setSimStatus("sim-it-status", "stable");
+  document.getElementById("sim-it-rate").value = 50;
+  document.getElementById("sim-it-rate-val").textContent = "50";
+
+  // Filter selection
+  ["L3","L4","L7"].forEach(function(f) {
+    var b = document.getElementById("sim-it-f-" + f.toLowerCase());
+    b.classList.toggle("selected", f === "L3");
+    b.onclick = function() {
+      filter = f;
+      ["L3","L4","L7"].forEach(function(x) {
+        document.getElementById("sim-it-f-" + x.toLowerCase()).classList.toggle("selected", x === f);
+      });
+    };
+  });
+
+  var slider = document.getElementById("sim-it-rate");
+  slider.oninput = function() {
+    rateLimit = parseInt(slider.value);
+    document.getElementById("sim-it-rate-val").textContent = rateLimit;
+  };
+
+  function addLog(text, cls) {
+    logLines.push({ text: text, cls: cls || "" });
+    if (logLines.length > 5) logLines.shift();
+    var html = logLines.map(function(l) {
+      return '<div class="sim-log-line ' + l.cls + '">' + l.text + '</div>';
+    }).join("");
+    document.getElementById("sim-it-log").innerHTML = html;
+  }
+
+  simInterval = setInterval(function() {
+    round++;
+    if (round > totalRounds) {
+      clearInterval(simInterval); simInterval = null;
+      var finalScore = Math.round(Math.max(0, 100 - serverLoad) * 0.5 + (totalBotBlocked / Math.max(1, totalBotBlocked + 1)) * 50);
+      showSimResult("🎉 Сервер защищён!", finalScore, "Атака отбита! Легитимных обслужено: " + totalLegitServed, true);
+      return;
+    }
+
+    document.getElementById("sim-it-round").textContent = "Раунд " + round + "/" + totalRounds;
+
+    // Генерация трафика
+    var legit = 10 + Math.floor(Math.random() * 21); // 10-30
+    var isDDoS = round % 3 === 0;
+    var bots = isDDoS ? 50 + Math.floor(Math.random() * 150) : 5 + Math.floor(Math.random() * 30);
+
+    if (isDDoS) {
+      document.getElementById("sim-it-event").textContent = "⚠️ DDoS ВОЛНА! Боты: " + bots;
+      document.getElementById("sim-it-event").style.display = "block";
+    } else {
+      document.getElementById("sim-it-event").style.display = "none";
+    }
+
+    // Применяем фильтр
+    var legitPassed, botsPassed;
+    var rl = rateLimit / 100;
+
+    if (filter === "L3") {
+      // Режет всё одинаково
+      legitPassed = Math.round(legit * rl);
+      botsPassed = Math.round(bots * rl);
+    } else if (filter === "L4") {
+      // Лучше фильтрует ботов, но пропускает немного легита
+      legitPassed = Math.round(legit * (0.6 + rl * 0.4));
+      botsPassed = Math.round(bots * rl * 0.5);
+    } else {
+      // L7 — очень точный, но медленнее (пропускает часть при высоком rate)
+      legitPassed = Math.round(legit * (0.5 + rl * 0.5));
+      botsPassed = Math.round(bots * (1 - rl / 100) * 0.3);
+    }
+
+    legitPassed = Math.max(0, legitPassed);
+    botsPassed = Math.max(0, botsPassed);
+    var totalPassed = legitPassed + botsPassed;
+    var blocked = bots - botsPassed;
+
+    totalLegitServed += legitPassed;
+    totalBotBlocked += blocked;
+
+    serverLoad = totalPassed > 0 ? Math.min(100, Math.round(botsPassed / (totalPassed + 1) * 100)) : 0;
+    var legitRate = legit > 0 ? Math.round(legitPassed / legit * 100) : 0;
+
+    // UI update
+    document.getElementById("sim-it-load").style.width = serverLoad + "%";
+    document.getElementById("sim-it-load-val").textContent = serverLoad + "%";
+    document.getElementById("sim-it-legit").style.width = legitRate + "%";
+    document.getElementById("sim-it-legit-val").textContent = legitRate + "%";
+
+    // Status
+    if (serverLoad >= 80) setSimStatus("sim-it-status", "critical");
+    else if (serverLoad >= 50) setSimStatus("sim-it-status", "unstable");
+    else setSimStatus("sim-it-status", "stable");
+
+    // Log
+    var logCls = isDDoS ? "warn" : (serverLoad > 60 ? "danger" : "good");
+    addLog("R" + round + ": " + legit + "L+" + bots + "B → " + legitPassed + "L/" + botsPassed + "B pass | Load:" + serverLoad + "%", logCls);
+
+    // Game Over checks
+    if (serverLoad >= 100) {
+      clearInterval(simInterval); simInterval = null;
+      showSimResult("💥 Сервер упал!", 0, "Нагрузка достигла 100%. Сервер не выдержал.", false);
+      return;
+    }
+    if (legitPassed < 20) {
+      lowLegitStreak++;
+    } else {
+      lowLegitStreak = 0;
+    }
+    if (lowLegitStreak >= 3) {
+      clearInterval(simInterval); simInterval = null;
+      showSimResult("😞 Клиенты ушли", 0, "Легитимные пользователи не обслуживались 3 раунда подряд.", false);
+      return;
+    }
+  }, 3000);
+}
+
+document.getElementById("sim-it-back").onclick = function() {
+  if (simInterval) clearInterval(simInterval); simInterval = null;
+  exitSimulator();
+};
+
+// ─── Медицина: Титрование дозировки ─────────────────────────────────
+function startSimMedicine() {
+  var el = document.getElementById("sim-medicine");
+  el.classList.add("active");
+
+  var round = 0;
+  var totalRounds = 8;
+  var sedation = 50;
+  var heartRate = 80;
+  var bloodPressure = 100;
+  var toxicity = 0;
+  var drugChosen = null;
+  var logLines = [];
+
+  // Reset UI
+  document.getElementById("sim-med-round").textContent = "Раунд 1/" + totalRounds;
+  document.getElementById("sim-med-log").innerHTML = "";
+  document.getElementById("sim-med-event").style.display = "none";
+  setSimStatus("sim-med-status", "stable");
+  updateMedGauges();
+
+  // Drug buttons
+  var drugBtns = {
+    a: document.getElementById("sim-med-drug-a"),
+    b: document.getElementById("sim-med-drug-b"),
+    c: document.getElementById("sim-med-drug-c")
+  };
+
+  function enableDrugs() {
+    drugChosen = null;
+    Object.keys(drugBtns).forEach(function(k) {
+      drugBtns[k].disabled = false;
+      drugBtns[k].classList.remove("selected");
+    });
+  }
+
+  function chooseDrug(d) {
+    drugChosen = d;
+    Object.keys(drugBtns).forEach(function(k) {
+      drugBtns[k].classList.toggle("selected", k === d);
+      drugBtns[k].disabled = true;
+    });
+  }
+
+  drugBtns.a.onclick = function() { chooseDrug("a"); };
+  drugBtns.b.onclick = function() { chooseDrug("b"); };
+  drugBtns.c.onclick = function() { chooseDrug("c"); };
+  enableDrugs();
+
+  function updateMedGauges() {
+    var s = Math.max(0, Math.min(100, sedation));
+    document.getElementById("sim-med-sed").style.width = s + "%";
+    document.getElementById("sim-med-sed-val").textContent = Math.round(s) + "%";
+
+    var hrPct = Math.max(0, Math.min(100, heartRate / 150 * 100));
+    document.getElementById("sim-med-hr").style.width = hrPct + "%";
+    document.getElementById("sim-med-hr-val").textContent = Math.round(heartRate) + " уд/м";
+
+    var bpPct = Math.max(0, Math.min(100, bloodPressure / 200 * 100));
+    document.getElementById("sim-med-bp").style.width = bpPct + "%";
+    document.getElementById("sim-med-bp-val").textContent = Math.round(bloodPressure);
+
+    var t = Math.max(0, Math.min(100, toxicity));
+    document.getElementById("sim-med-tox").style.width = t + "%";
+    document.getElementById("sim-med-tox-val").textContent = Math.round(t) + "%";
+  }
+
+  function addLog(text, cls) {
+    logLines.push({ text: text, cls: cls || "" });
+    if (logLines.length > 5) logLines.shift();
+    var html = logLines.map(function(l) {
+      return '<div class="sim-log-line ' + l.cls + '">' + l.text + '</div>';
+    }).join("");
+    document.getElementById("sim-med-log").innerHTML = html;
+  }
+
+  simInterval = setInterval(function() {
+    round++;
+    if (round > totalRounds) {
+      clearInterval(simInterval); simInterval = null;
+      var finalScore = Math.round(Math.max(0, 100 - toxicity) * 0.5 + (sedation >= 60 && sedation <= 90 ? 50 : 20));
+      showSimResult("🎉 Операция завершена!", finalScore, "Пациент стабилен. Седация: " + Math.round(sedation) + "%", true);
+      return;
+    }
+
+    document.getElementById("sim-med-round").textContent = "Раунд " + round + "/" + totalRounds;
+
+    // Резистентность: +10% слабее каждые 2 раунда
+    var resistance = 1 - Math.floor(round / 2) * 0.1;
+    resistance = Math.max(0.3, resistance);
+
+    // Метаболизм
+    sedation -= 8;
+
+    // Применяем выбранный препарат
+    if (drugChosen === "a") {
+      sedation += 15 * resistance;
+      bloodPressure -= 10;
+      heartRate -= 5;
+      toxicity += 5;
+      addLog("R" + round + ": 💧 Анестетик. Сед+" + Math.round(15 * resistance), "good");
+    } else if (drugChosen === "b") {
+      sedation += 5 * resistance;
+      heartRate -= 8;
+      toxicity += 3;
+      addLog("R" + round + ": 💊 Анальгетик. Сед+" + Math.round(5 * resistance), "good");
+    } else if (drugChosen === "c") {
+      bloodPressure += 20;
+      heartRate += 15;
+      sedation -= 10;
+      toxicity += 2;
+      addLog("R" + round + ": ⚡ Эпинефрин. BP+20, HR+15", "warn");
+    } else {
+      addLog("R" + round + ": Без препарата. Сед-8 (метаболизм)", "danger");
+    }
+
+    // Случайные события
+    document.getElementById("sim-med-event").style.display = "none";
+    if (round === 3) {
+      var hrShift = (Math.random() > 0.5 ? 1 : -1) * 30;
+      heartRate += hrShift;
+      document.getElementById("sim-med-event").textContent = "⚠️ Аритмия! Пульс " + (hrShift > 0 ? "+" : "") + hrShift;
+      document.getElementById("sim-med-event").style.display = "block";
+      addLog("⚠️ Аритмия! HR" + (hrShift > 0 ? "+" : "") + hrShift, "danger");
+    }
+    if (round === 6) {
+      bloodPressure += 40;
+      document.getElementById("sim-med-event").textContent = "⚠️ Скачок давления! BP+40";
+      document.getElementById("sim-med-event").style.display = "block";
+      addLog("⚠️ Скачок давления! BP+40", "danger");
+    }
+
+    // Clamp
+    sedation = Math.max(0, Math.min(100, sedation));
+    heartRate = Math.max(20, Math.min(180, heartRate));
+    bloodPressure = Math.max(40, Math.min(220, bloodPressure));
+    toxicity = Math.max(0, Math.min(100, toxicity));
+
+    updateMedGauges();
+
+    // Status
+    var inZone = sedation >= 70 && sedation <= 85;
+    var hrOk = heartRate >= 60 && heartRate <= 100;
+    var bpOk = bloodPressure >= 80 && bloodPressure <= 120;
+    if (inZone && hrOk && bpOk) setSimStatus("sim-med-status", "stable");
+    else if (sedation > 90 || sedation < 45 || heartRate < 50 || heartRate > 130 || toxicity > 60) setSimStatus("sim-med-status", "critical");
+    else setSimStatus("sim-med-status", "unstable");
+
+    // Game Over
+    if (sedation > 95) {
+      clearInterval(simInterval); simInterval = null;
+      showSimResult("💀 Передозировка!", 0, "Седация превысила 95%. Пациент в опасности.", false);
+      return;
+    }
+    if (sedation < 40) {
+      clearInterval(simInterval); simInterval = null;
+      showSimResult("😱 Пробуждение!", 0, "Седация упала ниже 40%. Пациент проснулся.", false);
+      return;
+    }
+    if (heartRate < 40 || heartRate > 150) {
+      clearInterval(simInterval); simInterval = null;
+      showSimResult("💔 Остановка!", 0, "Пульс вне допустимых пределов: " + Math.round(heartRate) + " уд/м.", false);
+      return;
+    }
+    if (toxicity > 80) {
+      clearInterval(simInterval); simInterval = null;
+      showSimResult("☠️ Токсичность!", 0, "Токсичность превысила 80%.", false);
+      return;
+    }
+
+    enableDrugs();
+  }, 3000);
+}
+
+document.getElementById("sim-med-back").onclick = function() {
+  if (simInterval) clearInterval(simInterval); simInterval = null;
+  exitSimulator();
+};
+
+function setSimStatus(elId, status) {
+  var el = document.getElementById(elId);
+  el.className = "sim-status " + status;
+  if (status === "stable") el.textContent = "🟢 Стабильно";
+  else if (status === "unstable") el.textContent = "🟡 Нестабильно";
+  else el.textContent = "🔴 Критично";
+}
 
 // ─── Навигация ───────────────────────────────────────────────────────
 $$(".nav-btn").forEach(function(btn) {
