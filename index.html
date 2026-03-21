@@ -3,417 +3,479 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>RE:ALITY</title>
+<title>REALITY: Профессии</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#111119;--bg2:#1a1a26;--bg3:#222233;--accent:#7c6ff7;--teal:#4fd1c5;--green:#56d89a;--red:#f76c6c;--yellow:#f7d76c;--orange:#f7a06c;--text:#d4d4e0;--text2:#6b6b80;--white:#eeeef5}
-body{font-family:'Press Start 2P',monospace;background:var(--bg);color:var(--text);max-width:420px;margin:0 auto;min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
-input,select{font-family:'Press Start 2P',monospace}
-.btn{font-family:'Press Start 2P',monospace;background:var(--bg3);color:var(--accent);border:2px solid var(--accent);padding:10px 16px;font-size:9px;cursor:pointer;width:100%;text-align:center;transition:all .15s;border-radius:4px}
-.btn:active{transform:scale(.97);opacity:.8}.btn:disabled{opacity:.3}.btn.green{border-color:var(--green);color:var(--green)}.btn.red{border-color:var(--red);color:var(--red)}.btn.sm{padding:7px 10px;font-size:7px;width:auto}
-.pbar{width:100%;height:8px;background:var(--bg);border-radius:4px;overflow:hidden}.pbar .fill{height:100%;border-radius:4px;transition:width .3s}.pbar.thick{height:14px;border-radius:6px}
-.screen{display:none;flex-direction:column;min-height:100vh;padding-bottom:60px}.screen.active{display:flex}
-.card{background:var(--bg2);border:1px solid #2a2a3a;border-radius:8px;padding:12px;margin:6px 8px}
-#navbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;display:flex;background:var(--bg2);border-top:1px solid #2a2a3a;z-index:100}
-#navbar .nb{flex:1;padding:8px 4px;text-align:center;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--text2);background:none;border:none;cursor:pointer}
-#navbar .nb.on{color:var(--accent)}#navbar .nb span{display:block;font-size:16px;margin-bottom:2px}
-/* Registration */
-#reg-screen{justify-content:center;align-items:center;padding:16px}
-#reg-screen h1{font-size:14px;color:var(--accent);text-align:center;margin-bottom:4px}
-.sub{font-size:7px;color:var(--teal);text-align:center;margin-bottom:16px}
-.av-sel{display:flex;gap:10px;justify-content:center;margin:12px 0}
-.av-opt{width:72px;height:72px;border:2px solid var(--text2);cursor:pointer;image-rendering:pixelated;background:var(--bg3);padding:4px;border-radius:8px;transition:all .2s}
-.av-opt.sel{border-color:var(--accent);box-shadow:0 0 16px rgba(124,111,247,.3);transform:scale(1.08)}
-.av-opt img{width:100%;height:100%;image-rendering:pixelated;object-fit:contain}
-.nm-inp{width:100%;background:var(--bg);border:2px solid #2a2a3a;color:var(--text);padding:10px;font-size:11px;text-align:center;outline:none;border-radius:6px}
-.nm-inp:focus{border-color:var(--accent)}
-.st-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
-.st-item{background:var(--bg3);border:1px solid #2a2a3a;padding:8px;text-align:center;border-radius:6px}
-.st-item .sn{font-size:6px;color:var(--teal);margin-bottom:6px;display:block}
-.st-item .sc{display:flex;align-items:center;justify-content:center;gap:8px}
-.st-item .sv{font-size:13px;color:var(--accent);min-width:24px}
-.st-item button{font-family:'Press Start 2P',monospace;width:26px;height:26px;background:var(--bg);color:var(--accent);border:1px solid var(--accent);cursor:pointer;font-size:11px;border-radius:4px}
-.st-item button:disabled{opacity:.3}
-.pts{font-size:8px;color:var(--yellow);text-align:center;margin:6px 0}
-/* Main */
-#main-screen{padding:0}
-.top-bar{display:flex;align-items:center;padding:10px 12px;gap:8px}
-.top-bar .av{width:36px;height:36px;image-rendering:pixelated;border:2px solid var(--accent);border-radius:6px}
-.top-bar .info{flex:1}.top-bar .nm{font-size:9px;color:var(--white)}.top-bar .lv{font-size:6px;color:var(--teal);margin-top:2px}
-.top-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.top-right .res{font-size:7px;color:var(--text2);display:flex;align-items:center;gap:3px}.top-right .res b{color:var(--yellow)}
-.xp-row{padding:2px 12px 6px}.xp-row .xl{font-size:6px;color:var(--text2);margin-bottom:2px;display:flex;justify-content:space-between}
-.tap-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;position:relative;min-height:340px}
-.tap-char{width:160px;height:160px;image-rendering:pixelated;cursor:pointer;animation:breathe 2.5s ease-in-out infinite;transition:transform .08s;touch-action:manipulation}
-.tap-char:active{transform:scale(.9)}
-@keyframes breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.03)}}
-.combo-txt{font-size:9px;color:var(--yellow);text-align:center;margin-top:8px;min-height:14px}
-.coin-pop{position:absolute;font-size:11px;color:var(--yellow);pointer-events:none;animation:cfloat .7s ease-out forwards;z-index:50}
-@keyframes cfloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-50px) scale(1.2)}}
-/* Prof */
-#prof-screen{padding:8px}#prof-screen h2{font-size:11px;color:var(--accent);text-align:center;margin:8px}
-.sph-card{background:var(--bg2);border:1px solid #2a2a3a;padding:12px;border-radius:8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.sph-card:active{border-color:var(--accent);transform:scale(.98)}
-.pr-card{background:var(--bg3);border:1px solid #2a2a3a;padding:10px;border-radius:6px;display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:6px}
-.pr-card.unlk{border-color:var(--green)}
-.back-b{background:none;border:none;color:var(--teal);font-family:'Press Start 2P',monospace;font-size:7px;cursor:pointer;padding:8px}
-/* Upgrades */
-#upg-screen{padding:8px}#upg-screen h2{font-size:11px;color:var(--accent);text-align:center;margin:8px}
-.upg-card{background:var(--bg2);border:1px solid #2a2a3a;padding:12px;border-radius:8px;margin-bottom:8px}
-/* Task / Sim */
-#task-screen{padding:6px;padding-bottom:16px}
-.sim-hud{display:flex;flex-direction:column;gap:6px;padding:4px}
-.sim-gauge{background:var(--bg2);border:1px solid #2a2a3a;border-radius:6px;padding:8px}
-.sim-gauge .sg-label{font-size:6px;color:var(--text2);margin-bottom:4px;display:flex;justify-content:space-between}
-.sim-gauge .sg-bar{height:16px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative}
-.sim-gauge .sg-fill{height:100%;border-radius:4px;transition:width .4s,background .4s}
-.sim-gauge .sg-zone{position:absolute;top:0;height:100%;border-left:2px solid rgba(255,255,255,.3);border-right:2px solid rgba(255,255,255,.3);background:rgba(86,216,154,.1)}
-.sim-controls{display:flex;flex-wrap:wrap;gap:6px;padding:4px;justify-content:center}
-.sim-btn{font-family:'Press Start 2P',monospace;background:var(--bg3);color:var(--teal);border:2px solid var(--teal);padding:8px 10px;font-size:6px;cursor:pointer;border-radius:6px;transition:all .15s;flex:1;min-width:90px;text-align:center}
-.sim-btn:active{transform:scale(.95);opacity:.8}
-.sim-btn:disabled{opacity:.3}
-.sim-btn.warn{border-color:var(--yellow);color:var(--yellow)}
-.sim-btn.danger{border-color:var(--red);color:var(--red)}
-.sim-log{background:var(--bg);border:1px solid #2a2a3a;border-radius:6px;padding:6px;max-height:80px;overflow-y:auto;font-size:5px;color:var(--text2);line-height:1.6}
-.sim-timer{font-size:10px;color:var(--yellow);text-align:center;margin:4px 0}
-.sim-status{font-size:7px;text-align:center;padding:4px;border-radius:4px;margin:4px 0}
-.sim-status.ok{color:var(--green);background:rgba(86,216,154,.1)}
-.sim-status.warn{color:var(--yellow);background:rgba(247,215,108,.1)}
-.sim-status.crit{color:var(--red);background:rgba(247,108,108,.1)}
-.task-res{text-align:center;padding:20px}.task-res .ri{font-size:36px;margin-bottom:10px}.task-res .rt{font-size:11px;color:var(--accent);margin-bottom:6px}.task-res .rs{font-size:8px;color:var(--teal);margin-bottom:6px}.task-res .rr{font-size:7px;color:var(--green);margin-bottom:14px}
-/* Slider */
-input[type=range]{-webkit-appearance:none;width:100%;height:12px;background:var(--bg);border-radius:6px;outline:none;border:1px solid #2a2a3a}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:var(--accent);border-radius:50%;cursor:pointer;border:2px solid var(--white)}
-/* Modal */
-.modal-ov{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:200;justify-content:center;align-items:center;padding:16px}
-.modal-ov.on{display:flex}
-.modal-bx{background:var(--bg2);border:1px solid var(--accent);padding:20px;max-width:320px;width:100%;text-align:center;border-radius:10px}
-.modal-bx h3{font-size:10px;color:var(--accent);margin-bottom:10px}.modal-bx p{font-size:7px;color:var(--text2);line-height:1.6;margin-bottom:14px}
-#loading{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999}
-#loading h1{font-size:14px;color:var(--accent);margin-bottom:8px}
-#loading p{font-size:7px;color:var(--teal);animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0f0f1a;--card:#1a1a2e;--accent:#7c6cf0;--mint:#4ecdc4;
+  --text:#e8e8f0;--border:#2a2a4a;--danger:#ff6b6b;
+}
+html,body{
+  height:100%;width:100%;overflow:hidden;
+  background:var(--bg);color:var(--text);
+  font-family:'Press Start 2P',monospace;font-size:10px;
+}
+body{display:flex;justify-content:center}
+.app{width:100%;max-width:420px;height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.screen{display:none;flex:1;flex-direction:column;overflow-y:auto;overflow-x:hidden;padding:12px;padding-bottom:70px}
+.screen.active{display:flex}
+
+/* ─── Регистрация ─── */
+#screen-register{align-items:center;justify-content:center;gap:20px;text-align:center}
+#screen-register h1{font-size:14px;color:var(--accent);line-height:1.6}
+.avatar-row{display:flex;gap:12px;justify-content:center}
+.avatar-pick{width:90px;height:90px;border-radius:16px;border:3px solid var(--border);cursor:pointer;transition:.2s;object-fit:cover;image-rendering:pixelated}
+.avatar-pick.selected{border-color:var(--accent);box-shadow:0 0 16px rgba(124,108,240,.5);transform:scale(1.08)}
+.reg-input{
+  background:var(--card);border:2px solid var(--border);border-radius:12px;
+  color:var(--text);font-family:'Press Start 2P',monospace;font-size:10px;
+  padding:12px 14px;width:220px;text-align:center;outline:none;
+}
+.reg-input:focus{border-color:var(--accent)}
+.btn{
+  background:var(--accent);color:#fff;border:none;border-radius:12px;
+  font-family:'Press Start 2P',monospace;font-size:10px;
+  padding:14px 24px;cursor:pointer;transition:.15s;
+}
+.btn:active{transform:scale(.95);opacity:.85}
+.btn:disabled{opacity:.4;cursor:default}
+
+/* ─── Главный экран ─── */
+#screen-main{gap:8px;position:relative;user-select:none;-webkit-user-select:none}
+
+.top-bar{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.top-left{display:flex;align-items:center;gap:8px}
+.top-avatar{width:32px;height:32px;border-radius:8px;image-rendering:pixelated;border:2px solid var(--border)}
+.top-info{display:flex;flex-direction:column;gap:3px}
+.top-name{font-size:8px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px}
+.top-level{font-size:7px;color:var(--accent)}
+.top-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.top-stat{font-size:7px;white-space:nowrap}
+
+/* XP Bar */
+.xp-wrap{width:100%;margin-top:4px}
+.xp-label{font-size:6px;color:var(--mint);margin-bottom:3px}
+.xp-bar{width:100%;height:14px;background:var(--card);border-radius:7px;border:1px solid var(--border);overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--mint));border-radius:7px;transition:width .4s ease;width:0%}
+
+/* Energy Bar */
+.energy-wrap{width:100%;margin-top:4px}
+.energy-label{font-size:6px;color:var(--mint);margin-bottom:3px}
+.energy-bar{width:100%;height:12px;background:var(--card);border-radius:6px;border:1px solid var(--border);overflow:hidden}
+.energy-fill{height:100%;background:linear-gradient(90deg,var(--mint),#2ecc71);border-radius:6px;transition:width .3s ease;width:100%}
+
+/* Hero */
+.hero-zone{flex:1;display:flex;align-items:center;justify-content:center;position:relative;min-height:200px}
+#hero{
+  width:160px;height:160px;image-rendering:pixelated;
+  animation:breathe 3s ease-in-out infinite;cursor:pointer;
+  transition:opacity .3s;border-radius:16px;
+}
+#hero.tired{opacity:.5;animation:none}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+
+/* Tap popup */
+.tap-pop{
+  position:absolute;pointer-events:none;font-size:14px;font-weight:bold;
+  color:var(--mint);text-shadow:0 0 6px rgba(78,205,196,.6);
+  animation:tapUp .8s ease-out forwards;z-index:50;
+  font-family:'Press Start 2P',monospace;
+}
+@keyframes tapUp{
+  0%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:0;transform:translateY(-70px) scale(1.3)}
+}
+
+/* Combo */
+.combo{
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  font-size:18px;color:var(--accent);text-shadow:0 0 12px rgba(124,108,240,.7);
+  opacity:0;transition:opacity .3s;pointer-events:none;z-index:40;
+}
+.combo.visible{opacity:1;animation:comboPulse .4s ease}
+@keyframes comboPulse{0%{transform:translateX(-50%) scale(1.4)}100%{transform:translateX(-50%) scale(1)}}
+
+/* ─── Навигация ─── */
+.nav{
+  position:absolute;bottom:0;left:0;right:0;
+  display:flex;background:var(--card);border-top:1px solid var(--border);
+  z-index:100;
+}
+.nav-btn{
+  flex:1;padding:14px 0 12px;text-align:center;font-family:'Press Start 2P',monospace;
+  font-size:7px;color:#666;background:none;border:none;cursor:pointer;
+  transition:.15s;display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.nav-btn .nav-icon{font-size:16px}
+.nav-btn.active{color:var(--accent)}
+.nav-btn:active{opacity:.7}
+
+/* ─── Экраны-заглушки ─── */
+.placeholder-screen{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:16px;text-align:center;
+}
+.placeholder-screen .emoji{font-size:40px}
+.placeholder-screen p{font-size:9px;color:#666;line-height:1.8}
+
+/* ─── Модалка ─── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  display:none;align-items:center;justify-content:center;z-index:200;
+}
+.modal-overlay.active{display:flex}
+.modal{
+  background:var(--card);border:2px solid var(--border);border-radius:16px;
+  padding:24px 20px;max-width:320px;width:90%;text-align:center;
+}
+.modal h2{font-size:11px;color:var(--accent);margin-bottom:14px;line-height:1.6}
+.modal p{font-size:8px;line-height:1.8;margin-bottom:18px;color:#aaa}
 </style>
 </head>
 <body>
-<div id="loading"><h1>RE:ALITY</h1><p>Загрузка...</p></div>
-<div class="modal-ov" id="modal"><div class="modal-bx" id="modal-c"></div></div>
-<div class="screen" id="reg-screen">
-<h1>RE:ALITY</h1><div class="sub">ПРОФЕССИИ</div>
-<div class="card"><div style="font-size:7px;color:var(--teal);text-align:center;margin-bottom:10px">АВАТАР</div>
-<div class="av-sel"><div class="av-opt sel" data-av="1" onclick="selAv(1)"><img src="/hero1.png"></div><div class="av-opt" data-av="2" onclick="selAv(2)"><img src="/hero2.png"></div><div class="av-opt" data-av="3" onclick="selAv(3)"><img src="/hero3.png"></div></div></div>
-<div class="card"><div style="font-size:7px;color:var(--teal);text-align:center;margin-bottom:10px">ИМЯ</div><input type="text" class="nm-inp" id="nm-inp" maxlength="8" placeholder="Макс 8 букв"></div>
-<div class="card"><div style="font-size:7px;color:var(--teal);text-align:center;margin-bottom:6px">ХАРАКТЕРИСТИКИ</div><div class="pts">Очков: <span id="pts-l">0</span></div>
-<div class="st-grid"><div class="st-item"><span class="sn">💪 СИЛА</span><div class="sc"><button onclick="chSt('str',-1)">-</button><span class="sv" id="s-str">5</span><button onclick="chSt('str',1)">+</button></div></div><div class="st-item"><span class="sn">🧠 ИНТЕЛЛЕКТ</span><div class="sc"><button onclick="chSt('int',-1)">-</button><span class="sv" id="s-int">5</span><button onclick="chSt('int',1)">+</button></div></div><div class="st-item"><span class="sn">🗣 ХАРИЗМА</span><div class="sc"><button onclick="chSt('cha',-1)">-</button><span class="sv" id="s-cha">5</span><button onclick="chSt('cha',1)">+</button></div></div><div class="st-item"><span class="sn">🍀 УДАЧА</span><div class="sc"><button onclick="chSt('luck',-1)">-</button><span class="sv" id="s-luck">5</span><button onclick="chSt('luck',1)">+</button></div></div></div></div>
-<div style="padding:8px"><button class="btn green" onclick="doReg()">НАЧАТЬ ПУТЬ</button></div>
+<div class="app">
+
+  <!-- ═══ Регистрация ═══ -->
+  <div id="screen-register" class="screen">
+    <h1>REALITY<br>Профессии</h1>
+    <p style="font-size:8px;color:#888;line-height:1.6">Выбери аватар</p>
+    <div class="avatar-row">
+      <img class="avatar-pick" src="hero1.png" data-avatar="1" alt="Avatar 1">
+      <img class="avatar-pick" src="hero2.png" data-avatar="2" alt="Avatar 2">
+      <img class="avatar-pick" src="hero3.png" data-avatar="3" alt="Avatar 3">
+    </div>
+    <input class="reg-input" id="reg-name" type="text" maxlength="8" placeholder="Твоё имя">
+    <button class="btn" id="btn-register" disabled>Начать путь</button>
+  </div>
+
+  <!-- ═══ Главный экран ═══ -->
+  <div id="screen-main" class="screen">
+    <div class="top-bar">
+      <div class="top-left">
+        <img class="top-avatar" id="main-avatar" src="hero1.png" alt="">
+        <div class="top-info">
+          <span class="top-name" id="main-name">—</span>
+          <span class="top-level" id="main-level">Ур.0</span>
+        </div>
+      </div>
+      <div class="top-right">
+        <span class="top-stat" id="main-coins">🪙 0</span>
+        <span class="top-stat" id="main-tokens">⚡ 0</span>
+      </div>
+    </div>
+    <div class="xp-wrap">
+      <div class="xp-label" id="xp-label">XP: 0 / 100</div>
+      <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
+    </div>
+    <div class="energy-wrap">
+      <div class="energy-label" id="energy-label">⚡ 100 / 100</div>
+      <div class="energy-bar"><div class="energy-fill" id="energy-fill"></div></div>
+    </div>
+    <div class="hero-zone" id="hero-zone">
+      <div class="combo" id="combo-display">x1</div>
+      <img id="hero" src="hero1.png" alt="Hero">
+    </div>
+  </div>
+
+  <!-- ═══ Профессии (заглушка) ═══ -->
+  <div id="screen-professions" class="screen">
+    <div class="placeholder-screen">
+      <div class="emoji">🔬</div>
+      <p>Профессии<br>Скоро</p>
+    </div>
+  </div>
+
+  <!-- ═══ Улучшения (заглушка) ═══ -->
+  <div id="screen-upgrades" class="screen">
+    <div class="placeholder-screen">
+      <div class="emoji">⚙️</div>
+      <p>Улучшения<br>Скоро</p>
+    </div>
+  </div>
+
+  <!-- ═══ Навигация ═══ -->
+  <div class="nav">
+    <button class="nav-btn" data-screen="screen-professions"><span class="nav-icon">🔬</span>Профессии</button>
+    <button class="nav-btn active" data-screen="screen-main"><span class="nav-icon">🏠</span>Главная</button>
+    <button class="nav-btn" data-screen="screen-upgrades"><span class="nav-icon">⚙️</span>Улучшения</button>
+  </div>
+
+  <!-- ═══ Модалка токенов ═══ -->
+  <div class="modal-overlay" id="modal-tokens">
+    <div class="modal">
+      <h2>🎉 Уровень 2!</h2>
+      <p>Ты получил токен! Токены профессий открываются на экране Профессий!</p>
+      <button class="btn" id="btn-close-modal">Понятно</button>
+    </div>
+  </div>
 </div>
-<div class="screen" id="main-screen">
-<div class="top-bar"><img class="av" id="m-av" src="/hero1.png"><div class="info"><div class="nm" id="m-nm">...</div><div class="lv" id="m-lv">УР. 1</div></div><div class="top-right"><div class="res">🪙 <b id="r-coins">0</b></div><div class="res">🎫 <b id="r-tokens">0</b></div></div></div>
-<div class="xp-row"><div class="xl"><span>XP</span><span id="m-xp-t">0/100</span></div><div class="pbar thick"><div class="fill" id="m-xp-b" style="width:0%;background:var(--accent)"></div></div></div>
-<div style="padding:4px 12px;display:flex;align-items:center;gap:6px;justify-content:flex-end"><span style="font-size:6px;color:var(--text2)">⚡</span><div style="width:45%"><div class="pbar thick"><div class="fill" id="e-bar" style="width:100%;background:var(--green)"></div></div></div><span style="font-size:6px;color:var(--text2)" id="e-txt">100/100</span></div>
-<div class="tap-zone" id="tap-zone"><img class="tap-char" id="tap-ch" src="/hero1.png" draggable="false"><div class="combo-txt" id="combo-d"></div></div>
-</div>
-<div class="screen" id="prof-screen"><h2>ПРОФЕССИИ</h2><div id="prof-c"></div></div>
-<div class="screen" id="upg-screen"><h2>УЛУЧШЕНИЯ</h2><div style="text-align:center;font-size:8px;color:var(--yellow);margin-bottom:8px">🪙 <span id="u-coins">0</span></div><div id="upg-list"></div></div>
-<div class="screen" id="task-screen"><button class="back-b" onclick="closeTask()">← НАЗАД</button><div id="tg-content"></div></div>
-<div id="navbar" style="display:none"><button class="nb" onclick="goTo('prof')"><span>🏢</span>Профессии</button><button class="nb on" onclick="goTo('main')"><span>👆</span>Главная</button><button class="nb" onclick="goTo('upg')"><span>⬆️</span>Улучшения</button></div>
+
 <script>
-var S={user:null,unlocked:[],completed:[],xpN:100,profs:[],tgId:0,initData:'',selAv:1,stats:{str:5,int:5,cha:5,luck:5},curSphere:null,curProf:null,curTask:null,eTimer:null,simLoop:null};
-var tg=window.Telegram&&window.Telegram.WebApp;if(tg){tg.ready();tg.expand();S.initData=tg.initData||'';if(tg.initDataUnsafe&&tg.initDataUnsafe.user)S.tgId=tg.initDataUnsafe.user.id}
-if(!S.tgId)S.tgId=Math.floor(Math.random()*999999)+100000;
-async function api(ep,body){body=body||{};body.tg_id=S.tgId;body.init_data=S.initData;var r=await fetch(ep,{method:ep.indexOf('professions')>=0?'GET':'POST',headers:{'Content-Type':'application/json'},body:ep.indexOf('professions')>=0?undefined:JSON.stringify(body)});if(!r.ok){var e=await r.json().catch(function(){return{}});throw new Error(e.detail||'HTTP '+r.status)}return r.json()}
-async function init(){try{var p=await api('/api/professions');S.profs=p.spheres;var d=await api('/api/auth');S.user=d.user;S.unlocked=d.unlocked_professions||[];S.completed=d.completed_tasks||[];S.xpN=d.xp_needed;document.getElementById('loading').style.display='none';if(!S.user.registered)goTo('reg');else{goTo('main');document.getElementById('navbar').style.display='flex';startE()}}catch(e){document.getElementById('loading').innerHTML='<h1>RE:ALITY</h1><p style="color:var(--red)">'+e.message+'</p>'}}
-function goTo(n){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('on')});var m={reg:'reg-screen',main:'main-screen',prof:'prof-screen',upg:'upg-screen',task:'task-screen'};var el=document.getElementById(m[n]);if(el)el.classList.add('active');var nb=document.querySelectorAll('.nb');if(n==='prof'&&nb[0])nb[0].classList.add('on');if(n==='main'&&nb[1])nb[1].classList.add('on');if(n==='upg'&&nb[2])nb[2].classList.add('on');if(n==='main')updMain();if(n==='prof')renSph();if(n==='upg')renUpg()}
-function selAv(n){S.selAv=n;document.querySelectorAll('.av-opt').forEach(function(e){e.classList.toggle('sel',+e.dataset.av===n)})}
-function chSt(s,d){var t=S.stats.str+S.stats.int+S.stats.cha+S.stats.luck,nv=S.stats[s]+d;if(nv<1||nv>14||d>0&&t>=20)return;S.stats[s]=nv;document.getElementById('s-'+s).textContent=nv;document.getElementById('pts-l').textContent=20-(S.stats.str+S.stats.int+S.stats.cha+S.stats.luck)}
-async function doReg(){var nm=document.getElementById('nm-inp').value.trim();if(!nm){modal('','Введи имя!');return}var t=S.stats.str+S.stats.int+S.stats.cha+S.stats.luck;if(t!==20){modal('','Распредели 20 очков');return}try{var d=await api('/api/register',{name:nm.slice(0,8),avatar:S.selAv,stats:S.stats});S.user=d.user;S.xpN=d.xp_needed;goTo('main');document.getElementById('navbar').style.display='flex';startE();modal('Добро пожаловать!',nm+', тапай и открывай профессии!')}catch(e){modal('Ошибка',e.message)}}
-function updMain(){var u=S.user;if(!u)return;document.getElementById('m-av').src='/hero'+u.avatar+'.png';document.getElementById('tap-ch').src='/hero'+u.avatar+'.png';document.getElementById('m-nm').textContent=u.name;document.getElementById('m-lv').textContent='УР. '+u.level;document.getElementById('m-xp-t').textContent=u.xp+'/'+S.xpN;document.getElementById('m-xp-b').style.width=Math.min(100,u.xp/S.xpN*100)+'%';document.getElementById('r-coins').textContent=fN(u.coins);document.getElementById('r-tokens').textContent=u.tokens;document.getElementById('e-txt').textContent=u.energy+'/'+u.max_energy;document.getElementById('e-bar').style.width=u.energy/u.max_energy*100+'%'}
-function fN(n){return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':''+n}
-var tapQ=0,tapT=null;
-document.getElementById('tap-zone').addEventListener('pointerdown',function(e){e.preventDefault();if(!S.user||!S.user.registered||S.user.energy<=0)return;S.user.energy=Math.max(0,S.user.energy-1);var earn=S.user.coins_per_tap;S.user.coins+=earn;updMain();var r=this.getBoundingClientRect(),p=document.createElement('div');p.className='coin-pop';p.textContent='+'+earn;p.style.left=(e.clientX-r.left-10)+'px';p.style.top=(e.clientY-r.top-10)+'px';this.appendChild(p);setTimeout(function(){p.remove()},700);tapQ++;if(tapT)clearTimeout(tapT);tapT=setTimeout(sendTaps,300)});
-async function sendTaps(){if(tapQ<=0)return;var t=tapQ;tapQ=0;try{var d=await api('/api/tap',{taps:t});S.user=d.user;S.xpN=d.xp_needed;updMain();var cd=document.getElementById('combo-d');if(d.combo>1){cd.textContent='COMBO x'+d.combo;cd.style.color=d.combo>=4?'var(--red)':'var(--yellow)'}else cd.textContent='';if(d.level_up){modal('УРОВЕНЬ!','Ты на '+S.user.level+' уровне! +1 токен');if(S.user.level===2)setTimeout(function(){modal('Токены','Открывай профессии!')},2e3)}}catch(e){}}
-function startE(){if(S.eTimer)clearInterval(S.eTimer);S.eTimer=setInterval(function(){if(!S.user)return;if(S.user.energy<S.user.max_energy){S.user.energy=Math.min(S.user.max_energy,S.user.energy+1);updMain()}},500)}
-// Sphere to sim type mapping
-var SPHERE_SIM={it:'traffic',engineering:'grid',medicine:'anesthesia',creative:'traffic',business:'grid',science:'rectification'};
-var SIM_NAMES={traffic:'Спектр-анализ трафика',grid:'Диспетчер энергосети',anesthesia:'Титрование дозировки',rectification:'Ректификация нефти'};
-var SIM_DESC={traffic:'Отрази DDoS-атаку, сохранив доступ для реальных пользователей. Настраивай фильтры и rate-limit.',grid:'Распредели энергию между районами города в пиковую нагрузку. Не отключай больницу!',anesthesia:'Удержи пациента в наркозе 60 секунд. Балансируй 3 препарата в узких коридорах.',rectification:'Выдели чистый бензин из сырья. Управляй температурой, давлением и возвратом жидкости.'};
+(function(){
+"use strict";
 
-function renSph(){S.curSphere=null;S.curProf=null;var h='';for(var i=0;i<S.profs.length;i++){var s=S.profs[i];h+='<div class="sph-card" onclick="openSph(\''+s.id+'\')"><div style="font-size:24px">'+s.icon+'</div><div><div style="font-size:8px;color:var(--text)">'+s.name+'</div><div style="font-size:6px;color:var(--text2);margin-top:3px">'+s.professions.length+' профессий</div></div></div>'}document.getElementById('prof-c').innerHTML=h}
-function openSph(id){var sp=S.profs.find(function(s){return s.id===id});if(!sp)return;S.curSphere=sp;var sim=SPHERE_SIM[id]||'traffic';var h='<button class="back-b" onclick="renSph()">← НАЗАД</button><div style="text-align:center;margin:8px;font-size:9px;color:var(--accent)">'+sp.icon+' '+sp.name+'</div>';h+='<div class="card" style="text-align:center"><div style="font-size:7px;color:var(--teal);margin-bottom:6px">СИМУЛЯЦИЯ СФЕРЫ</div><div style="font-size:8px;color:var(--accent);margin-bottom:4px">'+SIM_NAMES[sim]+'</div><div style="font-size:6px;color:var(--text2);line-height:1.6">'+SIM_DESC[sim]+'</div></div>';
-for(var i=0;i<sp.professions.length;i++){var p=sp.professions[i];var ul=S.unlocked.indexOf(p.id)>=0;var dn=S.completed.filter(function(c){return c.profession_id===p.id}).length>0;h+='<div class="pr-card'+(ul?' unlk':'')+'" onclick="openProf(\''+p.id+'\')"><div style="font-size:20px">'+p.icon+'</div><div style="flex:1"><div style="font-size:7px;color:var(--text)">'+p.name+'</div><div style="font-size:6px;margin-top:3px;color:'+(dn?'var(--green)':ul?'var(--teal)':'var(--yellow)')+'">'+(dn?'✓ Пройдено':ul?'▶ Играть':'🔒 '+p.cost+' токен')+'</div></div></div>'}document.getElementById('prof-c').innerHTML=h}
-function openProf(id){var pr=null,sph=null;for(var i=0;i<S.profs.length;i++){pr=S.profs[i].professions.find(function(p){return p.id===id});if(pr){sph=S.profs[i];break}}if(!pr)return;S.curProf=pr;var ul=S.unlocked.indexOf(id)>=0;var dn=S.completed.filter(function(c){return c.profession_id===id}).length>0;var sim=SPHERE_SIM[sph.id]||'traffic';var h='<button class="back-b" onclick="openSph(\''+sph.id+'\')">← НАЗАД</button>';h+='<div style="text-align:center;margin:8px 0"><div style="font-size:36px">'+pr.icon+'</div><div style="font-size:10px;color:var(--accent);margin:6px 0">'+pr.name+'</div><div style="font-size:6px;color:var(--text2);line-height:1.6">'+pr.desc+'</div></div>';h+='<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0">'+pr.tools.map(function(t){return'<span style="background:var(--bg);border:1px solid var(--teal);color:var(--teal);font-size:6px;padding:3px 8px;border-radius:4px">'+t+'</span>'}).join('')+'</div>';
-if(!ul){h+='<div style="text-align:center;padding:16px"><button class="btn" onclick="unlkP(\''+id+'\')">🎫 ОТКРЫТЬ ЗА '+pr.cost+' ТОКЕН</button><div style="font-size:6px;color:var(--text2);margin-top:8px">Токенов: '+S.user.tokens+'</div></div>'}else{h+='<div class="card" style="text-align:center"><div style="font-size:8px;color:var(--accent);margin-bottom:8px">'+SIM_NAMES[sim]+'</div><button class="btn green" onclick="startSim(\''+id+'\',\''+sim+'\')">'+(dn?'🔄 ПЕРЕИГРАТЬ':'▶ ЗАПУСТИТЬ СИМУЛЯЦИЮ')+'</button></div>'}document.getElementById('prof-c').innerHTML=h}
-async function unlkP(id){try{var d=await api('/api/unlock',{profession_id:id});S.user=d.user;S.unlocked=d.unlocked_professions;S.xpN=d.xp_needed;openProf(id);modal('Открыто!','Запускай симуляцию!')}catch(e){modal('Ошибка',e.message)}}
+// ─── Конфиг ──────────────────────────────────────────────────────────
+const API = "";
+let tgId = null;
+let user = null;
+let selectedAvatar = 0;
+let tapBuffer = 0;
+let tapTimer = null;
+let localEnergy = 100;
+let localMaxEnergy = 100;
+let localAutoRegen = 2;
+let levelUpShown = false;
 
-var UPG_I=[{type:'tap',name:'💪 Сила тапа',desc:'+1 монета/тап',f:'upg_tap_level',mx:10,bc:50,m:2},{type:'energy',name:'🔋 Выносливость',desc:'+20 энергии',f:'upg_energy_level',mx:10,bc:80,m:2.2},{type:'multi',name:'✋ Мультитап',desc:'+1 палец',f:'upg_multi_level',mx:4,bc:200,m:2.5},{type:'regen',name:'♻️ Регенерация',desc:'+0.5/сек',f:'upg_regen_level',mx:10,bc:100,m:2}];
-function renUpg(){var u=S.user;document.getElementById('u-coins').textContent=fN(u.coins);var h='';for(var i=0;i<UPG_I.length;i++){var up=UPG_I[i],lv=u[up.f],mx=lv>=up.mx,co=mx?0:Math.floor(up.bc*Math.pow(up.m,lv)),ok=!mx&&u.coins>=co;h+='<div class="upg-card"><div style="display:flex;align-items:center;gap:8px"><div style="font-size:8px;color:var(--text)">'+up.name+'</div><div style="font-size:6px;color:var(--teal);margin-left:auto">Ур.'+lv+'/'+up.mx+'</div></div><div style="font-size:6px;color:var(--text2);margin:4px 0">'+up.desc+'</div><button class="btn sm'+(ok?' green':'')+'" '+(ok?'':'disabled')+' onclick="buyUpg(\''+up.type+'\')" style="width:100%">'+(mx?'МАКС':'🪙 '+fN(co))+'</button></div>'}document.getElementById('upg-list').innerHTML=h}
-async function buyUpg(t){try{var d=await api('/api/upgrade',{upgrade_type:t});S.user=d.user;S.xpN=d.xp_needed;renUpg();updMain()}catch(e){modal('Ошибка',e.message)}}
-// ====== SIMULATION LAUNCHER ======
-function startSim(profId,simType){S.curTask={profId:profId,simType:simType};goTo('task');document.getElementById('navbar').style.display='none';if(simType==='traffic')simTraffic();else if(simType==='grid')simGrid();else if(simType==='anesthesia')simAnesthesia();else if(simType==='rectification')simRectification()}
-function closeTask(){if(S.simLoop)clearInterval(S.simLoop);S.simLoop=null;var pid=S.curTask?S.curTask.profId:null;S.curTask=null;goTo('prof');document.getElementById('navbar').style.display='flex';if(pid&&S.curSphere)setTimeout(function(){openSph(S.curSphere.id);setTimeout(function(){openProf(pid)},50)},50)}
-function gauge(id,label,val,max,color,zoneMin,zoneMax){var pct=Math.min(100,val/max*100);var zHtml='';if(zoneMin!==undefined){var zL=zoneMin/max*100,zW=(zoneMax-zoneMin)/max*100;zHtml='<div class="sg-zone" style="left:'+zL+'%;width:'+zW+'%"></div>'}return'<div class="sim-gauge"><div class="sg-label"><span>'+label+'</span><span id="'+id+'-v">'+Math.round(val)+'</span></div><div class="sg-bar">'+zHtml+'<div class="sg-fill" id="'+id+'-f" style="width:'+pct+'%;background:'+color+'"></div></div></div>'}
-function updG(id,val,max,color){var el=document.getElementById(id+'-f');var vl=document.getElementById(id+'-v');if(el)el.style.width=Math.min(100,Math.max(0,val/max*100))+'%';if(el&&color)el.style.background=color;if(vl)vl.textContent=Math.round(val)}
-function addLog(msg){var el=document.getElementById('sim-log');if(el){el.innerHTML+=msg+'<br>';el.scrollTop=el.scrollHeight}}
-async function finishSim(score){if(S.simLoop)clearInterval(S.simLoop);S.simLoop=null;score=Math.max(0,Math.min(100,Math.round(score)));var profId=S.curTask.profId;try{var d=await api('/api/task/complete',{profession_id:profId,task_index:0,score:score});S.user=d.user;S.completed=d.completed_tasks||S.completed;S.xpN=d.xp_needed;var icon=score>=80?'🏆':score>=50?'⭐':'📝',title=score>=80?'Отлично!':score>=50?'Неплохо!':'Попробуй ещё!';document.getElementById('tg-content').innerHTML='<div class="task-res"><div class="ri">'+icon+'</div><div class="rt">'+title+'</div><div class="rs">Результат: '+score+'%</div><div class="rr">+'+(d.coin_reward||0)+' 🪙  +'+(d.xp_reward||0)+' XP</div><button class="btn green" onclick="closeTask()">ПРОДОЛЖИТЬ</button></div>'}catch(e){modal('Ошибка',e.message)}}
+// ─── Telegram WebApp ─────────────────────────────────────────────────
+try {
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+  const initData = Telegram.WebApp.initDataUnsafe;
+  if (initData && initData.user && initData.user.id) {
+    tgId = initData.user.id;
+  }
+} catch(e) {}
+if (!tgId) tgId = 12345; // dev fallback
 
-// ====== SIM 1: TRAFFIC ANALYSIS (IT) ======
-function simTraffic(){
-  var st={load:20,legit:0,goal:500,filter:'none',rateLimit:50,tick:0,maxTick:40,alive:true,botWave:0};
-  var h='<div style="text-align:center;margin:4px 0"><div style="font-size:9px;color:var(--accent)">🛡 СПЕКТР-АНАЛИЗ ТРАФИКА</div><div style="font-size:6px;color:var(--text2);margin-top:4px">Отрази DDoS, обработай '+st.goal+' запросов</div></div>';
-  h+='<div class="sim-timer" id="sim-tm">Раунд 0/'+st.maxTick+'</div>';
-  h+='<div class="sim-hud">';
-  h+=gauge('srv','⚙️ Нагрузка сервера',st.load,100,'var(--teal)',0,80);
-  h+=gauge('req','📦 Обработано запросов',0,st.goal,'var(--green)');
-  h+=gauge('bot','🤖 Бот-трафик',0,100,'var(--red)');
-  h+='</div>';
-  h+='<div class="sim-status ok" id="sim-st">Сервер стабилен</div>';
-  h+='<div style="padding:4px 8px"><div style="font-size:6px;color:var(--text2);margin-bottom:4px">Фильтр уровня:</div>';
-  h+='<div class="sim-controls"><button class="sim-btn" id="fb-none" onclick="tSetF(\'none\')" style="border-color:var(--green);color:var(--green)">ВЫКЛ</button><button class="sim-btn" id="fb-l3" onclick="tSetF(\'l3\')">L3</button><button class="sim-btn" id="fb-l4" onclick="tSetF(\'l4\')">L4</button><button class="sim-btn" id="fb-l7" onclick="tSetF(\'l7\')">L7</button></div></div>';
-  h+='<div style="padding:4px 8px"><div style="font-size:6px;color:var(--text2);margin-bottom:4px">Rate Limit (req/s): <span id="rl-v">'+st.rateLimit+'</span></div>';
-  h+='<input type="range" min="10" max="100" value="'+st.rateLimit+'" oninput="tSetRL(this.value)" id="rl-sl"></div>';
-  h+='<div class="sim-log" id="sim-log">[ Система запущена ]</div>';
-  document.getElementById('tg-content').innerHTML=h;
-  window._tst=st;
-  S.simLoop=setInterval(function(){simTrafficTick()},1500);
-}
-function tSetF(f){window._tst.filter=f;['none','l3','l4','l7'].forEach(function(x){var el=document.getElementById('fb-'+x);if(el){el.style.borderColor=x===f?'var(--accent)':'var(--teal)';el.style.color=x===f?'var(--accent)':'var(--teal)'}});addLog('Фильтр: '+(f==='none'?'ВЫКЛ':f.toUpperCase()))}
-function tSetRL(v){window._tst.rateLimit=+v;document.getElementById('rl-v').textContent=v}
-function simTrafficTick(){
-  var st=window._tst;if(!st||!st.alive)return;
-  st.tick++;
-  // Generate traffic wave
-  var baseBots=15+st.tick*3+Math.random()*20;
-  var baseReal=20+Math.random()*15;
-  // Spike waves
-  if(st.tick%8===0){baseBots*=3;st.botWave=3;addLog('⚠️ ВОЛНА DDoS!')}
-  if(st.botWave>0){baseBots*=1.5;st.botWave--}
-  // Apply filter
-  var botBlock=0,realBlock=0;
-  if(st.filter==='l3'){botBlock=0.3;realBlock=0.05}
-  else if(st.filter==='l4'){botBlock=0.55;realBlock=0.1}
-  else if(st.filter==='l7'){botBlock=0.85;realBlock=0.25}
-  var botsThrough=baseBots*(1-botBlock);
-  var realsThrough=baseReal*(1-realBlock);
-  // Rate limit cuts both
-  var rlFactor=st.rateLimit/100;
-  botsThrough*=rlFactor;
-  realsThrough*=rlFactor;
-  // Server load
-  st.load=Math.min(100,(botsThrough+realsThrough)*0.8);
-  st.legit=Math.min(st.goal,st.legit+Math.floor(realsThrough));
-  var botPct=botsThrough/(botsThrough+realsThrough+0.1)*100;
-  // Update UI
-  updG('srv',st.load,100,st.load>80?'var(--red)':st.load>60?'var(--yellow)':'var(--teal)');
-  updG('req',st.legit,st.goal,'var(--green)');
-  updG('bot',botPct,100,'var(--red)');
-  document.getElementById('sim-tm').textContent='Раунд '+st.tick+'/'+st.maxTick;
-  var stEl=document.getElementById('sim-st');
-  if(st.load>90){stEl.textContent='🔴 КРИТИЧЕСКАЯ НАГРУЗКА!';stEl.className='sim-status crit'}
-  else if(st.load>70){stEl.textContent='🟡 Высокая нагрузка';stEl.className='sim-status warn'}
-  else{stEl.textContent='🟢 Сервер стабилен';stEl.className='sim-status ok'}
-  addLog('T'+st.tick+': load='+Math.round(st.load)+'% real=+'+Math.floor(realsThrough)+' bots='+Math.round(botPct)+'%');
-  // Check conditions
-  if(st.load>=100){st.alive=false;addLog('💀 СЕРВЕР УПАЛ!');finishSim(Math.round(st.legit/st.goal*60));return}
-  if(st.legit>=st.goal){st.alive=false;addLog('✅ ЦЕЛЬ ДОСТИГНУТА!');finishSim(90+Math.round((1-st.load/100)*10));return}
-  if(st.tick>=st.maxTick){st.alive=false;finishSim(Math.round(st.legit/st.goal*100));return}
+// ─── Утилиты ─────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const opts = { method, headers: {"Content-Type":"application/json"} };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}));
+    throw new Error(err.detail || r.statusText);
+  }
+  return r.json();
 }
 
-// ====== SIM 2: POWER GRID (ENGINEERING) ======
-function simGrid(){
-  var st={power:80,maxPower:100,districts:[{name:'🏥 Больница',need:25,give:25,min:20},{name:'🏭 Завод',need:30,give:30,min:10},{name:'🏠 Жильё',need:25,give:25,min:15}],stability:100,budget:500,tick:0,maxTick:30,alive:true,overheat:0};
-  var h='<div style="text-align:center;margin:4px 0"><div style="font-size:9px;color:var(--accent)">⚡ ДИСПЕТЧЕР ЭНЕРГОСЕТИ</div><div style="font-size:6px;color:var(--text2);margin-top:4px">Продержись '+st.maxTick+' раундов, не потеряй стабильность</div></div>';
-  h+='<div class="sim-timer" id="sim-tm">Раунд 0/'+st.maxTick+'</div>';
-  h+='<div class="sim-hud">';
-  h+=gauge('pwr','⚡ Генерация (МВт)',st.power,st.maxPower,'var(--yellow)');
-  h+=gauge('stb','📊 Стабильность сети',100,100,'var(--green)',60,100);
-  h+='</div>';
-  h+='<div style="font-size:6px;color:var(--text2);padding:4px 8px;margin-top:4px">Бюджет: <span id="g-budget">'+st.budget+'</span>₽</div>';
-  for(var i=0;i<3;i++){var d=st.districts[i];
-    h+='<div class="card" style="padding:8px"><div style="display:flex;justify-content:space-between;font-size:7px;margin-bottom:4px"><span>'+d.name+'</span><span style="color:var(--yellow)">Нужно: <span id="gn-'+i+'">'+d.need+'</span> МВт</span></div>';
-    h+='<div style="display:flex;align-items:center;gap:6px"><span style="font-size:6px;color:var(--text2)">Выдать:</span><input type="range" min="0" max="50" value="'+d.give+'" oninput="gSet('+i+',this.value)" style="flex:1"><span style="font-size:7px;color:var(--teal)" id="gv-'+i+'">'+d.give+'</span></div></div>'}
-  h+='<div class="sim-controls" style="margin-top:6px"><button class="sim-btn warn" onclick="gCool()">❄️ Охлаждение (-100₽)</button></div>';
-  h+='<div class="sim-status ok" id="sim-st">Сеть стабильна</div>';
-  h+='<div class="sim-log" id="sim-log">[ Диспетчерская запущена ]</div>';
-  document.getElementById('tg-content').innerHTML=h;
-  window._gst=st;
-  S.simLoop=setInterval(function(){simGridTick()},2000);
-}
-function gSet(i,v){window._gst.districts[i].give=+v;document.getElementById('gv-'+i).textContent=v}
-function gCool(){var st=window._gst;if(st.budget<100)return;st.budget-=100;st.overheat=Math.max(0,st.overheat-30);document.getElementById('g-budget').textContent=st.budget;addLog('❄️ Охлаждение активировано')}
-function simGridTick(){
-  var st=window._gst;if(!st||!st.alive)return;
-  st.tick++;
-  // Random demand spikes
-  for(var i=0;i<3;i++){var spike=(Math.random()-0.3)*15;st.districts[i].need=Math.max(st.districts[i].min,Math.min(50,Math.round(st.districts[i].need+spike)));document.getElementById('gn-'+i).textContent=st.districts[i].need}
-  // Check total power vs total give
-  var totalGive=0;for(var i=0;i<3;i++)totalGive+=st.districts[i].give;
-  // Overheat if total give > power
-  if(totalGive>st.power){st.overheat+=totalGive-st.power;addLog('🔥 Перегрев +'+(totalGive-st.power)+'МВт!')}else{st.overheat=Math.max(0,st.overheat-5)}
-  // Power drops if overheated
-  if(st.overheat>40){st.power=Math.max(40,st.power-5);addLog('⚠️ Генерация падает: '+st.power+'МВт')}
-  // Stability
-  var penalty=0;
-  for(var i=0;i<3;i++){var d=st.districts[i];var deficit=d.need-d.give;if(deficit>5)penalty+=deficit*0.8}
-  if(st.overheat>20)penalty+=st.overheat*0.3;
-  st.stability=Math.max(0,Math.min(100,st.stability-penalty*0.5+3));
-  // Hospital check
-  if(st.districts[0].give<st.districts[0].min){st.alive=false;addLog('💀 Больница обесточена! GAME OVER');finishSim(Math.round(st.tick/st.maxTick*40));return}
-  // Update UI
-  updG('pwr',st.power,st.maxPower,st.overheat>20?'var(--red)':'var(--yellow)');
-  updG('stb',st.stability,100,st.stability<40?'var(--red)':st.stability<70?'var(--yellow)':'var(--green)');
-  document.getElementById('sim-tm').textContent='Раунд '+st.tick+'/'+st.maxTick;
-  document.getElementById('g-budget').textContent=st.budget;
-  var stEl=document.getElementById('sim-st');
-  if(st.stability<30){stEl.textContent='🔴 СЕТЬ В КРИТИЧЕСКОМ СОСТОЯНИИ';stEl.className='sim-status crit'}
-  else if(st.stability<60){stEl.textContent='🟡 Нестабильность сети';stEl.className='sim-status warn'}
-  else{stEl.textContent='🟢 Сеть стабильна';stEl.className='sim-status ok'}
-  addLog('T'+st.tick+': gen='+st.power+' stab='+Math.round(st.stability)+'% heat='+Math.round(st.overheat));
-  if(st.stability<=0){st.alive=false;addLog('💀 Сеть рухнула!');finishSim(Math.round(st.tick/st.maxTick*50));return}
-  if(st.tick>=st.maxTick){st.alive=false;finishSim(Math.round(st.stability));return}
-}
-// ====== SIM 3: ANESTHESIA (MEDICINE) ======
-function simAnesthesia(){
-  var st={sedation:75,hr:72,bp:120,toxicity:10,resist:0,tick:0,maxTick:40,alive:true};
-  var h='<div style="text-align:center;margin:4px 0"><div style="font-size:9px;color:var(--accent)">💉 ТИТРОВАНИЕ ДОЗИРОВКИ</div><div style="font-size:6px;color:var(--text2);margin-top:4px">Удержи все показатели в зелёных зонах '+st.maxTick+' раундов</div></div>';
-  h+='<div class="sim-timer" id="sim-tm">Раунд 0/'+st.maxTick+'</div>';
-  h+='<div class="sim-hud">';
-  h+=gauge('sed','😴 Глубина сна',st.sedation,100,'var(--accent)',70,85);
-  h+=gauge('hr','❤️ Пульс (уд/мин)',st.hr,160,'var(--red)',60,90);
-  h+=gauge('bp','🩸 Давление (мм)',st.bp,200,'var(--orange)',100,140);
-  h+=gauge('tox','☠️ Токсичность',st.toxicity,100,'var(--yellow)',0,50);
-  h+='</div>';
-  h+='<div class="sim-status ok" id="sim-st">Пациент стабилен</div>';
-  h+='<div style="font-size:6px;color:var(--text2);text-align:center;margin:4px">Резистентность: <span id="a-res">0</span>%</div>';
-  h+='<div class="sim-controls">';
-  h+='<button class="sim-btn" onclick="aDose(\'sed\')">💊 Анестетик<br><span style="font-size:5px">Сон↑ Давл↓</span></button>';
-  h+='<button class="sim-btn warn" onclick="aDose(\'pain\')">💊 Анальгетик<br><span style="font-size:5px">Боль↓ Пульс↓</span></button>';
-  h+='<button class="sim-btn danger" onclick="aDose(\'epi\')">💊 Эпинефрин<br><span style="font-size:5px">Давл↑ Пульс↑</span></button>';
-  h+='</div>';
-  h+='<div class="sim-log" id="sim-log">[ Операция началась ]</div>';
-  document.getElementById('tg-content').innerHTML=h;
-  window._ast=st;
-  S.simLoop=setInterval(function(){simAnesthesiaTick()},1500);
-}
-function aDose(type){
-  var st=window._ast;if(!st||!st.alive)return;
-  var eff=1-st.resist*0.01;
-  if(type==='sed'){st.sedation=Math.min(100,st.sedation+12*eff);st.bp=Math.max(40,st.bp-10);st.toxicity+=8;addLog('💊 Анестетик введён')}
-  else if(type==='pain'){st.hr=Math.max(30,st.hr-8);st.sedation=Math.min(100,st.sedation+4*eff);st.toxicity+=5;addLog('💊 Анальгетик введён')}
-  else if(type==='epi'){st.bp=Math.min(200,st.bp+18);st.hr=Math.min(160,st.hr+12);st.sedation=Math.max(0,st.sedation-8);st.toxicity+=3;addLog('💊 Эпинефрин введён')}
-}
-function simAnesthesiaTick(){
-  var st=window._ast;if(!st||!st.alive)return;
-  st.tick++;
-  // Natural drift
-  st.sedation=Math.max(0,st.sedation-3-st.resist*0.2);
-  st.hr=Math.min(160,Math.max(30,st.hr+(Math.random()-0.45)*6));
-  st.bp=Math.min(200,Math.max(40,st.bp+(Math.random()-0.5)*8));
-  st.toxicity=Math.max(0,st.toxicity-2);
-  st.resist=Math.min(60,st.resist+1.5);
-  // Random events
-  if(st.tick%10===0){var evt=Math.random();if(evt<0.5){st.hr+=15;addLog('⚠️ Аритмия!')}else{st.bp-=15;addLog('⚠️ Давление падает!')}}
-  // Update UI
-  updG('sed',st.sedation,100,st.sedation>=70&&st.sedation<=85?'var(--green)':st.sedation<50?'var(--red)':'var(--yellow)');
-  updG('hr',st.hr,160,st.hr>=60&&st.hr<=90?'var(--green)':st.hr>120||st.hr<45?'var(--red)':'var(--yellow)');
-  updG('bp',st.bp,200,st.bp>=100&&st.bp<=140?'var(--green)':st.bp>170||st.bp<70?'var(--red)':'var(--yellow)');
-  updG('tox',st.toxicity,100,st.toxicity<50?'var(--yellow)':'var(--red)');
-  document.getElementById('sim-tm').textContent='Раунд '+st.tick+'/'+st.maxTick;
-  document.getElementById('a-res').textContent=Math.round(st.resist);
-  // Status
-  var stEl=document.getElementById('sim-st');
-  var crit=st.sedation<40||st.hr<40||st.hr>140||st.bp<60||st.bp>180||st.toxicity>80;
-  var warn=st.sedation<55||st.sedation>90||st.hr<50||st.hr>110||st.bp<80||st.bp>160||st.toxicity>60;
-  if(crit){stEl.textContent='🔴 КРИТИЧЕСКОЕ СОСТОЯНИЕ!';stEl.className='sim-status crit'}
-  else if(warn){stEl.textContent='🟡 Показатели нестабильны';stEl.className='sim-status warn'}
-  else{stEl.textContent='🟢 Пациент стабилен';stEl.className='sim-status ok'}
-  addLog('T'+st.tick+': сон='+Math.round(st.sedation)+' пульс='+Math.round(st.hr)+' давл='+Math.round(st.bp)+' токс='+Math.round(st.toxicity));
-  // Death conditions
-  if(st.sedation<20){st.alive=false;addLog('💀 Пациент проснулся!');finishSim(Math.round(st.tick/st.maxTick*50));return}
-  if(st.hr<30||st.hr>155){st.alive=false;addLog('💀 Остановка сердца!');finishSim(Math.round(st.tick/st.maxTick*40));return}
-  if(st.bp<50||st.bp>190){st.alive=false;addLog('💀 Критическое давление!');finishSim(Math.round(st.tick/st.maxTick*40));return}
-  if(st.toxicity>90){st.alive=false;addLog('💀 Передозировка!');finishSim(Math.round(st.tick/st.maxTick*30));return}
-  if(st.tick>=st.maxTick){st.alive=false;
-    var score=100;
-    if(st.sedation<70||st.sedation>85)score-=15;
-    if(st.hr<60||st.hr>90)score-=10;
-    if(st.bp<100||st.bp>140)score-=10;
-    if(st.toxicity>50)score-=15;
-    finishSim(Math.max(50,score));return}
+function $(sel) { return document.querySelector(sel); }
+function $$(sel) { return document.querySelectorAll(sel); }
+
+function showScreen(id) {
+  $$(".screen").forEach(s => s.classList.remove("active"));
+  const el = document.getElementById(id);
+  if (el) el.classList.add("active");
+  $$(".nav-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.screen === id);
+  });
 }
 
-// ====== SIM 4: RECTIFICATION (CHEMISTRY/SCIENCE) ======
-function simRectification(){
-  var st={temp:150,targetTemp:150,pressure:1.0,purity:20,reflux:1.5,tick:0,maxTick:35,alive:true,pendingHeat:[]};
-  var h='<div style="text-align:center;margin:4px 0"><div style="font-size:9px;color:var(--accent)">⚗️ РЕКТИФИКАЦИЯ НЕФТИ</div><div style="font-size:6px;color:var(--text2);margin-top:4px">Доведи чистоту до 95%+ за '+st.maxTick+' раундов</div></div>';
-  h+='<div class="sim-timer" id="sim-tm">Раунд 0/'+st.maxTick+'</div>';
-  h+='<div class="sim-hud">';
-  h+=gauge('tmp','🌡️ Температура (°C)',st.temp,300,'var(--orange)',140,180);
-  h+=gauge('prs','💨 Давление (атм)',st.pressure*100,300,'var(--teal)',80,150);
-  h+=gauge('pur','✨ Чистота продукта',st.purity,100,'var(--green)',95,100);
-  h+=gauge('rfl','🔄 Флегмовое число',st.reflux*40,100,'var(--accent)',50,80);
-  h+='</div>';
-  h+='<div class="sim-status ok" id="sim-st">Колонна работает</div>';
-  h+='<div style="padding:4px 8px"><div style="font-size:6px;color:var(--text2);margin-bottom:4px">Нагрев (°C за 2 хода): <span id="r-heat">0</span></div>';
-  h+='<input type="range" min="-20" max="20" value="0" oninput="rHeat(this.value)" id="r-hsl"></div>';
-  h+='<div class="sim-controls">';
-  h+='<button class="sim-btn" onclick="rAction(\'reflux_up\')">🔄 Возврат ↑</button>';
-  h+='<button class="sim-btn" onclick="rAction(\'reflux_dn\')">🔄 Возврат ↓</button>';
-  h+='<button class="sim-btn warn" onclick="rAction(\'vent\')">💨 Сброс давления</button>';
-  h+='</div>';
-  h+='<div class="sim-log" id="sim-log">[ Колонна запущена. Целевая чистота: 95% ]</div>';
-  document.getElementById('tg-content').innerHTML=h;
-  window._rst=st;
-  S.simLoop=setInterval(function(){simRectTick()},1800);
-}
-function rHeat(v){document.getElementById('r-heat').textContent=v>0?'+'+v:v}
-function rAction(a){
-  var st=window._rst;if(!st||!st.alive)return;
-  if(a==='reflux_up'){st.reflux=Math.min(3,st.reflux+0.3);addLog('🔄 Возврат увеличен: '+st.reflux.toFixed(1))}
-  else if(a==='reflux_dn'){st.reflux=Math.max(0.5,st.reflux-0.3);addLog('🔄 Возврат уменьшен: '+st.reflux.toFixed(1))}
-  else if(a==='vent'){st.pressure=Math.max(0.5,st.pressure-0.3);addLog('💨 Давление сброшено: '+st.pressure.toFixed(1)+' атм')}
-}
-function simRectTick(){
-  var st=window._rst;if(!st||!st.alive)return;
-  st.tick++;
-  // Delayed heating (inertia - 2 ticks)
-  var heatInput=+(document.getElementById('r-hsl')||{value:0}).value;
-  st.pendingHeat.push(heatInput);
-  if(st.pendingHeat.length>2){var applied=st.pendingHeat.shift();st.temp+=applied;addLog('🌡️ Нагрев применён: '+(applied>=0?'+':'')+applied+'°C')}
-  // Natural pressure rise
-  st.pressure+=0.05+Math.random()*0.08;
-  // Temperature affects purity
-  var optTemp=160;var tempDiff=Math.abs(st.temp-optTemp);
-  var purGain=0;
-  if(tempDiff<15&&st.pressure<1.5&&st.reflux>1.2){purGain=4+Math.random()*3}
-  else if(tempDiff<30){purGain=1+Math.random()*2}
-  else{purGain=-2-Math.random()*3}
-  // High reflux = slower but cleaner
-  purGain*=(st.reflux/2);
-  st.purity=Math.max(0,Math.min(100,st.purity+purGain));
-  // Danger conditions
-  if(st.temp>220){st.purity=Math.max(0,st.purity-8);addLog('🔥 Продукт горит!')}
-  if(st.temp<120){st.purity=Math.max(0,st.purity-5);addLog('❄️ Мазут смешивается!')}
-  if(st.pressure>2.5){addLog('⚠️ Критическое давление!')}
-  // Update UI
-  updG('tmp',st.temp,300,st.temp>200?'var(--red)':st.temp>=140&&st.temp<=180?'var(--green)':'var(--yellow)');
-  updG('prs',st.pressure*100,300,st.pressure>2?'var(--red)':st.pressure<=1.5?'var(--green)':'var(--yellow)');
-  updG('pur',st.purity,100,st.purity>=95?'var(--green)':st.purity>=70?'var(--yellow)':'var(--red)');
-  updG('rfl',st.reflux*40,100,'var(--accent)');
-  document.getElementById('sim-tm').textContent='Раунд '+st.tick+'/'+st.maxTick;
-  var stEl=document.getElementById('sim-st');
-  if(st.temp>200||st.pressure>2.2){stEl.textContent='🔴 ОПАСНОСТЬ!';stEl.className='sim-status crit'}
-  else if(st.temp>180||st.temp<130||st.pressure>1.8){stEl.textContent='🟡 Параметры на грани';stEl.className='sim-status warn'}
-  else{stEl.textContent='🟢 Колонна работает';stEl.className='sim-status ok'}
-  addLog('T'+st.tick+': t='+Math.round(st.temp)+'° p='+st.pressure.toFixed(1)+' чист='+Math.round(st.purity)+'%');
-  // Fail conditions
-  if(st.pressure>3){st.alive=false;addLog('💥 ВЗРЫВ КОЛОННЫ!');finishSim(Math.round(st.purity*0.3));return}
-  if(st.temp>260){st.alive=false;addLog('🔥 ПОЖАР!');finishSim(Math.round(st.purity*0.3));return}
-  if(st.tick>=st.maxTick){st.alive=false;finishSim(Math.round(st.purity));return}
+// ─── Инициализация ───────────────────────────────────────────────────
+async function init() {
+  try {
+    const data = await api("GET", "/api/user/" + tgId);
+    user = data.user;
+    enterMain();
+  } catch(e) {
+    showScreen("screen-register");
+  }
 }
 
-function modal(t,txt){document.getElementById('modal-c').innerHTML='<h3>'+(t||'')+'</h3><p>'+txt+'</p><button class="btn" onclick="closeM()">ОК</button>';document.getElementById('modal').classList.add('on')}
-function closeM(){document.getElementById('modal').classList.remove('on')}
+// ─── Регистрация ─────────────────────────────────────────────────────
+$$(".avatar-pick").forEach(img => {
+  img.addEventListener("click", () => {
+    $$(".avatar-pick").forEach(i => i.classList.remove("selected"));
+    img.classList.add("selected");
+    selectedAvatar = parseInt(img.dataset.avatar);
+    checkRegReady();
+  });
+});
+
+const regName = $("#reg-name");
+const btnReg = $("#btn-register");
+regName.addEventListener("input", checkRegReady);
+
+function checkRegReady() {
+  btnReg.disabled = !(selectedAvatar > 0 && regName.value.trim().length > 0);
+}
+
+btnReg.addEventListener("click", async () => {
+  if (btnReg.disabled) return;
+  btnReg.disabled = true;
+  btnReg.textContent = "...";
+  try {
+    const data = await api("POST", "/api/register", {
+      tg_id: tgId,
+      avatar: selectedAvatar,
+      name: regName.value.trim()
+    });
+    user = data.user;
+    enterMain();
+  } catch(e) {
+    alert(e.message);
+    btnReg.disabled = false;
+    btnReg.textContent = "Начать путь";
+  }
+});
+
+// ─── Главный экран ───────────────────────────────────────────────────
+function enterMain() {
+  updateUI();
+  showScreen("screen-main");
+  startEnergyRegen();
+}
+
+function updateUI() {
+  if (!user) return;
+  const av = user.avatar || 1;
+  $("#main-avatar").src = "hero" + av + ".png";
+  $("#hero").src = "hero" + av + ".png";
+  $("#main-name").textContent = user.username || "—";
+  $("#main-level").textContent = "Ур." + (user.level || 0);
+  $("#main-coins").textContent = "🪙 " + formatNum(user.coins || 0);
+  $("#main-tokens").textContent = "⚡ " + (user.tokens || 0);
+
+  localEnergy = user.energy;
+  localMaxEnergy = user.max_energy || 100;
+  localAutoRegen = user.auto_regen || 2;
+
+  updateXP();
+  updateEnergy();
+}
+
+function formatNum(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
+  if (n >= 1000) return (n / 1000).toFixed(1) + "K";
+  return n;
+}
+
+function updateXP() {
+  const xp = user.xp || 0;
+  const level = user.level || 0;
+  const xpInLevel = xp - level * 100;
+  const pct = Math.min(100, (xpInLevel / 100) * 100);
+  $("#xp-fill").style.width = pct + "%";
+  $("#xp-label").textContent = "XP: " + xpInLevel + " / 100";
+}
+
+function updateEnergy() {
+  const pct = localMaxEnergy > 0 ? (localEnergy / localMaxEnergy) * 100 : 0;
+  $("#energy-fill").style.width = Math.max(0, Math.min(100, pct)) + "%";
+  $("#energy-label").textContent = "⚡ " + Math.floor(localEnergy) + " / " + localMaxEnergy;
+
+  const hero = $("#hero");
+  if (localEnergy <= 0) {
+    hero.classList.add("tired");
+  } else {
+    hero.classList.remove("tired");
+  }
+}
+
+// ─── Реген энергии (клиент) ──────────────────────────────────────────
+let regenInterval = null;
+function startEnergyRegen() {
+  if (regenInterval) clearInterval(regenInterval);
+  regenInterval = setInterval(() => {
+    if (localEnergy < localMaxEnergy) {
+      localEnergy = Math.min(localMaxEnergy, localEnergy + localAutoRegen);
+      updateEnergy();
+    }
+  }, 1000);
+}
+
+// ─── Тапы ────────────────────────────────────────────────────────────
+const heroZone = $("#hero-zone");
+
+heroZone.addEventListener("pointerdown", (e) => {
+  if (localEnergy <= 0) return;
+  e.preventDefault();
+
+  localEnergy = Math.max(0, localEnergy - 1);
+  const mpc = user.mpc || 1;
+  user.coins = (user.coins || 0) + mpc;
+  user.xp = (user.xp || 0) + 1;
+
+  // Level up check
+  const newLevel = Math.floor(user.xp / 100);
+  if (newLevel > user.level) {
+    user.tokens = (user.tokens || 0) + (newLevel - user.level);
+    user.level = newLevel;
+    if (newLevel === 2 && !levelUpShown) {
+      levelUpShown = true;
+      $("#modal-tokens").classList.add("active");
+    }
+  }
+
+  updateUI();
+  spawnTapPop(e, mpc);
+
+  tapBuffer++;
+  if (!tapTimer) {
+    tapTimer = setTimeout(flushTaps, 500);
+  }
+});
+
+function spawnTapPop(e, amount) {
+  const zone = heroZone.getBoundingClientRect();
+  const pop = document.createElement("div");
+  pop.className = "tap-pop";
+  pop.textContent = "+" + amount;
+  pop.style.left = (e.clientX - zone.left) + "px";
+  pop.style.top = (e.clientY - zone.top) + "px";
+  heroZone.appendChild(pop);
+  pop.addEventListener("animationend", () => pop.remove());
+}
+
+async function flushTaps() {
+  const count = tapBuffer;
+  tapBuffer = 0;
+  tapTimer = null;
+  if (count <= 0) return;
+
+  try {
+    const data = await api("POST", "/api/tap", {
+      tg_id: tgId,
+      count: count,
+      timestamp: Date.now() / 1000
+    });
+    // Синхронизация с сервером
+    user.coins = data.coins;
+    user.xp = data.xp;
+    user.energy = data.energy;
+    user.level = data.level;
+    localEnergy = data.energy;
+
+    updateCombo(data.combo || 1);
+    updateUI();
+  } catch(e) {
+    // Молча игнорируем ошибки сети — UI уже обновлён оптимистично
+  }
+}
+
+// ─── Комбо ───────────────────────────────────────────────────────────
+let comboTimeout = null;
+function updateCombo(combo) {
+  const el = $("#combo-display");
+  if (combo > 1) {
+    el.textContent = "x" + combo;
+    el.classList.add("visible");
+    if (comboTimeout) clearTimeout(comboTimeout);
+    comboTimeout = setTimeout(() => el.classList.remove("visible"), 2000);
+  } else {
+    el.classList.remove("visible");
+  }
+}
+
+// ─── Модалка ─────────────────────────────────────────────────────────
+$("#btn-close-modal").addEventListener("click", () => {
+  $("#modal-tokens").classList.remove("active");
+});
+
+// ─── Навигация ───────────────────────────────────────────────────────
+$$(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const target = btn.dataset.screen;
+    if (target) showScreen(target);
+  });
+});
+
+// ─── Старт ───────────────────────────────────────────────────────────
 init();
-</script></body></html>
+
+})();
+</script>
+</body>
+</html>
